@@ -2,8 +2,9 @@ using JuLIP, NeighbourLists
 using JuLIP: AbstractCalculator
 using JuLIP.Potentials: @pot
 using StaticArrays
+using BenchmarkTools
 
-using NBodyIPs: NBodyFunction, bapolys, eval_site_nbody!, evaluate, eval_site_nbody!, evaluate_d!, NBSiteDescriptor, _get_loop_ex, _get_Jvec_ex, descriptor, ricoords, skip_simplex, fcut, invariants, evaluate_I
+using NBodyIPs: NBodyFunction, bapolys, eval_site_nbody!, evaluate, eval_site_nbody!, evaluate_d!, NBSiteDescriptor, _get_loop_ex, _get_Jvec_ex, descriptor, ricoords, skip_simplex, fcut, invariants, evaluate_I, fcut_d, invariants_ed, evaluate_I_ed, gradri2gradR!
 
 import JuLIP: site_energies, energy, forces
 
@@ -96,7 +97,6 @@ function site_energies(V::NBodyFunction{N}, at::Atoms{T},Species::Vector{Int}) w
    for (i, j, r, R) in sites(at, cutoff(V))
       Spi = Z[i]
       Spj = Z[j]
-      evaluate(V, descriptor(V), R, SVector(1),Spi,Spj,Species)
       Es[i] = eval_site_nbody!(Val(N), R, cutoff(V),
                                ((out, R, J, temp,Spi,Spj,Species) -> out + evaluate(V, descriptor(V), R, J,Spi,Spj,Species)), zero(T), nothing, Spi,Spj,Species)
    end
@@ -104,13 +104,50 @@ function site_energies(V::NBodyFunction{N}, at::Atoms{T},Species::Vector{Int}) w
 end
 
 
+function evaluate_d2!(dVsite,
+                     V::NBodyFunction{N},
+                     desc::NBSiteDescriptor,
+                     Rs,
+                     J,
+                     Spi::Int,Spj::Vector{Int},Species::Vector{Int}) where {N}
+   # check species
+   skip_simplex_species(Spi,Spj,Species,J) && return zero(T)
+   evaluate_d!(dVsite, V, Rs, J)
+end
 
 
+function forces(V::NBodyFunction{N}, at::Atoms{T},Species::Vector{Int}) where {N, T}
+   nlist = neighbourlist(at, cutoff(V))
+   maxneigs = max_neigs(nlist)
+   F = zeros(JVec{T}, length(at))
+   dVsite = zeros(JVec{T}, maxneigs)
+   Z = atomic_numbers(at)
+   for (i, j, r, R) in sites(nlist)
+      Spi = Z[i]
+      Spj = Z[j]
+      fill!(dVsite, zero(JVec{T}))
+      eval_site_nbody!(Val(N), R, cutoff(V),
+                               ((out, R, J, temp,Spi,Spj,Species) ->  evaluate_d2!(out, V, descriptor(V), R, J,Spi,Spj,Species)), dVsite, nothing, Spi,Spj,Species)
+      # write site energy gradient into forces
+      for n = 1:length(j)
+         F[j[n]] -= dVsite[n]
+         F[i] += dVsite[n]
+      end
+   end
+   return F
+end
 
 
+r0 = 2.5
+V = bapolys(2, "($r0/r)^4", "(:cos, 3.6, 4.8)", 2)
+Vcucu = V[2]
+at = bulk(:Cu, cubic=true)*2
 
+forces(Vcucu,at,[29,29])
+forces(Vcucu,at)
 
-site_energies(Vcucu, at, [29,29])
+@btime site_energies(Vcucu, at, [29,29])
+@btime site_energies(Vcucu, at)
 
 
 
