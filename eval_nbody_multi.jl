@@ -1,10 +1,13 @@
 using JuLIP, NeighbourLists
 using JuLIP: AbstractCalculator
 using JuLIP.Potentials: @pot
+using StaticArrays
 
-using NBodyIPs: NBodyFunction, bapolys, eval_site_nbody!, evaluate, eval_site_nbody!, evaluate_d!
+using NBodyIPs: NBodyFunction, bapolys, eval_site_nbody!, evaluate, eval_site_nbody!, evaluate_d!, NBSiteDescriptor, _get_loop_ex, _get_Jvec_ex, descriptor, ricoords, skip_simplex, fcut, invariants, evaluate_I
 
 import JuLIP: site_energies, energy, forces
+
+import NBodyIPs: evaluate, eval_site_nbody!
 
 using NeighbourLists: nbodies,
                       maptosites!,
@@ -15,15 +18,109 @@ using NeighbourLists: nbodies,
 
 # TODO: implement site_energies, energy, forces, virial
 
-struct NBodyFunctionM
-   d::Dict{Tuple{Symbol,Symbol},NBodyFunction{2}}
+# struct NBodyFunctionM
+#    d::Dict{Tuple{Symbol,Symbol},NBodyFunction{2}}
+# end
+
+function skip_simplex_species(Spi,Spj,Species,J)
+   Sp = [Spi]
+   for i=1:length(J)
+      push!(Sp,Spj[J[i]])
+   end
+   return sort(Sp) != sort(Species)
 end
+
+
+@generated function eval_site_nbody!( ::Val{N},
+                                      Rs::AbstractVector{JVec{T}},
+                                      rcut::T,
+                                      reducefun,
+                                      out,
+                                      temp,
+                                      Spi,Spj,Species ) where {N, T}
+   code = Expr[]
+   # initialise the output
+   push!(code, :( nR = length(Rs)  ))
+
+   # generate the multi-for-loop
+   ex_loop = _get_loop_ex(N)
+
+   # inside the loop
+   # ---------------
+   code_inner = Expr[]
+   # collect the indices into a vector
+   push!(code_inner,      _get_Jvec_ex(N) )
+
+   # now call `V` with the simplex-corner vectors and "add" this to the site energy
+   push!(code_inner, :(   out = reducefun(out, Rs, J, temp,Spi,Spj,Species) ))
+
+   # put code_inner into the loop expression
+   ex_loop.args[2] = Expr(:block, code_inner...)
+
+   # now append the loop to the main code
+   push!(code, ex_loop)
+
+   quote
+      @inbounds $(Expr(:block, code...))
+      return out
+   end
+end
+
+
+function evaluate(V::NBodyFunction{N},
+                  desc::NBSiteDescriptor,
+                  Rs::AbstractVector{JVec{T}},
+                  J::SVector{K, Int},
+                  Spi::Int,Spj::Vector{Int},Species::Vector{Int}) where {N, T, K}
+   # check species
+   skip_simplex_species(Spi,Spj,Species,J) && return zero(T)
+   # get the physical descriptor: bond-lengths (+ bond-angles)
+   rθ = ricoords(desc, Rs, J)
+   # check whether to skip this N-body term?
+   skip_simplex(desc, rθ) && return zero(T)
+   # compute the cutoff (and skip this site if the cutoff is zero)
+   fc = fcut(desc, rθ)
+   fc == 0 && return zero(T)
+   # compute the invariants (this also applies the transform)
+   II = invariants(desc, rθ)
+   # evaluate the inner potential function (e.g. polynomial)
+   return evaluate_I(V, II) * fc
+end
+
+evaluate(V::NBodyFunction,Rs::AbstractVector{JVec{T}},J::SVector{K, Int},Spi,Spj,Species) where {T,K} = evaluate(V,descriptor(V),Rs,J,Spi,Spj,Species)
+
+
+function site_energies(V::NBodyFunction{N}, at::Atoms{T},Species::Vector{Int}) where {N, T}
+   Es = zeros(T, length(at))
+   Z = atomic_numbers(at)
+   for (i, j, r, R) in sites(at, cutoff(V))
+      Spi = Z[i]
+      Spj = Z[j]
+      evaluate(V, descriptor(V), R, SVector(1),Spi,Spj,Species)
+      Es[i] = eval_site_nbody!(Val(N), R, cutoff(V),
+                               ((out, R, J, temp,Spi,Spj,Species) -> out + evaluate(V, descriptor(V), R, J,Spi,Spj,Species)), zero(T), nothing, Spi,Spj,Species)
+   end
+   return Es
+end
+
+
+
+
+
+
+
+
+site_energies(Vcucu, at, [29,29])
+
+
+
+
 
 
 
 # implement site_energies for given species
 # Pair potential
-function site_energies(V::NBodyFunction{2}, at::Atoms{T},
+function site_energies2(V::NBodyFunction{2}, at::Atoms{T},
                                        species::Tuple{Int,Int}) where {T}
    Z = atomic_numbers(at)
    Es = zeros(T, length(at))
@@ -39,34 +136,34 @@ function site_energies(V::NBodyFunction{2}, at::Atoms{T},
 end
 
 # using symbols
-function site_energies(V::NBodyFunction{2}, at::Atoms{T},
-                                       species::Tuple{Symbol,Symbol}) where {T}
-   sp = atomic_number.(species)
-   return site_energies(V, at, sp)
-end
+# function site_energies(V::NBodyFunction{2}, at::Atoms{T},
+#                                        species::Tuple{Symbol,Symbol}) where {T}
+#    sp = atomic_number.(species)
+#    return site_energies(V, at, sp)
+# end
 
-energy(V::NBodyFunction, at::Atoms,species::Tuple{Symbol,Symbol}) = sum_kbn(site_energies(V, at,species))
-
-# Implementation of the forces
-function forces(V::NBodyFunction{2}, at::Atoms{T},sp::Tuple{Int,Int}) where { T}
-   nlist = neighbourlist(at, cutoff(V))
-   maxneigs = max_neigs(nlist)
-   F = zeros(JVec{T}, length(at))
-   dVsite = zeros(JVec{T}, maxneigs)
-   for (i, j, r, R) in sites(nlist)
-      fill!(dVsite, zero(JVec{T}))
-      eval_site_nbody!(
-            Val(2), R, cutoff(V),
-            (out, R, J, temp) -> evaluate_d!(out, V, R, J),
-            dVsite, nothing )   # dVsite == out, nothing == temp
-      # write site energy gradient into forces
-      for n = 1:length(j)
-         F[j[n]] -= dVsite[n]
-         F[i] += dVsite[n]
-      end
-   end
-   return F
-end
+# energy(V::NBodyFunction, at::Atoms,species::Tuple{Symbol,Symbol}) = sum_kbn(site_energies(V, at,species))
+#
+# # Implementation of the forces
+# function forces(V::NBodyFunction{2}, at::Atoms{T},sp::Tuple{Int,Int}) where { T}
+#    nlist = neighbourlist(at, cutoff(V))
+#    maxneigs = max_neigs(nlist)
+#    F = zeros(JVec{T}, length(at))
+#    dVsite = zeros(JVec{T}, maxneigs)
+#    for (i, j, r, R) in sites(nlist)
+#       fill!(dVsite, zero(JVec{T}))
+#       eval_site_nbody!(
+#             Val(2), R, cutoff(V),
+#             (out, R, J, temp) -> evaluate_d!(out, V, R, J),
+#             dVsite, nothing )   # dVsite == out, nothing == temp
+#       # write site energy gradient into forces
+#       for n = 1:length(j)
+#          F[j[n]] -= dVsite[n]
+#          F[i] += dVsite[n]
+#       end
+#    end
+#    return F
+# end
 
 
 
@@ -74,14 +171,14 @@ end
 r0 = 2.5
 V = bapolys(2, "($r0/r)^4", "(:cos, 3.6, 4.8)", 2)
 Vcucu = V[2]
-at = bulk(:Cu, cubic=true)*2
+at = bulk(:Cu, cubic=true)
 species = (:Cu,:Zn)
 
 atomic_number(:Cu)
 
 Vcucu(3.)
 
-site_energies(Vcucu, at, (29,29))
+site_energies2(Vcucu, at, (29,29))
 site_energies(Vcucu, at, (:Cu,:Cu))
 energy(Vcucu,at,(:Cu,:Cu))
 forces(Vcucu,at,(29,29))
