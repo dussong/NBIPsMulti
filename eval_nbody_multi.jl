@@ -8,7 +8,7 @@ using NBodyIPs: NBodyFunction, bapolys, eval_site_nbody!, evaluate, eval_site_nb
 
 import JuLIP: site_energies, energy, forces
 
-import NBodyIPs: evaluate, eval_site_nbody!
+import NBodyIPs: evaluate, eval_site_nbody!, evaluate_d!
 
 using NeighbourLists: nbodies,
                       maptosites!,
@@ -17,11 +17,7 @@ using NeighbourLists: nbodies,
                       max_neigs,
                       sites
 
-# TODO: implement site_energies, energy, forces, virial
-
-# struct NBodyFunctionM
-#    d::Dict{Tuple{Symbol,Symbol},NBodyFunction{2}}
-# end
+# TODO: build potential with several species
 
 function skip_simplex_species(Spi,Spj,Species,J)
    Sp = [Spi]
@@ -104,7 +100,7 @@ function site_energies(V::NBodyFunction{N}, at::Atoms{T},Species::Vector{Int}) w
 end
 
 
-function evaluate_d2!(dVsite,
+function evaluate_d!(dVsite,
                      V::NBodyFunction{N},
                      desc::NBSiteDescriptor,
                      Rs,
@@ -127,7 +123,7 @@ function forces(V::NBodyFunction{N}, at::Atoms{T},Species::Vector{Int}) where {N
       Spj = Z[j]
       fill!(dVsite, zero(JVec{T}))
       eval_site_nbody!(Val(N), R, cutoff(V),
-                               ((out, R, J, temp,Spi,Spj,Species) ->  evaluate_d2!(out, V, descriptor(V), R, J,Spi,Spj,Species)), dVsite, nothing, Spi,Spj,Species)
+                               ((out, R, J, temp,Spi,Spj,Species) ->  evaluate_d!(out, V, descriptor(V), R, J,Spi,Spj,Species)), dVsite, nothing, Spi,Spj,Species)
       # write site energy gradient into forces
       for n = 1:length(j)
          F[j[n]] -= dVsite[n]
@@ -142,35 +138,37 @@ r0 = 2.5
 V = bapolys(2, "($r0/r)^4", "(:cos, 3.6, 4.8)", 2)
 Vcucu = V[2]
 at = bulk(:Cu, cubic=true)*2
+rattle!(at,0.1)
 
-forces(Vcucu,at,[29,29])
-forces(Vcucu,at)
+norm(site_energies(Vcucu, at, [29,29])-site_energies(Vcucu, at))
 
 @btime site_energies(Vcucu, at, [29,29])
 @btime site_energies(Vcucu, at)
 
+norm(forces(Vcucu, at, [29,29])-forces(Vcucu, at))
+@btime forces(Vcucu,at,[29,29])
+@btime forces(Vcucu,at)
 
 
 
 
 
-
-# implement site_energies for given species
-# Pair potential
-function site_energies2(V::NBodyFunction{2}, at::Atoms{T},
-                                       species::Tuple{Int,Int}) where {T}
-   Z = atomic_numbers(at)
-   Es = zeros(T, length(at))
-   for (i, j, r, R) in sites(at, cutoff(V))
-      for k = 1:length(j)
-         atnb = sort([Z[i],Z[j][k]])
-         if (atnb[1] == species[1])&(atnb[2] == species[2])
-            Es[i] += V(r[k])
-         end
-      end
-   end
-   return Es
-end
+# # implement site_energies for given species
+# # Pair potential
+# function site_energies2(V::NBodyFunction{2}, at::Atoms{T},
+#                                        species::Tuple{Int,Int}) where {T}
+#    Z = atomic_numbers(at)
+#    Es = zeros(T, length(at))
+#    for (i, j, r, R) in sites(at, cutoff(V))
+#       for k = 1:length(j)
+#          atnb = sort([Z[i],Z[j][k]])
+#          if (atnb[1] == species[1])&(atnb[2] == species[2])
+#             Es[i] += V(r[k])
+#          end
+#       end
+#    end
+#    return Es
+# end
 
 # using symbols
 # function site_energies(V::NBodyFunction{2}, at::Atoms{T},
@@ -205,20 +203,20 @@ end
 
 
 
-r0 = 2.5
-V = bapolys(2, "($r0/r)^4", "(:cos, 3.6, 4.8)", 2)
-Vcucu = V[2]
-at = bulk(:Cu, cubic=true)
-species = (:Cu,:Zn)
-
-atomic_number(:Cu)
-
-Vcucu(3.)
-
-site_energies2(Vcucu, at, (29,29))
-site_energies(Vcucu, at, (:Cu,:Cu))
-energy(Vcucu,at,(:Cu,:Cu))
-forces(Vcucu,at,(29,29))
+# r0 = 2.5
+# V = bapolys(2, "($r0/r)^4", "(:cos, 3.6, 4.8)", 2)
+# Vcucu = V[2]
+# at = bulk(:Cu, cubic=true)
+# species = (:Cu,:Zn)
+#
+# atomic_number(:Cu)
+#
+# Vcucu(3.)
+#
+# site_energies2(Vcucu, at, (29,29))
+# site_energies(Vcucu, at, (:Cu,:Cu))
+# energy(Vcucu,at,(:Cu,:Cu))
+# forces(Vcucu,at,(29,29))
 
 # Vcucu(x) = x
 # Vcuzr(x) = 2*x
