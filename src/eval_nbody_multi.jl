@@ -17,13 +17,14 @@ using NeighbourLists: nbodies,
                       max_neigs,
                       sites
 
-# TODO: build potential with several species
 
+# skip the simplex if not the right species
 function skip_simplex_species(Spi,Spj,Species,J)
    Sp = [Spi]
    for i=1:length(J)
       push!(Sp,Spj[J[i]])
    end
+   @show
    return sort(Sp) != sort(Species)
 end
 
@@ -71,17 +72,7 @@ function evaluate(V::NBodyFunction{N},
                   Spi::Int,Spj::Vector{Int},Species::Vector{Int}) where {N, T, K}
    # check species
    skip_simplex_species(Spi,Spj,Species,J) && return zero(T)
-   # get the physical descriptor: bond-lengths (+ bond-angles)
-   rθ = ricoords(desc, Rs, J)
-   # check whether to skip this N-body term?
-   skip_simplex(desc, rθ) && return zero(T)
-   # compute the cutoff (and skip this site if the cutoff is zero)
-   fc = fcut(desc, rθ)
-   fc == 0 && return zero(T)
-   # compute the invariants (this also applies the transform)
-   II = invariants(desc, rθ)
-   # evaluate the inner potential function (e.g. polynomial)
-   return evaluate_I(V, II) * fc
+   evaluate(V,desc,Rs,J)
 end
 
 evaluate(V::NBodyFunction,Rs::AbstractVector{JVec{T}},J::SVector{K, Int},Spi,Spj,Species) where {T,K} = evaluate(V,descriptor(V),Rs,J,Spi,Spj,Species)
@@ -99,17 +90,17 @@ function site_energies(V::NBodyFunction{N}, at::Atoms{T},Species::Vector{Int}) w
    return Es
 end
 
-energy(V::NBodyFunction, at::Atoms, Species::Vector{Int}) = sum_kbn(site_energies(V, at,Species))
+energy(V::NBodyFunction, at::Atoms, Species::Vector{Int}) = sum_kbn(site_energies(V, at, Species))
 
 function evaluate_d!(dVsite,
                      V::NBodyFunction{N},
                      desc::NBSiteDescriptor,
-                     Rs,
+                     Rs::AbstractVector{JVec{T}},
                      J,
-                     Spi::Int,Spj::Vector{Int},Species::Vector{Int}) where {N}
+                     Spi::Int,Spj::Vector{Int},Species::Vector{Int}) where {N,T}
    # check species
-   skip_simplex_species(Spi,Spj,Species,J) && return zero(T)
-   evaluate_d!(dVsite, V, Rs, J)
+   skip_simplex_species(Spi,Spj,Species,J) && return dVsite
+   evaluate_d!(dVsite, V, desc, Rs, J)
 end
 
 
@@ -133,98 +124,3 @@ function forces(V::NBodyFunction{N}, at::Atoms{T},Species::Vector{Int}) where {N
    end
    return F
 end
-
-
-
-
-
-
-# # implement site_energies for given species
-# # Pair potential
-# function site_energies2(V::NBodyFunction{2}, at::Atoms{T},
-#                                        species::Tuple{Int,Int}) where {T}
-#    Z = atomic_numbers(at)
-#    Es = zeros(T, length(at))
-#    for (i, j, r, R) in sites(at, cutoff(V))
-#       for k = 1:length(j)
-#          atnb = sort([Z[i],Z[j][k]])
-#          if (atnb[1] == species[1])&(atnb[2] == species[2])
-#             Es[i] += V(r[k])
-#          end
-#       end
-#    end
-#    return Es
-# end
-
-# using symbols
-# function site_energies(V::NBodyFunction{2}, at::Atoms{T},
-#                                        species::Tuple{Symbol,Symbol}) where {T}
-#    sp = atomic_number.(species)
-#    return site_energies(V, at, sp)
-# end
-
-# energy(V::NBodyFunction, at::Atoms,species::Tuple{Symbol,Symbol}) = sum_kbn(site_energies(V, at,species))
-#
-# # Implementation of the forces
-# function forces(V::NBodyFunction{2}, at::Atoms{T},sp::Tuple{Int,Int}) where { T}
-#    nlist = neighbourlist(at, cutoff(V))
-#    maxneigs = max_neigs(nlist)
-#    F = zeros(JVec{T}, length(at))
-#    dVsite = zeros(JVec{T}, maxneigs)
-#    for (i, j, r, R) in sites(nlist)
-#       fill!(dVsite, zero(JVec{T}))
-#       eval_site_nbody!(
-#             Val(2), R, cutoff(V),
-#             (out, R, J, temp) -> evaluate_d!(out, V, R, J),
-#             dVsite, nothing )   # dVsite == out, nothing == temp
-#       # write site energy gradient into forces
-#       for n = 1:length(j)
-#          F[j[n]] -= dVsite[n]
-#          F[i] += dVsite[n]
-#       end
-#    end
-#    return F
-# end
-
-
-
-
-# r0 = 2.5
-# V = bapolys(2, "($r0/r)^4", "(:cos, 3.6, 4.8)", 2)
-# Vcucu = V[2]
-# at = bulk(:Cu, cubic=true)
-# species = (:Cu,:Zn)
-#
-# atomic_number(:Cu)
-#
-# Vcucu(3.)
-#
-# site_energies2(Vcucu, at, (29,29))
-# site_energies(Vcucu, at, (:Cu,:Cu))
-# energy(Vcucu,at,(:Cu,:Cu))
-# forces(Vcucu,at,(29,29))
-
-# Vcucu(x) = x
-# Vcuzr(x) = 2*x
-# Vzrzr(x) = 3*x
-# V2s = Dict(
-#             (:Cu, :Cu) => Vcucu,
-#             (:Cu, :Zr) => Vcuzr,
-#             (:Zr, :Zr) => Vcuzr
-#          )
-# at = bulk(:Cu, cubic=true)*2
-# rcut = 2.7
-#
-# Z = atomic_numbers(at)
-# species = (:Cu,:Zn)
-# for (i, j, r, R) in sites(atu, rcut)
-#    Zi =
-#    @show i
-#    @show j
-#    @show r
-#    @show size(R)
-# end
-#
-# sites(atu,rcut)
-# site_energies(V2s, atu,rcut)
-# energy(V2s,atu,rcut)
