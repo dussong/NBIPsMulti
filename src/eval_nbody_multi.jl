@@ -99,6 +99,7 @@ function site_energies(V::NBodyFunction{N}, at::Atoms{T},Species::Vector{Int}) w
    return Es
 end
 
+energy(V::NBodyFunction, at::Atoms, Species::Vector{Int}) = sum_kbn(site_energies(V, at,Species))
 
 function evaluate_d!(dVsite,
                      V::NBodyFunction{N},
@@ -133,21 +134,6 @@ function forces(V::NBodyFunction{N}, at::Atoms{T},Species::Vector{Int}) where {N
    return F
 end
 
-
-r0 = 2.5
-V = bapolys(2, "($r0/r)^4", "(:cos, 3.6, 4.8)", 2)
-Vcucu = V[2]
-at = bulk(:Cu, cubic=true)*2
-rattle!(at,0.1)
-
-norm(site_energies(Vcucu, at, [29,29])-site_energies(Vcucu, at))
-
-@btime site_energies(Vcucu, at, [29,29])
-@btime site_energies(Vcucu, at)
-
-norm(forces(Vcucu, at, [29,29])-forces(Vcucu, at))
-@btime forces(Vcucu,at,[29,29])
-@btime forces(Vcucu,at)
 
 
 
