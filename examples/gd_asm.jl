@@ -28,8 +28,7 @@ BL3 = BondLengthDesc("exp( - 2.5 * (r/$r0-1))",
 ##
 info("Generate a BL-3B basis ...")
 basis = [
-      nbpolys(2, BL2a, 14);
-      nbpolys(2, BL2b, 8);
+      nbpolys(2, BL2, 14, [29,29]);
       nbpolys(3, BL3, 12);
       nbpolys(4, BL4, 10);
    ]
