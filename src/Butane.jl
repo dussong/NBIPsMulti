@@ -8,7 +8,7 @@ export read_Butane
 
 get_E0() = -5.817622899211898
 
-filename() = homedir() * "/Gits/NBIPsMulti/examples/1500K_TB_butane"
+filename() = homedir() * "/Gits/NBIPsMulti/examples/Butane_short"
 
 function loaddb(;  include=nothing, kwargs...)
    # default - read from jld2.

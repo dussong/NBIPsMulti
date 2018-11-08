@@ -4,11 +4,18 @@ using JuLIP.Potentials: @pot
 using StaticArrays
 using BenchmarkTools
 
-using NBodyIPs: NBodyFunction, bapolys, eval_site_nbody!, evaluate, eval_site_nbody!, evaluate_d!, NBSiteDescriptor, _get_loop_ex, _get_Jvec_ex, descriptor, ricoords, skip_simplex, fcut, invariants, evaluate_I, fcut_d, invariants_ed, evaluate_I_ed, gradri2gradR!
+using NBodyIPs: NBodyFunction, bapolys, eval_site_nbody!, evaluate, eval_site_nbody!, evaluate_d!, NBSiteDescriptor, _get_loop_ex, _get_Jvec_ex, descriptor, ricoords, skip_simplex, fcut, invariants, evaluate_I, fcut_d, invariants_ed, evaluate_I_ed, gradri2gradR!, evaluate_many!
 
-import JuLIP: site_energies, energy, forces
+import JuLIP: site_energies,
+              energy,
+              forces,
+              virial
 
-import NBodyIPs: evaluate, eval_site_nbody!, evaluate_d!
+import NBodyIPs: evaluate,
+                 eval_site_nbody!,
+                 evaluate_d!,
+                 evaluate_many!,
+                 evaluate_many_d!
 
 using NeighbourLists: nbodies,
                       maptosites!,
@@ -77,6 +84,23 @@ end
 
 evaluate(V::NBodyFunction,Rs::AbstractVector{JVec{T}},J::SVector{K, Int},Spi,Spj,Species) where {T,K} = evaluate(V,descriptor(V),Rs,J,Spi,Spj,Species)
 
+function evaluate_d!(dVsite,
+                     V::NBodyFunction{N},
+                     desc::NBSiteDescriptor,
+                     Rs::AbstractVector{JVec{T}},
+                     J,
+                     Spi::Int,Spj::Vector{Int},Species::Vector{Int}) where {N,T}
+   # check species
+   skip_simplex_species(Spi,Spj,Species,J) && return dVsite
+   evaluate_d!(dVsite, V, desc, Rs, J)
+end
+
+
+
+
+
+
+
 
 function site_energies(V::NBodyFunction{N}, at::Atoms{T},Species::Vector{Int}) where {N, T}
    Es = zeros(T, length(at))
@@ -90,18 +114,18 @@ function site_energies(V::NBodyFunction{N}, at::Atoms{T},Species::Vector{Int}) w
    return Es
 end
 
-energy(V::NBodyFunction, at::Atoms, Species::Vector{Int}) = sum_kbn(site_energies(V, at, Species))
-
-function evaluate_d!(dVsite,
-                     V::NBodyFunction{N},
-                     desc::NBSiteDescriptor,
-                     Rs::AbstractVector{JVec{T}},
-                     J,
-                     Spi::Int,Spj::Vector{Int},Species::Vector{Int}) where {N,T}
-   # check species
-   skip_simplex_species(Spi,Spj,Species,J) && return dVsite
-   evaluate_d!(dVsite, V, desc, Rs, J)
+# energy(V::NBodyFunctionM, at::Atoms, Species::Vector{Int}) = sum_kbn(site_energies(V, at, Species))
+function energy(V::NBodyFunctionM, at::Atoms, Species::Vector{Int})
+   error("right energy function_multi")
+   return 0.5*sum_kbn(site_energies(V, at, Species))
 end
+
+function energy(V::NBodyFunctionM, at::Atoms)
+   # @show at
+   # println("...")
+   return energy(V,at,V.Sp)
+end
+
 
 
 function forces(V::NBodyFunction{N}, at::Atoms{T},Species::Vector{Int}) where {N, T}
@@ -123,4 +147,133 @@ function forces(V::NBodyFunction{N}, at::Atoms{T},Species::Vector{Int}) where {N
       end
    end
    return F
+end
+
+
+
+# ========================= assembly support for LSQ system ====================
+
+# For assembling the LSQ system efficiently we need a way to evaluate all basis
+# functions of the same body-order at the same time. Otherwise we would be
+# re-computing the invariants many many times, which is very expensive.
+# To achieve this we just wrap all basis functions of a body-order into
+# a new type `NBBasis` which evaluates to a long vector
+#
+# at the moment, it seems we need to hard-code this to the Polys
+# sub-module, but it would be good if this can be fixed, so we keep this
+# "interface" here.
+
+
+function evaluate_many!(Es,
+                        B::AbstractVector{TB},
+                        desc::NBSiteDescriptor,
+                        Rs, J, Spi,Spj,Species)  where {TB <: NBodyFunctionM{N}} where {N}
+   skip_simplex_species(Spi,Spj,Species,J) && return Es
+   return evaluate_many!(Es,B,desc,Rs, J)
+end
+
+evaluate_many!(out, B, Rs, J, Spi, Spj, Species) =
+      evaluate_many!(out, B, descriptor(B[1]), Rs, J, Spi, Spj, Species)
+
+
+
+function energy(B::AbstractVector{TB}, at::Atoms{T}
+                ) where {TB <: NBodyFunctionM{N}, T} where {N}
+   # TODO: assert that all B[j] have the same invariants and same species
+   rcut = cutoff(B[1])
+   nlist = neighbourlist(at, rcut)
+   E = zeros(T, length(B))
+   Species = species(B[1])
+   Z = atomic_numbers(at)
+   for (i, j, r, R) in sites(nlist)
+      Spi = Z[i]
+      Spj = Z[j]
+      # evaluate all the site energies at the same time
+      # for each simplex, write the nB energies into temp
+      # then add them to E, which is just passed through all the
+      # various loops, so no need to update it here again
+      eval_site_nbody!(Val(N), R, rcut,
+                       (out, R, J, temp,Spi,Spj,Species) -> evaluate_many!(out, B, R, J, Spi, Spj, Species),
+                       E, nothing, Spi,Spj,Species)
+   end
+   return E
+end
+
+
+
+function evaluate_many_d!(dVsite::AbstractVector,
+                          B::AbstractVector{TB},
+                          desc::NBSiteDescriptor,
+                          Rs,
+                          J, Spi,Spj,Species)  where {TB <: NBodyFunctionM{N}} where {N}
+   skip_simplex_species(Spi,Spj,Species,J) && return dVsite
+   return evaluate_many_d!(dVsite,B,desc,Rs,J)
+end
+
+evaluate_many_d!(out, B, Rs, J, Spi, Spj, Species) =
+      evaluate_many_d!(out, B, descriptor(B[1]), Rs, J, Spi,Spj,Species)
+
+
+function forces(B::AbstractVector{TB}, at::Atoms{T}
+              ) where {TB <: NBodyFunctionM{N}, T} where {N}
+   rcut = cutoff(B[1])
+   nlist = neighbourlist(at, rcut)
+   maxneigs = max_neigs(nlist)
+   nB = length(B)
+   # forces
+   F =      [ zeros(JVec{T}, length(at)) for n = 1:nB ]
+   # site gradient
+   dVsite = [ zeros(JVec{T}, maxneigs)   for n = 1:nB ]
+
+   Species = species(B[1])
+   Z = atomic_numbers(at)
+
+   for (i, j, r, R) in sites(nlist)
+      Spi = Z[i]
+      Spj = Z[j]
+      # clear dVsite
+      for n = 1:nB; fill!(dVsite[n], zero(JVec{T})); end
+      # fill dVsite
+      eval_site_nbody!(Val(N), R, rcut,
+                       (out, R, J, temp, Spi, Spj, Species) -> evaluate_many_d!(out, B, R, J, Spi, Spj, Species),
+                       dVsite, nothing,Spi,Spj,Species)
+      # write it into the force vectors
+      for ib = 1:nB, n = 1:length(j)
+         F[ib][j[n]] -= dVsite[ib][n]
+         F[ib][i] += dVsite[ib][n]
+      end
+   end
+   return F
+end
+
+
+function virial(B::AbstractVector{TB}, at::Atoms{T}
+                ) where {TB <: NBodyFunctionM{N}, T} where {N}
+   rcut = cutoff(B[1])
+   nlist = neighbourlist(at, rcut)
+   maxneigs = max_neigs(nlist)
+   nB = length(B)
+   # virials (main output)
+   S = fill((@SMatrix zeros(3,3)), nB)
+   # site gradient
+   dVsite = [ zeros(JVec{T}, maxneigs)   for n = 1:nB ]
+
+   Species = species(B[1])
+   Z = atomic_numbers(at)
+
+   for (i, j, r, R) in sites(nlist)
+      Spi = Z[i]
+      Spj = Z[j]
+      # clear dVsite
+      for n = 1:nB; dVsite[n] .*= 0.0; end
+      # fill dVsite
+      eval_site_nbody!(Val(N), R, rcut,
+                       (out, R, J, temp, Spi, Spj, Species) -> evaluate_many_d!(out, B, R, J, Spi, Spj, Species),
+                       dVsite, nothing,Spi,Spj,Species)
+      # update the virials
+      for iB = 1:nB
+         S[iB] += JuLIP.Potentials.site_virial(dVsite[iB], R)
+      end
+   end
+   return S
 end

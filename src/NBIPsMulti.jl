@@ -12,7 +12,10 @@ module NBIPsMulti
 
 # using Reexport
 
+include("types_and_wrappers.jl")
+
 include("eval_nbody_multi.jl")
+
 
 
 end # module
