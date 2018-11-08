@@ -102,7 +102,7 @@ end
 
 
 
-function site_energies(V::NBodyFunction{N}, at::Atoms{T},Species::Vector{Int}) where {N, T}
+function site_energies(V::NBodyFunctionM{N}, at::Atoms{T},Species::Vector{Int}) where {N, T}
    Es = zeros(T, length(at))
    Z = atomic_numbers(at)
    for (i, j, r, R) in sites(at, cutoff(V))
@@ -114,21 +114,16 @@ function site_energies(V::NBodyFunction{N}, at::Atoms{T},Species::Vector{Int}) w
    return Es
 end
 
-# energy(V::NBodyFunctionM, at::Atoms, Species::Vector{Int}) = sum_kbn(site_energies(V, at, Species))
-function energy(V::NBodyFunctionM, at::Atoms, Species::Vector{Int})
-   error("right energy function_multi")
-   return 0.5*sum_kbn(site_energies(V, at, Species))
-end
+energy(V::NBodyFunctionM, at::Atoms, Species::Vector{Int}) = sum_kbn(site_energies(V, at, Species))
+
 
 function energy(V::NBodyFunctionM, at::Atoms)
-   # @show at
-   # println("...")
    return energy(V,at,V.Sp)
 end
 
 
 
-function forces(V::NBodyFunction{N}, at::Atoms{T},Species::Vector{Int}) where {N, T}
+function forces(V::NBodyFunctionM{N}, at::Atoms{T},Species::Vector{Int}) where {N, T}
    nlist = neighbourlist(at, cutoff(V))
    maxneigs = max_neigs(nlist)
    F = zeros(JVec{T}, length(at))
@@ -149,7 +144,9 @@ function forces(V::NBodyFunction{N}, at::Atoms{T},Species::Vector{Int}) where {N
    return F
 end
 
-
+function forces(V::NBodyFunctionM, at::Atoms)
+   return forces(V,at,V.Sp)
+end
 
 # ========================= assembly support for LSQ system ====================
 
