@@ -86,6 +86,23 @@ println("---------------")
 @test minimum(errs) <= 1e-3 * maximum(errs)
 
 
+println("-------------------------------------------------")
+println(" Test comparison between 2 implementations - evaluate and evaluate_many ")
+println("-------------------------------------------------")
+
+println(" Energy ")
+E1 = energy(basis, at)
+E2 = [energy(basis[k], at) for k=1:length(basis)]
+@test vecnorm(E1-E2,Inf) <= 1e-10
+
+println(" Forces ")
+F = forces(basis,at)
+F1 = [mat(F[i]) for i = 1:length(F)]
+F2 = [mat(forces(basis[k], at)) for k=1:length(basis)]
+@test vecnorm([vecnorm(F1[k]-F2[k],Inf) for k=1:length(basis)], Inf) <= 1e-10
+
+
+
 # r0 = 2.5
 # V = bapolys(2, "($r0/r)^4", "(:cos, 3.6, 4.8)", 4)
 # Vcucu = V[3]

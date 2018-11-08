@@ -12,11 +12,6 @@ data = Butane.load_xyz() # ; include = ["hess_bcc", "hess_hcp"])
 @show length(data)
 data2 = data
 
-# include(homedir() * "/Dropbox/PIBmat/Ti_DFTB_Data/Ti.jl")
-# data = Ti.loaddb() # ; include = ["hess_bcc", "hess_hcp"])
-# @show length(data)
-# data2 = data[1:10]
-
 
 r0 = round(rnn(:Ti),2)
 E0 = Butane.get_E0()
@@ -36,24 +31,24 @@ BL3 = BondLengthDesc("exp( - 2.5 * (r/$r0-1))",
 ##
 info("Generate a BL-2B basis ...")
 basis = [
-      nbpolys(2, BL2, 14, [1,1]);
-      # nbpolys(2, BL2, 14, [1,6]);
-      # nbpolys(2, BL2, 14, [6,6]);
-      # nbpolys(3, BL3, 6, [1,6]);
+      # nbpolys(2, BL2, 10, [1,1]);
+      # nbpolys(2, BL2, 10, [1,6]);
+      nbpolys(2, BL2, 10, [6,6]);
+      nbpolys(3, BL3, 5, [1,6,6]);
    ]
 # basis = [
 #       nbpolys(2, BL2, 14);
 #    ]
 
-energy(basis,data[1].at)
+# @show energy(basis,data[1].at)
 
 # energy(basis[1],data[1].at)
 
 
 info("Assemble the LsqDB ...")
 @show length(basis)
-# dbpath = homedir() * "/Dropbox/PIBmat/multispecies/Butane_3B"
-dbpath = homedir() * "/Documents/Butane_3B"
+dbpath = homedir() * "/Dropbox/PIBmat/multispecies/Butane_3B"
+# dbpath = homedir() * "/Documents/Butane_3B"
 
 
 db =  LsqDB(dbpath, basis, data2);

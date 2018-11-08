@@ -28,10 +28,18 @@ IP, info = lsqfit( db; E0 = E0,
                        )
 info
 
+IP
+
+
 table_absolute(info["errors"])
 table_relative(info["errors"])
 
 at = bulk(:Si) * 3
+
+(IP.components[1].E0)*54
+
+[energy(Vn, at)  for Vn in IP.components]
+
 @show energy(IP, at)
 # IPf = fast(IP)
 # energy(IPf, at)

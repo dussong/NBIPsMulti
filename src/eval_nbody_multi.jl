@@ -31,8 +31,16 @@ function skip_simplex_species(Spi,Spj,Species,J)
    for i=1:length(J)
       push!(Sp,Spj[J[i]])
    end
-   @show
    return sort(Sp) != sort(Species)
+end
+
+# skip the simplex if not the right species
+function skip_simplex_species_many(Spi,Spj,Species,J)
+   Sp = [Spi]
+   for i=1:length(J)
+      push!(Sp,Spj[J[i]])
+   end
+   return [sort(Sp) == sort(Species[k]) for k=1:length(Species)]
 end
 
 
@@ -42,7 +50,7 @@ end
                                       reducefun,
                                       out,
                                       temp,
-                                      Spi,Spj,Species ) where {N, T}
+                                      Spi,Spj,Species) where {N, T}
    code = Expr[]
    # initialise the output
    push!(code, :( nR = length(Rs)  ))
@@ -165,8 +173,9 @@ function evaluate_many!(Es,
                         B::AbstractVector{TB},
                         desc::NBSiteDescriptor,
                         Rs, J, Spi,Spj,Species)  where {TB <: NBodyFunctionM{N}} where {N}
-   skip_simplex_species(Spi,Spj,Species,J) && return Es
-   return evaluate_many!(Es,B,desc,Rs, J)
+   ind = find(skip_simplex_species_many(Spi,Spj,Species,J))
+   Es[ind] = evaluate_many!(Es[ind],B[ind],desc,Rs,J)
+   return Es
 end
 
 evaluate_many!(out, B, Rs, J, Spi, Spj, Species) =
@@ -176,12 +185,12 @@ evaluate_many!(out, B, Rs, J, Spi, Spj, Species) =
 
 function energy(B::AbstractVector{TB}, at::Atoms{T}
                 ) where {TB <: NBodyFunctionM{N}, T} where {N}
-   # TODO: assert that all B[j] have the same invariants and same species
+   # TODO: assert that all B[j] have the same invariants
    rcut = cutoff(B[1])
    nlist = neighbourlist(at, rcut)
    E = zeros(T, length(B))
-   Species = species(B[1])
    Z = atomic_numbers(at)
+   Species = [B[i].Sp for i=1:length(B)]
    for (i, j, r, R) in sites(nlist)
       Spi = Z[i]
       Spj = Z[j]
@@ -190,7 +199,7 @@ function energy(B::AbstractVector{TB}, at::Atoms{T}
       # then add them to E, which is just passed through all the
       # various loops, so no need to update it here again
       eval_site_nbody!(Val(N), R, rcut,
-                       (out, R, J, temp,Spi,Spj,Species) -> evaluate_many!(out, B, R, J, Spi, Spj, Species),
+                       (out, R, J, temp,Spi,Spj,Species) -> evaluate_many!(out, B, R, J, Spi, Spj,Species),
                        E, nothing, Spi,Spj,Species)
    end
    return E
@@ -203,8 +212,9 @@ function evaluate_many_d!(dVsite::AbstractVector,
                           desc::NBSiteDescriptor,
                           Rs,
                           J, Spi,Spj,Species)  where {TB <: NBodyFunctionM{N}} where {N}
-   skip_simplex_species(Spi,Spj,Species,J) && return dVsite
-   return evaluate_many_d!(dVsite,B,desc,Rs,J)
+   ind = find(skip_simplex_species_many(Spi,Spj,Species,J))
+   dVsite[ind] = evaluate_many_d!(dVsite[ind],B[ind],desc,Rs,J)
+   return dVsite
 end
 
 evaluate_many_d!(out, B, Rs, J, Spi, Spj, Species) =
@@ -222,7 +232,7 @@ function forces(B::AbstractVector{TB}, at::Atoms{T}
    # site gradient
    dVsite = [ zeros(JVec{T}, maxneigs)   for n = 1:nB ]
 
-   Species = species(B[1])
+   Species = [B[i].Sp for i=1:length(B)]
    Z = atomic_numbers(at)
 
    for (i, j, r, R) in sites(nlist)
@@ -233,7 +243,7 @@ function forces(B::AbstractVector{TB}, at::Atoms{T}
       # fill dVsite
       eval_site_nbody!(Val(N), R, rcut,
                        (out, R, J, temp, Spi, Spj, Species) -> evaluate_many_d!(out, B, R, J, Spi, Spj, Species),
-                       dVsite, nothing,Spi,Spj,Species)
+                       dVsite, nothing, Spi,Spj,Species)
       # write it into the force vectors
       for ib = 1:nB, n = 1:length(j)
          F[ib][j[n]] -= dVsite[ib][n]
@@ -255,7 +265,7 @@ function virial(B::AbstractVector{TB}, at::Atoms{T}
    # site gradient
    dVsite = [ zeros(JVec{T}, maxneigs)   for n = 1:nB ]
 
-   Species = species(B[1])
+   Species = [B[i].Sp for i=1:length(B)]
    Z = atomic_numbers(at)
 
    for (i, j, r, R) in sites(nlist)
