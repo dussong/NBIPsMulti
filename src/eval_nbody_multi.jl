@@ -5,43 +5,40 @@ using StaticArrays
 using BenchmarkTools
 
 using NBodyIPs: NBodyFunction,
-                bapolys,
-                eval_site_nbody!,
-                evaluate,
-                eval_site_nbody!,
-                evaluate_d!,
-                NBSiteDescriptor,
                 _get_loop_ex,
                 _get_Jvec_ex,
+                eval_site_nbody!,
+                evaluate_I,
+                NBSiteDescriptor,
                 descriptor,
                 ricoords,
                 skip_simplex,
                 fcut,
-                invariants,
-                evaluate_I,
                 fcut_d,
+                invariants,
                 invariants_ed,
                 evaluate_I_ed,
-                gradri2gradR!,
-                evaluate_many!
+                gradri2gradR!
+
+using NeighbourLists: nbodies,
+                    maptosites!,
+                    maptosites_d!,
+                    virial!,
+                    max_neigs,
+                    sites
 
 import JuLIP: site_energies,
               energy,
               forces,
               virial
 
-import NBodyIPs: evaluate,
-                 eval_site_nbody!,
+import NBodyIPs: eval_site_nbody!,
+                 evaluate,
                  evaluate_d!,
                  evaluate_many!,
                  evaluate_many_d!
 
-using NeighbourLists: nbodies,
-                      maptosites!,
-                      maptosites_d!,
-                      virial!,
-                      max_neigs,
-                      sites
+
 
 
 # skip the simplex if not the right species

@@ -1,6 +1,7 @@
 
 
-using NBodyIPs: NBodyFunction
+# using NBodyIPs: NBodyFunction
+using JuLIP: AbstractCalculator
 using StaticArrays
 
 using NBodyIPs:        BondLengthDesc,
@@ -23,13 +24,10 @@ import Base:              length,
                           ==
 import JuLIP:             cutoff
 import JuLIP.Potentials:  @pot
-import NBodyIPs:          fast,
-                          degree,
+import NBodyIPs:          degree,
                           combinebasis,
                           descriptor,
                           combiscriptor,
-                          evaluate_many!,
-                          evaluate_many_d!,
                           evaluate_I,
                           evaluate_I_ed,
                           basisname,
@@ -41,7 +39,7 @@ export NBPolyM, NBodyFunctionM
 #          Type for species NBodyFunction
 # ==================================================================
 
-abstract type NBodyFunctionM{N, DT} <: NBodyFunction{N,DT} end
+abstract type NBodyFunctionM{N, DT} <: AbstractCalculator end
 
 # ==================================================================
 #           Polynomials of Invariants
@@ -266,7 +264,7 @@ Base.convert(::Val{:NBPolyM}, D::Dict) = NBPolyM(D)
 #  Construction of basis functions
 # ---------------------------------------------------------------------
 
-nbpolys(N::Integer, desc, tdeg, Sp; kwargs...) =
+nbpolys(N::Integer, desc, tdeg, Sp::Vector{Int}; kwargs...) =
    nbpolys(gen_tuples(desc, N, tdeg; kwargs...), desc, Sp)
 
-nbpolys(ts::VecTup, desc, Sp) = [NBPolyM(t, 1.0, desc, Sp) for t in ts]
+nbpolys(ts::VecTup, desc, Sp::Vector{Int}) = [NBPolyM(t, 1.0, desc, Sp) for t in ts]
