@@ -31,12 +31,11 @@ import JuLIP: site_energies,
               forces,
               virial
 
-import NBodyIPs: evaluate,
-                 evaluate_d!,
+import NBodyIPs: evaluate_d!,
                  evaluate_many!,
-                 evaluate_many_d!,
-                 # eval_site_nbody!
-
+                 evaluate_many_d!
+                 # eval_site_nbody!,
+                 # evaluate,
 
 
 
@@ -61,15 +60,15 @@ function skip_simplex_species_many(Spi::Int,Spj::Vector{Int},Species::Vector{Int
 end
 
 
-@generated function eval_site_nbody!( ::Val{N},
-                                      Rs::AbstractVector{JVec{T}},
-                                      rcut::T,
-                                      reducefun,
-                                      out,
-                                      temp,
-                                      Spi::Int,
-                                      Spj::Vector{Int},
-                                      Species::Vector{Int}) where {N, T}
+@generated function eval_site_nbodyM!(::Val{N},
+                          Rs::AbstractVector{JVec{T}},
+                          rcut::T,
+                          reducefun,
+                          out,
+                          temp,
+                          Spi::Int,
+                          Spj::Vector{Int},
+                          Species::Vector{Int}) where {N, T}
 
    code = Expr[]
    # initialise the output
@@ -100,18 +99,18 @@ end
 end
 
 
-function evaluate(V::NBodyFunctionM{N},
+function evaluateM(V::NBodyFunctionM{N},
                   desc::NBSiteDescriptor,
                   Rs::AbstractVector{JVec{T}},
                   J::SVector{K, Int},
-                  Spi::Int,Spj::Vector{Int},Species::Vector{Int}) where {N, T, K}
+                  Spi,Spj,Species) where {N, T, K}
    # check species
-   error("evaluate")
+   error("evaluateM")
    skip_simplex_species(Spi,Spj,Species,J) && return zero(T)
    evaluate(V,desc,Rs,J)
 end
 
-evaluate(V::NBodyFunctionM,Rs::AbstractVector{JVec{T}},J::SVector{K, Int},Spi::Int,Spj::Vector{Int},Species::Vector{Int}) where {T,K} = evaluate(V,descriptor(V),Rs,J,Spi,Spj,Species)
+evaluateM(V::NBodyFunctionM,Rs::AbstractVector{JVec{T}},J::SVector{K, Int},Spi::Int,Spj::Vector{Int},Species::Vector{Int}) where {T,K} = evaluateM(V,descriptor(V),Rs,J,Spi,Spj,Species)
 
 function evaluate_d!(dVsite,
                      V::NBodyFunctionM{N},
@@ -138,8 +137,9 @@ function site_energies(V::NBodyFunctionM{N}, at::Atoms{T},Species::Vector{Int}) 
    for (i, j, r, R) in sites(at, cutoff(V))
       Spi = Z[i]
       Spj = Z[j]
-      Es[i] = eval_site_nbody!(Val(N), R, cutoff(V),
-                               ((out, R, J, temp,Spi,Spj,Species) -> out + evaluate(V, descriptor(V), R, J,Spi,Spj,Species)), zero(T), nothing, Spi,Spj,Species)
+      # println("here I am")
+      Es[i] = eval_site_nbodyM!(Val(N), R, cutoff(V),
+                               ((out, R, J, temp,Spi,Spj,Species) -> out + evaluateM(V, descriptor(V), R, J,Spi,Spj,Species)), zero(T), nothing, Spi,Spj,Species)
    end
    return Es
 end
@@ -163,7 +163,7 @@ function forces(V::NBodyFunctionM{N}, at::Atoms{T},Species::Vector{Int}) where {
       Spi = Z[i]
       Spj = Z[j]
       fill!(dVsite, zero(JVec{T}))
-      eval_site_nbody!(Val(N), R, cutoff(V),
+      eval_site_nbodyM!(Val(N), R, cutoff(V),
                                ((out, R, J, temp,Spi,Spj,Species) ->  evaluate_d!(out, V, descriptor(V), R, J,Spi,Spj,Species)), dVsite, nothing, Spi,Spj,Species)
       # write site energy gradient into forces
       for n = 1:length(j)
@@ -220,7 +220,7 @@ function energy(B::AbstractVector{TB}, at::Atoms{T}
       # for each simplex, write the nB energies into temp
       # then add them to E, which is just passed through all the
       # various loops, so no need to update it here again
-      eval_site_nbody!(Val(N), R, rcut,
+      eval_site_nbodyM!(Val(N), R, rcut,
                        (out, R, J, temp,Spi,Spj,Species) -> evaluate_many!(out, B, R, J, Spi, Spj,Species),
                        E, nothing, Spi,Spj,Species)
    end
@@ -263,7 +263,7 @@ function forces(B::AbstractVector{TB}, at::Atoms{T}
       # clear dVsite
       for n = 1:nB; fill!(dVsite[n], zero(JVec{T})); end
       # fill dVsite
-      eval_site_nbody!(Val(N), R, rcut,
+      eval_site_nbodyM!(Val(N), R, rcut,
                        (out, R, J, temp, Spi, Spj, Species) -> evaluate_many_d!(out, B, R, J, Spi, Spj, Species),
                        dVsite, nothing, Spi,Spj,Species)
       # write it into the force vectors
@@ -296,7 +296,7 @@ function virial(B::AbstractVector{TB}, at::Atoms{T}
       # clear dVsite
       for n = 1:nB; dVsite[n] .*= 0.0; end
       # fill dVsite
-      eval_site_nbody!(Val(N), R, rcut,
+      eval_site_nbodyM!(Val(N), R, rcut,
                        (out, R, J, temp, Spi, Spj, Species) -> evaluate_many_d!(out, B, R, J, Spi, Spj, Species),
                        dVsite, nothing,Spi,Spj,Species)
       # update the virials

@@ -24,28 +24,32 @@ at = rattle!(bulk(:Cu, cubic=true) * 2, 0.02)
 # @show E = energy(basis[1], at)
 # @show E2 = energy(basis[1],at2)
 
-@show Ei = site_energies(basis[1],at,[29,29])
-@show Ei = site_energies(basis[1],at2,[29,29])
+# Ei = site_energies(basis[1],at2,[29,29])
+Ei = [site_energies(basis[1],at,[29,29]) for i=1:1000]
 
 
-V = basis[1]
-Z = atomic_numbers(at)
-Species = [29,29]
-Es = zeros(Float64, length(at))
-for (i, j, r, R) in sites(at, cutoff(V))
-   Spi = Z[i]
-   Spj = Z[j]
-   @which eval_site_nbody!(Val(2), R, cutoff(V),
-                            ((out, R, J, temp,Spi,Spj,Species) -> out + evaluate(V, descriptor(V), R, J,Spi,Spj,Species)), zero(Float64), nothing, Spi,Spj,Species)
-   Es[i] = eval_site_nbody!(Val(2), R, cutoff(V),
-                            ((out, R, J, temp,Spi,Spj,Species) -> out + evaluate(V, descriptor(V), R, J,Spi,Spj,Species)), zero(Float64), nothing, Spi,Spj,Species)
-end
 
-@which site_energies(basis[1],at,[29,29])
-@which site_energies(basis[1],at2,[29,29])
+# V = basis[1]
+# Z = atomic_numbers(at)
+# Species = [29,29]
+# Es = zeros(Float64, length(at))
+# for (i, j, r, R) in sites(at, cutoff(V))
+#    Spi = Z[i]
+#    Spj = Z[j]
+#    @show typeof(R)
+#    @show typeof(cutoff(V))
+#    # @show eval_site_nbody!(Val(2), R, cutoff(V),
+#                             # ((out, R, J, temp,Spi,Spj,Species) -> out + evaluate(V, descriptor(V), R, J,Spi,Spj,Species)), zero(Float64), nothing, Spi,Spj,Species)
+#    # Es[i] = eval_site_nbody!(Val(2), R, cutoff(V),
+#    #                          ((out, R, J, temp,Spi,Spj,Species) -> out + evaluate(V, descriptor(V), R, J,Spi,Spj,Species)), zero(Float64), nothing, Spi,Spj,Species)
+#    error("stop")
+# end
 
-@which energy(basis[1], at)
-@which energy(basis[1], at2)
-
-typeof(at)
-typeof(at2)
+# @which site_energies(basis[1],at,[29,29])
+# @which site_energies(basis[1],at2,[29,29])
+#
+# @which energy(basis[1], at)
+# @which energy(basis[1], at2)
+#
+# typeof(at)
+# typeof(at2)
