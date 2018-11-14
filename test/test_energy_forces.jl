@@ -5,12 +5,20 @@ using BenchmarkTools, Base.Test
 
 r0 = 2.5
 BL2 = BondLengthDesc("exp( - 2 * (r/$r0-1))",
-                    "(:cos, $(rcut2-1.5), $(rcut2))")
+                    "(:cos, $(r0-1.5), $(r0))")
+
 basis = [
-     nbpolys(2, BL2, 14, [29,29]);
-     nbpolys(2, BL2, 14, [29,30]);
-     nbpolys(2, BL2, 14, [30,30]);
+     nbpolys(2, BL2, 14, [29,29], Val{:AA});
+     nbpolys(2, BL2, 14, [29,30], Val{:AA});
+     nbpolys(2, BL2, 14, [30,30], Val{:AA});
   ]
+
+basis[1].Sp
+energy(basis[1],at,basis[1].Sp)
+site_energies(basis[1], at, [29,29])
+
+
+
 
 at = rattle!(bulk(:Cu, cubic=true) * 2, 0.02)
 Z1 = atomic_numbers(at)
@@ -24,6 +32,7 @@ println("-------------------------------------------------")
 println(" Test finite difference energy vs forces - implementation with evaluate ")
 println("-------------------------------------------------")
 E = energy(basis[1], at)
+@show E
 
 dE = -forces(basis[1], at) |> mat
 

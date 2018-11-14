@@ -127,3 +127,5 @@ tdegrees(::Val{3},::Val{:AAB}) = (1, 2, 1), (0,)
 
 
    tdegrees(::Val{3},::Val{:ABC}) = (1, 1, 1), (0,)
+
+end

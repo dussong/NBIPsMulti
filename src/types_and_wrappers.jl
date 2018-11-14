@@ -47,17 +47,18 @@ abstract type NBodyFunctionM{N, DT} <: NBodyFunction{N,DT} end
 #           Polynomials of Invariants
 # ==================================================================
 
-@pot struct NBPolyM{N, M, T, TD} <: NBodyFunctionM{N, TD}
+@pot struct NBPolyM{N, M, T, TD, SP} <: NBodyFunctionM{N, TD}
    t::VecTup{M}               # tuples M = #edges + 1
    c::Vector{T}               # coefficients
    D::TD                      # Descriptor
    valN::Val{N}               # encodes that this is an N-body function
    Sp::Vector{Int}            #encodes the species
+   Sp_type::SP
 
-   NBPolyM(t::VecTup{M}, c::Vector{T}, D::TD, valN::Val{N}, Sp::Vector{Int}) where {N, M, T, TD} = (
+   NBPolyM(t::VecTup{M}, c::Vector{T}, D::TD, valN::Val{N}, Sp::Vector{Int}, Sp_type::SP) where {N, M, T, TD, SP} = (
       N <= 1 ? error("""NBPoly must have body-order 2 or larger;
                         use `NBodyIPs.OneBody{T}` for 1-body.""")
-             : new{N, M, T, TD}(t, c, D, valN, Sp))
+             : new{N, M, T, TD, SP}(t, c, D, valN, Sp, Sp_type))
 end
 
 """
@@ -81,33 +82,37 @@ where `I1, I2` are the 4-body invariants.
 * `D`: a descriptor (cf `NBodyIPs.NBodyDescriptor`)
 
 * `Sp`: a vector of Int containing the species
+
+* `Sp_type`
 """
 NBPolyM
 
-==(V1::NBPolyM, V2::NBPolyM) = ( (V1.t == V2.t) && (V1.c == V2.c) && (V1.D == V2.D) && (V1.Sp == V2.Sp) )
+==(V1::NBPolyM, V2::NBPolyM) = ( (V1.t == V2.t) && (V1.c == V2.c) && (V1.D == V2.D) && (V1.Sp == V2.Sp)  && (V1.Sp_type == V2.Sp_type) )
 
 descriptor(V::NBPolyM) = V.D
 
 species(V::NBPolyM) = V.Sp
 
+species_type(V::NBPolyM) = V.Sp_type
+
 basisname(::NBPolyM) = "NBPolyM"
 
-combiscriptor(V::NBPolyM) = (NBPolyM, bodyorder(V), combiscriptor(V.D), V.Sp)
+combiscriptor(V::NBPolyM) = (NBPolyM, bodyorder(V), combiscriptor(V.D), V.Sp, V.Sp_type)
 
 # standard constructor (N can be inferred)
-NBPolyM(t::VecTup{K}, c, D, Sp) where {K} = NBPolyM(t, c, D, Val(edges2bo(K-1)), Sp)
+NBPolyM(t::VecTup{K}, c, D, Sp, Sp_type) where {K} = NBPolyM(t, c, D, Val(edges2bo(K-1)), Sp, Sp_type)
 
 # NBPolyM made from a single basis function rather than a collection
-NBPolyM(t::Tup, c, D, Sp) = NBPolyM([t], [c], D, Sp)
+NBPolyM(t::Tup, c, D, Sp, Sp_type) = NBPolyM([t], [c], D, Sp, Sp_type)
 
 # collect multiple basis functions represented as NBPoly's into a single NBPolyM
 # (for performance reasons)
 # TODO: this is not general enough!
-NBPolyM(B::Vector{TB}, c, D, Sp) where {TB <: NBPolyM} =
-      NBPolyM([b.t[1] for b in B], c .* [b.c[1] for b in B], D, Sp)
+NBPolyM(B::Vector{TB}, c, D, Sp, Sp_type) where {TB <: NBPolyM} =
+      NBPolyM([b.t[1] for b in B], c .* [b.c[1] for b in B], D, Sp, Sp_type)
 
 # 1-body term (on-site energy)
-NBPolyM(c::Float64) = NBPolyM([Tup{0}()], [c], nothing, Val(1), Sp)
+NBPolyM(c::Float64) = NBPolyM([Tup{0}()], [c], nothing, Val(1), [], Val{OneB})
 
 # number of basis functions which this term is made from
 length(V::NBPolyM) = length(V.t)
@@ -118,15 +123,17 @@ function match_dictionary(V::NBPolyM, V1::NBPolyM)
    if V.D != V1.D
       if V.D.s != V1.D.s
          if V.Sp != V1.Sp
-            warn("matching two non-matching dictionaries!")
+            if V.Sp_type != V1.Sp_type
+               warn("matching two non-matching dictionaries!")
+            end
          end
       end
    end
-   return NBPolyM(V.t, V.c, V1.D, V.valN, V.Sp)
+   return NBPolyM(V.t, V.c, V1.D, V.valN, V.Sp, V.Sp_type)
 end
 
 combinebasis(basis::AbstractVector{TV}, coeffs) where {TV <: NBPolyM} =
-      NBPolyM(basis, coeffs, basis[1].D, basis[1].Sp)
+      NBPolyM(basis, coeffs, basis[1].D, basis[1].Sp, basis[1].Sp_type)
 
 
 function degree(V::NBPolyM)
@@ -142,6 +149,7 @@ function Base.info(B::Vector{T}; indent = 2) where T <: NBPolyM
    println(ind * "body-order = $(bodyorder(B[1]))")
    println(ind * "    length = $(length(B))")
    println(ind * "    Species = $(species(B))")
+   println(ind * "    Species type = $(species_type(B))")
    if bodyorder(B[1]) > 1
       println(ind * " transform = $(B[1].D.s[1])")
       println(ind * "    cutoff = $(B[1].D.s[2])")
@@ -195,13 +203,15 @@ Dict(V::NBPolyM{N}) where {N} = Dict( "__id__" => "NBPolyM",
                                       "c" => V.c,
                                       "D" => Dict(V.D),
                                       "N" => N,
-                                      "Sp" => V.Sp )
+                                      "Sp" => V.Sp,
+                                      "Sp_type" => V.Sp_type )
 
 NBPolyM(D::Dict) = NBPolyM([ tuple(ti...) for ti in D["t"] ],
                            Vector{Float64}(D["c"]),
                            _decode_dict(D["D"]),
                            Val(D["N"]),
-                           Vector{Int}(D["Sp"]))
+                           Vector{Int}(D["Sp"]),
+                           (D["Sp_type"]))
 
 Base.convert(::Val{:NBPolyM}, D::Dict) = NBPolyM(D)
 
@@ -266,7 +276,7 @@ Base.convert(::Val{:NBPolyM}, D::Dict) = NBPolyM(D)
 #  Construction of basis functions
 # ---------------------------------------------------------------------
 
-nbpolys(N::Integer, desc, tdeg, Sp; kwargs...) =
-   nbpolys(gen_tuples(desc, N, tdeg; kwargs...), desc, Sp)
+nbpolys(N::Integer, desc, tdeg, Sp, Sp_type; kwargs...) =
+   nbpolys(gen_tuples(desc, N, tdeg; kwargs...), desc, Sp, Sp_type)
 
-nbpolys(ts::VecTup, desc, Sp) = [NBPolyM(t, 1.0, desc, Sp) for t in ts]
+nbpolys(ts::VecTup, desc, Sp, Sp_type) = [NBPolyM(t, 1.0, desc, Sp, Sp_type) for t in ts]
