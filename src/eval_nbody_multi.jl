@@ -7,7 +7,6 @@ using BenchmarkTools
 using NBodyIPs: NBodyFunction,
                 _get_loop_ex,
                 _get_Jvec_ex,
-                eval_site_nbody!,
                 evaluate_I,
                 NBSiteDescriptor,
                 descriptor,
@@ -32,17 +31,17 @@ import JuLIP: site_energies,
               forces,
               virial
 
-import NBodyIPs: eval_site_nbody!,
-                 evaluate,
+import NBodyIPs: evaluate,
                  evaluate_d!,
                  evaluate_many!,
-                 evaluate_many_d!
+                 evaluate_many_d!,
+                 # eval_site_nbody!
 
 
 
 
 # skip the simplex if not the right species
-function skip_simplex_species(Spi,Spj,Species,J)
+function skip_simplex_species(Spi::Int,Spj::Vector{Int},Species::Vector{Int},J)
    error("skip simplex")
    Sp = [Spi]
    for i=1:length(J)
@@ -52,7 +51,7 @@ function skip_simplex_species(Spi,Spj,Species,J)
 end
 
 # skip the simplex if not the right species
-function skip_simplex_species_many(Spi,Spj,Species,J)
+function skip_simplex_species_many(Spi::Int,Spj::Vector{Int},Species::Vector{Int},J)
    error("skip simplex2")
    Sp = [Spi]
    for i=1:length(J)
@@ -68,7 +67,9 @@ end
                                       reducefun,
                                       out,
                                       temp,
-                                      Spi,Spj,Species) where {N, T}
+                                      Spi::Int,
+                                      Spj::Vector{Int},
+                                      Species::Vector{Int}) where {N, T}
 
    code = Expr[]
    # initialise the output
@@ -110,7 +111,7 @@ function evaluate(V::NBodyFunctionM{N},
    evaluate(V,desc,Rs,J)
 end
 
-evaluate(V::NBodyFunctionM,Rs::AbstractVector{JVec{T}},J::SVector{K, Int},Spi,Spj,Species) where {T,K} = evaluate(V,descriptor(V),Rs,J,Spi,Spj,Species)
+evaluate(V::NBodyFunctionM,Rs::AbstractVector{JVec{T}},J::SVector{K, Int},Spi::Int,Spj::Vector{Int},Species::Vector{Int}) where {T,K} = evaluate(V,descriptor(V),Rs,J,Spi,Spj,Species)
 
 function evaluate_d!(dVsite,
                      V::NBodyFunctionM{N},
