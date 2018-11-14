@@ -1,11 +1,15 @@
 # Test energy and forces
+include("../src/NBIPsMulti.jl")
+
 using JuLIP, NBodyIPs, NBIPsMulti, StaticArrays
 using BenchmarkTools, Base.Test
 
 
 r0 = 2.5
 BL2 = BondLengthDesc("exp( - 2 * (r/$r0-1))",
-                    "(:cos, $(rcut2-1.5), $(rcut2))")
+                    "(:cos, $(r0-1.5), $(r0))")
+
+nbpolys(2, BL2, 14, [29,29])
 basis = [
      nbpolys(2, BL2, 14, [29,29]);
      nbpolys(2, BL2, 14, [29,30]);
@@ -23,7 +27,11 @@ at_positions = copy(positions(at)) |> mat
 println("-------------------------------------------------")
 println(" Test finite difference energy vs forces - implementation with evaluate ")
 println("-------------------------------------------------")
+@which energy(basis[1], at)
 E = energy(basis[1], at)
+
+typeof(basis[1])
+basis[1]
 
 dE = -forces(basis[1], at) |> mat
 

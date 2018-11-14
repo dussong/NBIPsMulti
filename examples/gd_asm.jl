@@ -34,7 +34,7 @@ basis = [
       # nbpolys(2, BL2, 10, [1,1]);
       # nbpolys(2, BL2, 10, [1,6]);
       nbpolys(2, BL2, 10, [6,6]);
-      nbpolys(3, BL3, 5, [1,6,6]);
+      # nbpolys(3, BL3, 5, [1,6,6]);
    ]
 # basis = [
 #       nbpolys(2, BL2, 14);
@@ -42,7 +42,7 @@ basis = [
 
 # @show energy(basis,data[1].at)
 
-# energy(basis[1],data[1].at)
+energy(basis[1],data[1].at)
 
 
 info("Assemble the LsqDB ...")

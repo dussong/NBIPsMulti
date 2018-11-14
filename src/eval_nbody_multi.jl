@@ -4,7 +4,26 @@ using JuLIP.Potentials: @pot
 using StaticArrays
 using BenchmarkTools
 
-using NBodyIPs: NBodyFunction, bapolys, eval_site_nbody!, evaluate, eval_site_nbody!, evaluate_d!, NBSiteDescriptor, _get_loop_ex, _get_Jvec_ex, descriptor, ricoords, skip_simplex, fcut, invariants, evaluate_I, fcut_d, invariants_ed, evaluate_I_ed, gradri2gradR!, evaluate_many!
+using NBodyIPs: NBodyFunction,
+                bapolys,
+                eval_site_nbody!,
+                evaluate,
+                eval_site_nbody!,
+                evaluate_d!,
+                NBSiteDescriptor,
+                _get_loop_ex,
+                _get_Jvec_ex,
+                descriptor,
+                ricoords,
+                skip_simplex,
+                fcut,
+                invariants,
+                evaluate_I,
+                fcut_d,
+                invariants_ed,
+                evaluate_I_ed,
+                gradri2gradR!,
+                evaluate_many!
 
 import JuLIP: site_energies,
               energy,
@@ -27,6 +46,7 @@ using NeighbourLists: nbodies,
 
 # skip the simplex if not the right species
 function skip_simplex_species(Spi,Spj,Species,J)
+   error("skip simplex")
    Sp = [Spi]
    for i=1:length(J)
       push!(Sp,Spj[J[i]])
@@ -36,6 +56,7 @@ end
 
 # skip the simplex if not the right species
 function skip_simplex_species_many(Spi,Spj,Species,J)
+   error("skip simplex2")
    Sp = [Spi]
    for i=1:length(J)
       push!(Sp,Spj[J[i]])
@@ -51,6 +72,7 @@ end
                                       out,
                                       temp,
                                       Spi,Spj,Species) where {N, T}
+
    code = Expr[]
    # initialise the output
    push!(code, :( nR = length(Rs)  ))
@@ -80,20 +102,21 @@ end
 end
 
 
-function evaluate(V::NBodyFunction{N},
+function evaluate(V::NBodyFunctionM{N},
                   desc::NBSiteDescriptor,
                   Rs::AbstractVector{JVec{T}},
                   J::SVector{K, Int},
                   Spi::Int,Spj::Vector{Int},Species::Vector{Int}) where {N, T, K}
    # check species
+   error("evaluate")
    skip_simplex_species(Spi,Spj,Species,J) && return zero(T)
    evaluate(V,desc,Rs,J)
 end
 
-evaluate(V::NBodyFunction,Rs::AbstractVector{JVec{T}},J::SVector{K, Int},Spi,Spj,Species) where {T,K} = evaluate(V,descriptor(V),Rs,J,Spi,Spj,Species)
+evaluate(V::NBodyFunctionM,Rs::AbstractVector{JVec{T}},J::SVector{K, Int},Spi,Spj,Species) where {T,K} = evaluate(V,descriptor(V),Rs,J,Spi,Spj,Species)
 
 function evaluate_d!(dVsite,
-                     V::NBodyFunction{N},
+                     V::NBodyFunctionM{N},
                      desc::NBSiteDescriptor,
                      Rs::AbstractVector{JVec{T}},
                      J,
@@ -111,6 +134,7 @@ end
 
 
 function site_energies(V::NBodyFunctionM{N}, at::Atoms{T},Species::Vector{Int}) where {N, T}
+   println("site_energy_multi")
    Es = zeros(T, length(at))
    Z = atomic_numbers(at)
    for (i, j, r, R) in sites(at, cutoff(V))
