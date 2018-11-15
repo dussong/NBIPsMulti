@@ -44,15 +44,15 @@ function skip_simplex_species_many(Spi,Spj,Species,J)
 end
 
 # sort by species for 3B:
-function sort_by_species(Spi,Spj,J::)
-   Sp = [Spi]
-   for i=1:length(J)
-      push!(Sp,Spj[J[i]])
-   end
-   if Sp[1] == Sp[2]
-      return J
-   elseif
-end
+# function sort_by_species(Spi,Spj,J::)
+#    Sp = [Spi]
+#    for i=1:length(J)
+#       push!(Sp,Spj[J[i]])
+#    end
+#    if Sp[1] == Sp[2]
+#       return J
+#    elseif
+# end
 
 
 @generated function eval_site_nbody!( ::Val{N},
@@ -89,35 +89,6 @@ end
       return out
    end
 end
-
-
-function evaluate(V::NBodyFunction{N},
-                  desc::NBSiteDescriptor,
-                  Rs::AbstractVector{JVec{T}},
-                  J::SVector{K, Int},
-                  Spi::Int,Spj::Vector{Int},Species::Vector{Int}) where {N, T, K}
-   # check species
-   skip_simplex_species(Spi,Spj,Species,J) && return zero(T)
-   evaluate(V,desc,Rs,J)
-end
-
-evaluate(V::NBodyFunction,Rs::AbstractVector{JVec{T}},J::SVector{K, Int},Spi,Spj,Species) where {T,K} = evaluate(V,descriptor(V),Rs,J,Spi,Spj,Species)
-
-function evaluate_d!(dVsite,
-                     V::NBodyFunction{N},
-                     desc::NBSiteDescriptor,
-                     Rs::AbstractVector{JVec{T}},
-                     J,
-                     Spi::Int,Spj::Vector{Int},Species::Vector{Int}) where {N,T}
-   # check species
-   skip_simplex_species(Spi,Spj,Species,J) && return dVsite
-   evaluate_d!(dVsite, V, desc, Rs, J)
-end
-
-
-
-
-
 
 
 
@@ -180,20 +151,6 @@ end
 # "interface" here.
 
 
-function evaluate_many!(Es,
-                        B::AbstractVector{TB},
-                        desc::NBSiteDescriptor,
-                        Rs, J, Spi,Spj,Species)  where {TB <: NBodyFunctionM{N}} where {N}
-   ind = find(skip_simplex_species_many(Spi,Spj,Species,J))
-   Es[ind] = evaluate_many!(Es[ind],B[ind],desc,Rs,J)
-   return Es
-end
-
-evaluate_many!(out, B, Rs, J, Spi, Spj, Species) =
-      evaluate_many!(out, B, descriptor(B[1]), Rs, J, Spi, Spj, Species)
-
-
-
 function energy(B::AbstractVector{TB}, at::Atoms{T}
                 ) where {TB <: NBodyFunctionM{N}, T} where {N}
    # TODO: assert that all B[j] have the same invariants
@@ -216,20 +173,6 @@ function energy(B::AbstractVector{TB}, at::Atoms{T}
    return E
 end
 
-
-
-function evaluate_many_d!(dVsite::AbstractVector,
-                          B::AbstractVector{TB},
-                          desc::NBSiteDescriptor,
-                          Rs,
-                          J, Spi,Spj,Species)  where {TB <: NBodyFunctionM{N}} where {N}
-   ind = find(skip_simplex_species_many(Spi,Spj,Species,J))
-   dVsite[ind] = evaluate_many_d!(dVsite[ind],B[ind],desc,Rs,J)
-   return dVsite
-end
-
-evaluate_many_d!(out, B, Rs, J, Spi, Spj, Species) =
-      evaluate_many_d!(out, B, descriptor(B[1]), Rs, J, Spi,Spj,Species)
 
 
 function forces(B::AbstractVector{TB}, at::Atoms{T}

@@ -8,7 +8,10 @@ using NBodyIPs:        BondLengthDesc,
                        edges2bo,
                        bo2edges,
                        _decode_dict,
-                       bodyorder
+                       bodyorder,
+                       SpaceTransform,
+                       Cutoff,
+                       NBSiteDescriptor
 
 using NBodyIPs.Polys:  Tup,
                        VecTup,
@@ -35,13 +38,30 @@ import NBodyIPs:          fast,
                           basisname,
                           nbpolys
 
+import NBodyIPs.PolyBasis: gen_tuples,
+                           tdegree
+
 export NBPolyM, NBodyFunctionM
+
+
+# tdegrees(desc::MultiDesc, vN) = NBIPsMulti.MultiInvariants.tdegrees(vN)
 
 # ==================================================================
 #          Type for species NBodyFunction
 # ==================================================================
 
 abstract type NBodyFunctionM{N, DT} <: NBodyFunction{N,DT} end
+
+
+
+export MultiDesc
+
+struct MultiDesc{TT <: SpaceTransform, TC <: Cutoff, SP, N} <: NBSiteDescriptor
+   transform::TT
+   cutoff::TC
+   sp_type::SP
+   valN::Val{N} #encodes the body-order
+end
 
 # ==================================================================
 #           Polynomials of Invariants
@@ -275,8 +295,61 @@ Base.convert(::Val{:NBPolyM}, D::Dict) = NBPolyM(D)
 # ---------------------------------------------------------------------
 #  Construction of basis functions
 # ---------------------------------------------------------------------
+function tdegree(desc::MultiDesc, α)
+   K = length(α)
+   @assert Val(edges2bo(K-1)) == desc.valN
+   degs1, degs2 = tdegrees(desc.sp_type)
+   # primary invariants
+   d = sum(α[j] * degs1[j] for j = 1:K-1)
+   # secondary invariants
+   d += degs2[1+α[end]]
+   return d
+end
 
-nbpolys(N::Integer, desc, tdeg, Sp, Sp_type; kwargs...) =
-   nbpolys(gen_tuples(desc, N, tdeg; kwargs...), desc, Sp, Sp_type)
+
+function gen_tuples(desc::MultiDesc, vN::Val{N}, vK::Val{K}, deg, tuplebound) where {N, K}
+   A = Tup{K}[]
+   degs1, degs2 = tdegrees(desc, vN)
+
+   α = @MVector zeros(Int, K)
+   α[1] = 1
+   lastinc = 1
+
+   while true
+      admit_tuple = false
+      if α[end] <= length(degs2)-1
+         if tuplebound(α)
+            admit_tuple = true
+         end
+      end
+      if admit_tuple
+         push!(A, SVector(α).data)
+         α[1] += 1
+         lastinc = 1
+      else
+         if lastinc == K
+            return A
+         end
+         α[1:lastinc] = 0
+         α[lastinc+1] += 1
+         lastinc += 1
+      end
+   end
+   error("I shouldn't be here!")
+end
+
+
+
+function gen_tuples(desc::MultiDesc, deg; tuplebound = (α -> (0 < tdegree(desc, α) <= deg)))
+   N = desc.valN
+   vN = desc.sp_type
+   return gen_tuples(desc, vN, Val(bo2edges(N)+1), deg, tuplebound)
+end
+
+
+function nbpolys(desc::MultiDesc, tdeg, Sp, Sp_type)
+   temp = gen_tuples(desc, tdeg)
+   return nbpolys(temp, desc, Sp, Sp_type)
+end
 
 nbpolys(ts::VecTup, desc, Sp, Sp_type) = [NBPolyM(t, 1.0, desc, Sp, Sp_type) for t in ts]

@@ -2,6 +2,9 @@
 using JuLIP, NBodyIPs, NBIPsMulti, StaticArrays
 using BenchmarkTools, Base.Test
 
+using NBodyIPs: tdegrees
+
+
 at = rattle!(bulk(:Cu, cubic=true) * 2, 0.02)
 Z1 = atomic_numbers(at)
 Z1[2] = 30
@@ -12,13 +15,13 @@ at_positions = copy(positions(at)) |> mat
 
 
 r0 = 1.2*rnn(:Cu)
-BL2 = BondLengthDesc("exp( - 2 * (r/$r0-1))",
-                    "(:cos, $(r0-1.5), $(r0))")
+BL2 = MultiDesc("exp( - 2 * (r/$r0-1))",
+                    "(:cos, $(r0-1.5), $(r0))",Val(:AA),Val(2))
 
 basis = [
-     nbpolys(2, BL2, 14, [29,29], Val{:AA});
-     nbpolys(2, BL2, 14, [29,30], Val{:AA});
-     nbpolys(2, BL2, 14, [30,30], Val{:AA});
+     nbpolys(BL2, 14, [29,29], Val(:AA));
+     nbpolys(BL2, 14, [29,30], Val(:AA));
+     nbpolys(BL2, 14, [30,30], Val(:AA));
   ]
 
 basis[1].Sp

@@ -9,28 +9,28 @@ import NBodyIPs: invariants, invariants_d, invariants_ed, tdegrees
 
 
 
-# # ------------------------------------------------------------------------
-# #             2-BODY Invariants
-# #             fully equivalent to BL/BA invariants
-# # ------------------------------------------------------------------------
-#
-# # x = (r12,)
-#
-# invariants(x::SVector{1, T}) where {T} =
-#       copy(x),
-#       SVector{1, T}(1.0)
-#
-# invariants_d(x::SVector{1, T}) where {T} =
-#       (@SVector [ SVector(one(T))  ]),
-#       (@SVector [ SVector(zero(T)) ])
-#
-# invariants_ed(x::SVector{1,T}) where {T} =
-#       copy(x),
-#       SVector{1, T}(1.0),
-#       (@SVector [ SVector(one(T))  ]),
-#       (@SVector [ SVector(zero(T)) ])
-#
-# tdegrees(::Val{2}) = (1,), (0,)
+# ------------------------------------------------------------------------
+#             2-BODY Invariants
+#             fully equivalent to BL/BA invariants
+# ------------------------------------------------------------------------
+
+# x = (r12,)
+
+invariants(x::SVector{1, T},::Val{:AA}) where {T} =
+      copy(x),
+      SVector{1, T}(1.0)
+
+invariants_d(x::SVector{1, T},::Val{:AA}) where {T} =
+      (@SVector [ SVector(one(T))  ]),
+      (@SVector [ SVector(zero(T)) ])
+
+invariants_ed(x::SVector{1,T},::Val{:AA}) where {T} =
+      copy(x),
+      SVector{1, T}(1.0),
+      (@SVector [ SVector(one(T))  ]),
+      (@SVector [ SVector(zero(T)) ])
+
+tdegrees(::Val{:AA}) = (1,), (0,)
 
 
 # ------------------------------------------------------------------------
