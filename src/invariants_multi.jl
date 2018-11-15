@@ -9,33 +9,28 @@ import NBodyIPs: invariants, invariants_d, invariants_ed, tdegrees
 
 
 
-# ------------------------------------------------------------------------
-#             2-BODY Invariants
-#             fully equivalent to BL/BA invariants
-# ------------------------------------------------------------------------
-
-# x = (r12,)
-
-invariants(x::SVector{1, T}) where {T} =
-      copy(x),
-      SVector{1, T}(1.0)
-
-invariants_d(x::SVector{1, T}) where {T} =
-      (@SVector [ SVector(one(T))  ]),
-      (@SVector [ SVector(zero(T)) ])
-
-invariants_ed(x::SVector{1,T}) where {T} =
-      copy(x),
-      SVector{1, T}(1.0),
-      (@SVector [ SVector(one(T))  ]),
-      (@SVector [ SVector(zero(T)) ])
-
-tdegrees(::Val{2}) = (1,), (0,)
-
-# this is a terrible hack that mostly likely will not work as we want.
-# see Slack discussion for more details.
-rtdegrees(::Val{2}) =
-   ( (1,0), ), ( (0,0), )
+# # ------------------------------------------------------------------------
+# #             2-BODY Invariants
+# #             fully equivalent to BL/BA invariants
+# # ------------------------------------------------------------------------
+#
+# # x = (r12,)
+#
+# invariants(x::SVector{1, T}) where {T} =
+#       copy(x),
+#       SVector{1, T}(1.0)
+#
+# invariants_d(x::SVector{1, T}) where {T} =
+#       (@SVector [ SVector(one(T))  ]),
+#       (@SVector [ SVector(zero(T)) ])
+#
+# invariants_ed(x::SVector{1,T}) where {T} =
+#       copy(x),
+#       SVector{1, T}(1.0),
+#       (@SVector [ SVector(one(T))  ]),
+#       (@SVector [ SVector(zero(T)) ])
+#
+# tdegrees(::Val{2}) = (1,), (0,)
 
 
 # ------------------------------------------------------------------------
@@ -70,9 +65,9 @@ invariants_ed(r::SVector{3, T},::Val{:AAA}) where {T} =
                   (@SVector [r[2] * r[3], r[1] * r[3], r[1] * r[2]]) ]),
       (@SVector [ (@SVector [0.0, 0.0, 0.0]) ])
 
-tdegrees(::Val{3},::Val{:AAA}) = (1, 2, 3), (0,)
+tdegrees(::Val{:AAA}) = (1, 2, 3), (0,)
 
-corners(::Val{3},::Val{:AAA}) = ( SVector(1,2), SVector(1,3), SVector(2,3) )
+corners(::Val{:AAA}) = ( SVector(1,2), SVector(1,3), SVector(2,3) )
 
 # Case :AAB (two different species), using bond-angle invariants
 
@@ -99,7 +94,7 @@ invariants_ed(x::SVector{3, T},::Val{:AAB}) where {T} =
       (@SVector [ (@SVector T[0.0, 0.0, 0.0]) ])
 
 
-tdegrees(::Val{3},::Val{:AAB}) = (1, 2, 1), (0,)
+tdegrees(::Val{:AAB}) = (1, 2, 1), (0,)
 
    # Case :ABC (two different species), no real invariants since there is no symmetry
 
@@ -126,6 +121,6 @@ tdegrees(::Val{3},::Val{:AAB}) = (1, 2, 1), (0,)
          (@SVector [ (@SVector T[0.0, 0.0, 0.0]) ])
 
 
-   tdegrees(::Val{3},::Val{:ABC}) = (1, 1, 1), (0,)
+   tdegrees(::Val{:ABC}) = (1, 1, 1), (0,)
 
 end

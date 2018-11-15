@@ -43,6 +43,17 @@ function skip_simplex_species_many(Spi,Spj,Species,J)
    return [sort(Sp) == sort(Species[k]) for k=1:length(Species)]
 end
 
+# sort by species for 3B:
+function sort_by_species(Spi,Spj,J::)
+   Sp = [Spi]
+   for i=1:length(J)
+      push!(Sp,Spj[J[i]])
+   end
+   if Sp[1] == Sp[2]
+      return J
+   elseif
+end
+
 
 @generated function eval_site_nbody!( ::Val{N},
                                       Rs::AbstractVector{JVec{T}},

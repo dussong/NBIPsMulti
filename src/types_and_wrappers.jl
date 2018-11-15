@@ -112,7 +112,7 @@ NBPolyM(B::Vector{TB}, c, D, Sp, Sp_type) where {TB <: NBPolyM} =
       NBPolyM([b.t[1] for b in B], c .* [b.c[1] for b in B], D, Sp, Sp_type)
 
 # 1-body term (on-site energy)
-NBPolyM(c::Float64) = NBPolyM([Tup{0}()], [c], nothing, Val(1), [], Val{OneB})
+NBPolyM(c::Float64) = NBPolyM([Tup{0}()], [c], nothing, Val(1), [], Val{:OneB})
 
 # number of basis functions which this term is made from
 length(V::NBPolyM) = length(V.t)
