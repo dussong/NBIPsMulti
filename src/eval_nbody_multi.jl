@@ -72,7 +72,9 @@ end
 
    code = Expr[]
    # initialise the output
+   push!(code, :( print(".") ))
    push!(code, :( nR = length(Rs)  ))
+   push!(code, :( println("nR = ", nR) ))
 
    # generate the multi-for-loop
    ex_loop = _get_loop_ex(N)
@@ -84,7 +86,9 @@ end
    push!(code_inner,      _get_Jvec_ex(N) )
 
    # now call `V` with the simplex-corner vectors and "add" this to the site energy
+   push!(code_inner, :( print(out) ))
    push!(code_inner, :(   out = reducefun(out, Rs, J, temp,Spi,Spj,Species) ))
+   push!(code_inner, :( println(" -> ", out) ))
 
    # put code_inner into the loop expression
    ex_loop.args[2] = Expr(:block, code_inner...)
@@ -109,6 +113,7 @@ function evaluateM(V::NBodyFunctionM{N},
    skip_simplex_species(Spi,Spj,Species,J) && return zero(T)
    evaluate(V,desc,Rs,J)
 end
+
 
 evaluateM(V::NBodyFunctionM,Rs::AbstractVector{JVec{T}},J::SVector{K, Int},Spi::Int,Spj::Vector{Int},Species::Vector{Int}) where {T,K} = evaluateM(V,descriptor(V),Rs,J,Spi,Spj,Species)
 
@@ -138,8 +143,12 @@ function site_energies(V::NBodyFunctionM{N}, at::Atoms{T},Species::Vector{Int}) 
       Spi = Z[i]
       Spj = Z[j]
       # println("here I am")
-      Es[i] = eval_site_nbodyM!(Val(N), R, cutoff(V),
-                               ((out, R, J, temp,Spi,Spj,Species) -> out + evaluateM(V, descriptor(V), R, J,Spi,Spj,Species)), zero(T), nothing, Spi,Spj,Species)
+      Es[i] = eval_site_nbodyM!(
+                 Val(N), R, cutoff(V),
+                (out, R, J, temp,Spi,Spj,Species) -> (out +
+                                 evaluateM(V, descriptor(V), R,
+                                           J,Spi,Spj,Species)),
+                zero(T), nothing, Spi,Spj,Species)
    end
    return Es
 end

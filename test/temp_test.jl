@@ -11,7 +11,7 @@ data = Butane.load_xyz() # ; include = ["hess_bcc", "hess_hcp"])
 data2 = data
 at2 = data[1].at
 
-r0 = 2.5
+r0 = 3.
 BL2 = BondLengthDesc("exp( - 2 * (r/$r0-1))",
                     "(:cos, $(r0-1.5), $(r0))")
 
@@ -23,10 +23,14 @@ at = rattle!(bulk(:Cu, cubic=true) * 2, 0.02)
 
 # @show E = energy(basis[1], at)
 # @show E2 = energy(basis[1],at2)
+cutoff(basis[1])
+rnn(:Cu)
 
-# Ei = site_energies(basis[1],at2,[29,29])
-Ei = [site_energies(basis[1],at,[29,29]) for i=1:1000]
+Ei = site_energies(basis[1],at,[29,29])
+Ei = site_energies(basis[1],at2,[29,29])
 
+@which site_energies(basis[1],at,[29,29])
+@which site_energies(basis[1],at2,[29,29])
 
 
 # V = basis[1]
@@ -45,8 +49,7 @@ Ei = [site_energies(basis[1],at,[29,29]) for i=1:1000]
 #    error("stop")
 # end
 
-# @which site_energies(basis[1],at,[29,29])
-# @which site_energies(basis[1],at2,[29,29])
+
 #
 # @which energy(basis[1], at)
 # @which energy(basis[1], at2)
