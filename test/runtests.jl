@@ -1,3 +1,5 @@
+include("../src/NBIPsMulti.jl")
+
 using NBIPsMulti
 using JuLIP, NBodyIPs, Base.Test, StaticArrays
 

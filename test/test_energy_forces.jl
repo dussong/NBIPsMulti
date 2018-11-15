@@ -2,8 +2,16 @@
 using JuLIP, NBodyIPs, NBIPsMulti, StaticArrays
 using BenchmarkTools, Base.Test
 
+at = rattle!(bulk(:Cu, cubic=true) * 2, 0.02)
+Z1 = atomic_numbers(at)
+Z1[2] = 30
+Z1[10] = 30
+at.Z = Z1
 
-r0 = 2.5
+at_positions = copy(positions(at)) |> mat
+
+
+r0 = 1.2*rnn(:Cu)
 BL2 = BondLengthDesc("exp( - 2 * (r/$r0-1))",
                     "(:cos, $(r0-1.5), $(r0))")
 
@@ -20,13 +28,7 @@ site_energies(basis[1], at, [29,29])
 
 
 
-at = rattle!(bulk(:Cu, cubic=true) * 2, 0.02)
-Z1 = atomic_numbers(at)
-Z1[2] = 30
-Z1[10] = 30
-at.Z = Z1
 
-at_positions = copy(positions(at)) |> mat
 
 println("-------------------------------------------------")
 println(" Test finite difference energy vs forces - implementation with evaluate ")
@@ -99,15 +101,17 @@ println("-------------------------------------------------")
 println(" Test comparison between 2 implementations - evaluate and evaluate_many ")
 println("-------------------------------------------------")
 
-println(" Energy ")
+println(" Energy difference between 2 implementations - ")
 E1 = energy(basis, at)
 E2 = [energy(basis[k], at) for k=1:length(basis)]
-@test vecnorm(E1-E2,Inf) <= 1e-10
+print(vecnorm(E1-E2,Inf))
+@test vecnorm(E1-E2,Inf) <= 1e-9
 
-println(" Forces ")
+println(" Forces difference between 2 implementations -")
 F = forces(basis,at)
 F1 = [mat(F[i]) for i = 1:length(F)]
 F2 = [mat(forces(basis[k], at)) for k=1:length(basis)]
+print(vecnorm([vecnorm(F1[k]-F2[k],Inf) for k=1:length(basis)], Inf))
 @test vecnorm([vecnorm(F1[k]-F2[k],Inf) for k=1:length(basis)], Inf) <= 1e-10
 
 
