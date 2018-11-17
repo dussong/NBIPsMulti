@@ -348,8 +348,38 @@ end
 
 
 function nbpolys(desc::MultiDesc, tdeg, Sp, Sp_type)
-   temp = gen_tuples(desc, tdeg)
-   return nbpolys(temp, desc, Sp, Sp_type)
+   @assert Sp_type == desc.sp_type
+   @assert Val(length(Sp)) == desc.valN
+   @assert check_species(desc, Sp)
+   nbpolys(gen_tuples(desc, tdeg),desc, Sp, Sp_type)
 end
 
 nbpolys(ts::VecTup, desc, Sp, Sp_type) = [NBPolyM(t, 1.0, desc, Sp, Sp_type) for t in ts]
+
+nbpolys(desc::MultiDesc, tdeg, Sp) = nbpolys(desc, tdeg, Sp, desc.sp_type)
+
+function check_species(desc::MultiDesc, Sp, ::Val{:AA})
+   return length(Sp) == 2
+end
+
+function check_species(desc::MultiDesc, Sp, ::Val{:AAA})
+   return (length(Sp) == 3)&&(Sp[1] == Sp[2])&&(Sp[2] == Sp[3])
+end
+
+function check_species(desc::MultiDesc, Sp, ::Val{:AAB})
+   if length(Sp) == 3
+      if (Sp[1] == Sp[2])&&(Sp[2] !== Sp[3])
+         return true
+      elseif (Sp[2] == Sp[3])&&(Sp[1] !== Sp[3])
+         return true
+      elseif (Sp[1] == Sp[3])&&(Sp[2] !== Sp[3])
+         return true
+      else
+         return false
+      end
+   else
+      return false
+   end
+end
+
+check_species(desc::MultiDesc, Sp) = check_species(desc::MultiDesc, Sp, desc.sp_type)

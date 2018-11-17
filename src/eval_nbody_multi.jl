@@ -43,6 +43,45 @@ function skip_simplex_species_many(Spi,Spj,Species,J)
    return [sort(Sp) == sort(Species[k]) for k=1:length(Species)]
 end
 
+
+# 2-Body
+skip_simplex_species_order!(desc::MultiDesc,Spi,Spj,Species,J,::Val{:AA}) = false
+
+# 3-Body
+skip_simplex_species_order!(desc::MultiDesc,
+                                    Spi,Spj,Species,
+                                    J,
+                                    ::Val{:AAA}) = false
+
+function skip_simplex_species_order!(desc::MultiDesc,Spi,Spj,Species,J,::Val{:AAB})
+   return Spj[J[1]] != Spj[J[2]]
+end
+
+function skip_simplex_species_order!(desc::MultiDesc,Spi,Spj,Species,J,::Val{:ABC})
+   if Spi == Species[1]
+      if Spj[J[1]] == Species[2]
+         return false
+      elseif Spj[J[1]] == Species[3]
+         J[1],J[2] = J[2],J[1]
+         return false
+      else
+         error("I shouldnt be here: skip_simplex_species_order")
+      end
+   else
+      return true
+   end
+end
+
+skip_simplex_species_order!(desc::MultiDesc,
+                            Spi,Spj,Species,J) =
+                            skip_simplex_species_order!(desc,
+                                                        Spi,Spj,Species,J,
+                                                        desc.sp_type)
+
+
+
+
+
 # sort by species for 3B:
 # function sort_by_species(Spi,Spj,J::)
 #    Sp = [Spi]

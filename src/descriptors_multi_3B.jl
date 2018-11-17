@@ -32,6 +32,22 @@ import NBodyIPs: ricoords,
 MultiDesc(transform::String, cutoff::Union{String, Tuple}, sp_type, valN) =
          MultiDesc(SpaceTransform(transform), Cutoff(cutoff),sp_type, valN)
 
+MultiDesc(transform::String, cutoff::Union{String, Tuple}, ::Val{:AA}) =
+         MultiDesc(SpaceTransform(transform), Cutoff(cutoff),
+                   Val(:AA), Val(2))
+
+MultiDesc(transform::String, cutoff::Union{String, Tuple}, ::Val{:AAA}) =
+         MultiDesc(SpaceTransform(transform), Cutoff(cutoff),
+                   Val(:AAA), Val(3))
+
+MultiDesc(transform::String, cutoff::Union{String, Tuple}, ::Val{:AAB}) =
+         MultiDesc(SpaceTransform(transform), Cutoff(cutoff),
+                   Val(:AAB), Val(3))
+
+MultiDesc(transform::String, cutoff::Union{String, Tuple}, ::Val{:ABC}) =
+         MultiDesc(SpaceTransform(transform), Cutoff(cutoff),
+                   Val(:ABC), Val(3))    
+
 Dict(D::MultiDesc) = Dict( "__id__"    =>  "MultiDesc",
                                 "transform" =>  Dict(D.transform),
                                 "cutoff"    =>  Dict(D.cutoff),
