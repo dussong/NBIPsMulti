@@ -9,7 +9,6 @@ at = rattle!(bulk(:Cu, cubic=true) * 2, 0.02)
 Z1 = atomic_numbers(at)
 Z1[2] = 30
 Z1[10] = 30
-Z1[11] = 31
 at.Z = Z1
 
 at_positions = copy(positions(at)) |> mat
@@ -17,10 +16,10 @@ at_positions = copy(positions(at)) |> mat
 
 r0 = 1.2*rnn(:Cu)
 
-valSp = [Val(:AAA),Val(:AAB),Val(:ABC)]
-Sp = [[29,29,29], [29,29,30], [29,30,31]]
+valSp = [Val(:AA),Val(:AA)]
+Sp = [[29,29], [29,30]]
 
-for i in 1:3
+for i in 1:2
    println("-------------------------------------------------")
    println(" Tests $(valSp[i]) ")
    println("-------------------------------------------------")
