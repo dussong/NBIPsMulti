@@ -50,7 +50,7 @@ export NBPolyM, NBodyFunctionM
 #          Type for species NBodyFunction
 # ==================================================================
 
-abstract type NBodyFunctionM{N, DT} <: NBodyFunction{N,DT} end
+abstract type NBodyFunctionM{N, DT, SP} <: NBodyFunction{N,DT} end
 
 
 
@@ -59,7 +59,7 @@ export MultiDesc
 struct MultiDesc{TT <: SpaceTransform, TC <: Cutoff, SP, N} <: NBSiteDescriptor
    transform::TT
    cutoff::TC
-   sp_type::SP
+   sp_type::Val{SP}
    valN::Val{N} #encodes the body-order
 end
 
@@ -67,15 +67,15 @@ end
 #           Polynomials of Invariants
 # ==================================================================
 
-@pot struct NBPolyM{N, M, T, TD, SP} <: NBodyFunctionM{N, TD}
+@pot struct NBPolyM{N, M, T, TD, SP} <: NBodyFunctionM{N, TD, SP}
    t::VecTup{M}               # tuples M = #edges + 1
    c::Vector{T}               # coefficients
    D::TD                      # Descriptor
    valN::Val{N}               # encodes that this is an N-body function
    Sp::Vector{Int}            #encodes the species
-   Sp_type::SP
+   Sp_type::Val{SP}
 
-   NBPolyM(t::VecTup{M}, c::Vector{T}, D::TD, valN::Val{N}, Sp::Vector{Int}, Sp_type::SP) where {N, M, T, TD, SP} = (
+   NBPolyM(t::VecTup{M}, c::Vector{T}, D::TD, valN::Val{N}, Sp::Vector{Int}, Sp_type::Val{SP}) where {N, M, T, TD, SP} = (
       N <= 1 ? error("""NBPoly must have body-order 2 or larger;
                         use `NBodyIPs.OneBody{T}` for 1-body.""")
              : new{N, M, T, TD, SP}(t, c, D, valN, Sp, Sp_type))
@@ -214,24 +214,30 @@ function evaluate_I_ed(V::NBPolyM, II)
    return E, dE
 end
 
+# # -------------- Body-order from species --------
+# bodyorder(::Val{:AA}) = 2
+# bodyorder(::Val{:AAA}) = 3
+# bodyorder(::Val{:AAB}) = 3
+# bodyorder(::Val{:ABC}) = 3
 
 # -------------- Infrastructure to read/write NBPoly  --------
 
 
-Dict(V::NBPolyM{N}) where {N} = Dict( "__id__" => "NBPolyM",
-                                      "t" => V.t,
-                                      "c" => V.c,
-                                      "D" => Dict(V.D),
-                                      "N" => N,
-                                      "Sp" => V.Sp,
-                                      "Sp_type" => V.Sp_type )
+Dict(V::NBPolyM{N, M, T, TD, SP}) where {N, M, T, TD, SP} = Dict(
+                        "__id__" => "NBPolyM",
+                        "t" => V.t,
+                        "c" => V.c,
+                        "D" => Dict(V.D),
+                        "N" => N,
+                        "Sp" => V.Sp,
+                        "Sp_type" => String(SP) )
 
 NBPolyM(D::Dict) = NBPolyM([ tuple(ti...) for ti in D["t"] ],
                            Vector{Float64}(D["c"]),
                            _decode_dict(D["D"]),
                            Val(D["N"]),
                            Vector{Int}(D["Sp"]),
-                           (D["Sp_type"]))
+                           Val(Symbol(D["Sp_type"])))
 
 Base.convert(::Val{:NBPolyM}, D::Dict) = NBPolyM(D)
 

@@ -3,7 +3,7 @@ info("Load libraries ...")
 
 include("../src/NBIPsMulti.jl")
 
-using JuLIP, NBodyIPs, FileIO, NBIPsMulti, NBodyIPFitting
+using JuLIP, NBodyIPs, NBIPsMulti, NBodyIPFitting
 
 info("Load Butane database ...")
 
@@ -31,18 +31,30 @@ BL3_AAB = MultiDesc("exp( - 2.5 * (r/$r0-1))", "(:cos2s, $(0.7*r0), $(0.88*r0), 
 ##
 info("Generate a BL-2B basis ...")
 basis = [
-      nbpolys(BL2, 14, [6,6]);
-      nbpolys(BL2, 14, [1,1]);
-      nbpolys(BL2, 14, [1,6]);
-      nbpolys(BL3_AAA, 10, [1,1,1]);
-      nbpolys(BL3_AAA, 10, [6,6,6]);
-      nbpolys(BL3_AAB, 10, [1,1,6]);
-      nbpolys(BL3_AAB, 10, [1,6,6]);
+      # nbpolys(BL2, 14, [6,6]);
+      # nbpolys(BL2, 14, [1,1]);
+      # nbpolys(BL2, 14, [1,6]);
+      nbpolys(BL3_AAA, 2, [1,1,1]);
+      # nbpolys(BL3_AAA, 10, [6,6,6]);
+      # nbpolys(BL3_AAB, 10, [1,1,6]);
+      # nbpolys(BL3_AAB, 10, [1,6,6]);
    ]
-
 
 info("Assemble the LsqDB ...")
 @show length(basis)
 dbpath = homedir() * "/Gits/NBIPsMulti/data/Butane_3B"
 
-db =  LsqDB(dbpath, basis, data);
+db1 =  LsqDB(dbpath, basis, data);
+db1
+
+info("Fit Butane Database basis...")
+
+dataweights = Dict("E" => 10.0, "F" => 1.0, "V" => 1.0)
+configweights = Dict(""  => 1.0)
+
+IP, info = lsqfit( db1; E0 = E0,
+                       dataweights=dataweights,
+                       configweights=configweights,
+                       # Ibasis = Ibasis
+                       )
+info

@@ -45,19 +45,23 @@ end
 
 
 # 2-Body
-skip_simplex_species_order!(desc::MultiDesc,Spi,Spj,Species,J,::Val{:AA}) = false
+function skip_simplex_species_order! end
+
+skip_simplex_species_order!(desc::MultiDesc,
+                            Spi,Spj,Species,J,::Val{:AA}) = false
 
 # 3-Body
 skip_simplex_species_order!(desc::MultiDesc,
-                                    Spi,Spj,Species,
-                                    J,
-                                    ::Val{:AAA}) = false
+                            Spi,Spj,Species,
+                            J,::Val{:AAA}) = false
 
-function skip_simplex_species_order!(desc::MultiDesc,Spi,Spj,Species,J,::Val{:AAB})
+function skip_simplex_species_order!(desc::MultiDesc,
+                                     Spi,Spj,Species,J,::Val{:AAB})
    return Spj[J[1]] != Spj[J[2]]
 end
 
-function skip_simplex_species_order!(desc::MultiDesc,Spi,Spj,Species,J,::Val{:ABC})
+function skip_simplex_species_order!(desc::MultiDesc,
+                                     Spi,Spj,Species,J,::Val{:ABC})
    if Spi == Species[1]
       if Spj[J[1]] == Species[2]
          return false

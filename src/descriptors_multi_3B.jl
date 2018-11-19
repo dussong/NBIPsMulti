@@ -27,7 +27,8 @@ import NBodyIPs: ricoords,
 
 
 # -------------- IO -------------------
-
+to_str(::Val{T}) where {T} = string(T)
+get_val(v::Val{T}) where {T} = T
 
 MultiDesc(transform::String, cutoff::Union{String, Tuple}, sp_type, valN) =
          MultiDesc(SpaceTransform(transform), Cutoff(cutoff),sp_type, valN)
@@ -46,18 +47,20 @@ MultiDesc(transform::String, cutoff::Union{String, Tuple}, ::Val{:AAB}) =
 
 MultiDesc(transform::String, cutoff::Union{String, Tuple}, ::Val{:ABC}) =
          MultiDesc(SpaceTransform(transform), Cutoff(cutoff),
-                   Val(:ABC), Val(3))    
+                   Val(:ABC), Val(3))
 
 Dict(D::MultiDesc) = Dict( "__id__"    =>  "MultiDesc",
-                                "transform" =>  Dict(D.transform),
-                                "cutoff"    =>  Dict(D.cutoff),
-                                "sp_type"    =>  Dict(D.sp_type),
-                                "valN"    =>  Dict(D.valN) )
+                            "transform" =>  Dict(D.transform),
+                            "cutoff"    =>  Dict(D.cutoff),
+                            "sp_type"    =>  to_str(D.sp_type),
+                            "valN"    =>  get_val(D.valN)
+                             )
 
 MultiDesc(D::Dict) = MultiDesc( SpaceTransform(D["transform"]),
                                           Cutoff(D["cutoff"]),
-                                          D["sp_type"],
-                                          D["valN"] )
+                                          Val(Symbol(D["sp_type"])),
+                                          Val(D["valN"])
+                                          )
 
 ==(D1::MultiDesc, D2::MultiDesc) =
       ( (D1.transform == D2.transform) && (D1.cutoff == D2.cutoff)

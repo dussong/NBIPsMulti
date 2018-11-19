@@ -30,7 +30,3 @@ table_absolute(info["errors"])
 table_relative(info["errors"])
 
 NBodyIPs.save_ip("Butane_3B.json", IP, info)
-
-
-# IP, info = NBodyIPs.load_ip("SiPIP_4BBA_short.json")
-# info
