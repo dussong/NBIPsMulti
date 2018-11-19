@@ -1,6 +1,6 @@
 info("Load libraries...")
 
-include("../src/NBIPsMulti.jl")
+# include("../src/NBIPsMulti.jl")
 
 using NBodyIPs, NBodyIPFitting, JuLIP, NBIPsMulti
 include(homedir() * "/Gits/NBIPsMulti/src/Butane.jl")
@@ -29,4 +29,4 @@ IP
 table_absolute(info["errors"])
 table_relative(info["errors"])
 
-NBodyIPs.save_ip("Butane_3B.json", IP, info)
+# NBodyIPs.save_ip("Butane_3B.json", IP, info)
