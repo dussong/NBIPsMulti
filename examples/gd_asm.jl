@@ -57,12 +57,20 @@ db =  LsqDB(dbpath, basis, data);
 # -------------------------
 info("Fit Butane Database basis...")
 
-dataweights = Dict("E" => 10.0, "F" => 1.0, "V" => 1.0)
-configweights = Dict(""  => 1.0)
+p = 0.5
+
+dataweights = Dict("E" => 1.0, "F" => 1.0)
+configweights = Dict(""  => (1.0,p))
+
+
 
 IP, info = lsqfit( db; E0 = E0,
+                       # solver = (:svd,3),
                        dataweights=dataweights,
                        configweights=configweights,
-                       # Ibasis = Ibasis
+                       Ibasis = collect(1:45)
                        )
 info
+
+table_absolute(info["errors"])
+table_relative(info["errors"])
