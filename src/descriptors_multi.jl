@@ -8,7 +8,7 @@ function evaluate(V::NBodyFunction{N},
    # check species
    skip_simplex_species(Spi,Spj,Species,J) && return zero(T)
    skip_simplex_species_order!(desc,Spi,Spj,Species,J) && return zero(T)
-   return evaluate(V,desc,Rs,J)
+   return evaluate(V,desc,Rs,0,J)
    # get the physical descriptor: bond-lengths (+ bond-angles)
    # rθ = ricoords(desc, Rs, J)
    # # # order the variables
@@ -35,7 +35,7 @@ function evaluate_d!(dVsite,
    # check species
    skip_simplex_species(Spi,Spj,Species,J) && return dVsite
    skip_simplex_species_order!(desc,Spi,Spj,Species,J) && return dVsite
-   evaluate_d!(dVsite, V, desc, Rs, J)
+   evaluate_d!(dVsite, V, desc, Rs,0,J)
 end
 
 
@@ -47,7 +47,7 @@ function evaluate_many!(Es,
    # Es[ind] = evaluate_many!(Es[ind],B[ind],desc,Rs,J)
    for i in ind
       if !(skip_simplex_species_order!(desc,Spi,Spj,Species[i],J))
-         Es[i] += evaluate(B[i],desc,Rs,J)
+         Es[i] += evaluate(B[i],desc,Rs,0,J)
       end
    end
    return Es
@@ -67,7 +67,7 @@ function evaluate_many_d!(dVsite::AbstractVector,
    # dVsite[ind] = evaluate_many_d!(dVsite[ind],B[ind],desc,Rs,J)
    for i in ind
       if !(skip_simplex_species_order!(desc,Spi,Spj,Species[i],J))
-         dVsite[i] = evaluate_d!(dVsite[i], B[i], desc, Rs, J)
+         dVsite[i] = evaluate_d!(dVsite[i], B[i], desc, Rs,0, J)
       end
    end
    return dVsite
