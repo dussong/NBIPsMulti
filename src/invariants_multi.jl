@@ -2,11 +2,11 @@ module MultiInvariants
 
 using StaticArrays
 
+using NBodyIPs
 using NBodyIPs: invariants, invariants_d, invariants_ed, tdegrees
 
 import NBodyIPs: invariants, invariants_d, invariants_ed, tdegrees
 
-using NBodyIPs.BLInvariants
 
 
 
@@ -134,8 +134,18 @@ tdegrees(::Val{:AAB}) = (1, 2, 1), (0,)
 
 invariants(x::SVector{6, T},::Val{:AAAA}) where {T} = NBodyIPs.BLInvariants.invariants(x)
 
-invariants_d(x::SVector{6, T},::Val{:AAAA}) where {T} = invariants_d(x)
+invariants_d(x::SVector{6, T},::Val{:AAAA}) where {T} =  NBodyIPs.BLInvariants.invariants_d(x)
 
-invariants_ed(x::SVector{6, T},::Val{:AAAA}) where {T} = BLInvariants.invariants_ed(x)
+invariants_ed(x::SVector{6, T},::Val{:AAAA}) where {T} = NBodyIPs.BLInvariants.invariants_ed(x)
+
+
+# Case :AAAB (3+1 atoms), using bond-angle invariants
+
+invariants(x::SVector{6, T},::Val{:AAAB}) where {T} = NBodyIPs.BAInvariants.invariants(x)
+
+invariants_d(x::SVector{6, T},::Val{:AAAB}) where {T} =  NBodyIPs.BAInvariants.invariants_d(x)
+
+invariants_ed(x::SVector{6, T},::Val{:AAAB}) where {T} = NBodyIPs.BAInvariants.invariants_ed(x)
+
 
 end
