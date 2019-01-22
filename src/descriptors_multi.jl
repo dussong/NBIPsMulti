@@ -3,8 +3,9 @@
 function evaluate(V::NBodyFunction{N},
                   desc::NBSiteDescriptor,
                   Rs::AbstractVector{JVec{T}},
-                  J::SVector{K, Integer},
-                  Spi::Integer,Spj::Vector{Integer},Species::Vector{Integer}) where {N, T, K}
+                  J,
+                  Spi, Spj, Species) where {N, T}
+                  # ,Spi::Integer,Spj::Vector{Integer},Species::Vector{Integer}
    # check species
    skip_simplex_species(Spi,Spj,Species,J) && return zero(T)
    skip_simplex_species_order!(desc,Spi,Spj,Species,J) && return zero(T)
@@ -24,17 +25,18 @@ function evaluate(V::NBodyFunction{N},
    # return evaluate_I(V, II) * fc
 end
 
-evaluate(V::NBodyFunction,
-         Rs::AbstractVector{JVec{T}},
-         J::SVector{K, Integer},
-         Spi,Spj,Species) where {T,K} = evaluate(V,descriptor(V),Rs,J,Spi,Spj,Species)
+# evaluate(V::NBodyFunction,
+#          Rs::AbstractVector{JVec{T}},
+#          J::SVector{K, Integer},
+#          Spi,Spj,Species) where {T,K} = evaluate(V,descriptor(V),Rs,J,Spi,Spj,Species)
 
 function evaluate_d!(dVsite,
                      V::NBodyFunction{N},
                      desc::NBSiteDescriptor,
                      Rs::AbstractVector{JVec{T}},
                      J,
-                     Spi::Integer,Spj::Vector{Integer},Species::Vector{Integer}) where {N,T}
+                     Spi, Spj, Species) where {N,T}
+                     # Spi::Integer,Spj::Vector{Integer},Species::Vector{Integer}
    # check species
    skip_simplex_species(Spi,Spj,Species,J) && return dVsite
    skip_simplex_species_order!(desc,Spi,Spj,Species,J) && return dVsite
@@ -80,4 +82,4 @@ evaluate_many_d!(out, B, Rs, J, Spi, Spj, Species) =
       evaluate_many_d!(out, B, descriptor(B[1]), Rs, J, Spi,Spj,Species)
 
 
-include("descriptors_multi_3B.jl")
+include("descriptors_multi_3B_4B.jl")
