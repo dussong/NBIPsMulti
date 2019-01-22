@@ -76,6 +76,78 @@ function skip_simplex_species_order!(desc::MultiDesc,
    end
 end
 
+# 4-Body
+
+skip_simplex_species_order!(desc::MultiDesc,
+                            Spi,Spj,Species,
+                            J,::Val{:AAAA}) = false
+
+function skip_simplex_species_order!(desc::MultiDesc,
+                                   Spi,Spj,Species,J,::Val{:AAAB})
+   return (Spj[J[1]] != Spj[J[2]])||(Spj[J[1]] != Spj[J[3]])||(
+         Spj[J[2]] != Spj[J[3]])
+end
+
+function skip_simplex_species_order!(desc::MultiDesc,
+                                   Spi,Spj,Species,J,::Val{:AABB})
+   if Spi == Species[1]
+      ind = sortperm([Spj[J[k]] for k=1:3])
+      J[1:3] = J[ind]
+      return false
+      # if (Spj[J[1]] == Species[2])
+      #    return false
+      # elseif (Spj[J[2]] == Species[2])
+      #    J[2], J[1] = J[1], J[2]
+      #    return false
+      # elseif (Spj[J[3]] == Species[2])
+      #    J[3], J[1] = J[1], J[3]
+      #    return false
+   else
+      return true
+   end
+end
+
+function skip_simplex_species_order!(desc::MultiDesc,
+                                   Spi,Spj,Species,J,::Val{:AABC})
+   if Spi == Species[1]
+      ind = sortperm([Spj[J[k]] for k=1:3])
+      J[1:3] = J[ind]
+      return false
+   else
+      return true
+   end
+end
+
+
+function skip_simplex_species_order!(desc::MultiDesc,
+                                     Spi,Spj,Species,J,::Val{:ABCD})
+   if Spi == Species[1]
+      if (Spj[J[1]] == Species[2])&&(Spj[J[2]] == Species[3])
+         return false
+      elseif (Spj[J[1]] == Species[2])&&(Spj[J[2]] == Species[4])
+         J[2], J[3] = J[3], J[2]
+         return false
+      elseif (Spj[J[1]] == Species[3])&&(Spj[J[2]] == Species[2])
+         J[2], J[1], J[3] = J[1], J[2], J[3]
+         return false
+      elseif (Spj[J[1]] == Species[3])&&(Spj[J[2]] == Species[4])
+         J[2], J[3], J[1] = J[1], J[2], J[3]
+         return false
+      elseif (Spj[J[1]] == Species[4])&&(Spj[J[2]] == Species[2])
+         J[3], J[1], J[2] = J[1], J[2], J[3]
+         return false
+      elseif (Spj[J[1]] == Species[4])&&(Spj[J[2]] == Species[3])
+         J[3], J[1] = J[1], J[3]
+         return false
+      else
+         error("I shouldnt be here: skip_simplex_species_order")
+      end
+   else
+      return true
+   end
+end
+
+
 skip_simplex_species_order!(desc::MultiDesc,
                             Spi,Spj,Species,J) =
                             skip_simplex_species_order!(desc,

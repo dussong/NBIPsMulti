@@ -389,10 +389,55 @@ function check_species(desc::MultiDesc, Sp, ::Val{:AAB})
 end
 
 function check_species(desc::MultiDesc, Sp, ::Val{:ABC})
-   return ((length(Sp) == 3)&&
-            (Sp[1] != Sp[2])&&
-            (Sp[2] != Sp[3])&&
-            (Sp[1] != Sp[3]))
+   return (length(Sp) == 3)&&(length(unique(Sp)) == 3)
+            # (Sp[1] != Sp[2])&&
+            # (Sp[2] != Sp[3])&&
+            # (Sp[1] != Sp[3]))
 end
 
-check_species(desc::MultiDesc, Sp) = check_species(desc::MultiDesc, Sp, desc.sp_type)
+function check_species(desc::MultiDesc, Sp, ::Val{:AAAA})
+   return (length(Sp) == 4)&&(length(unique(Sp)) == 1)
+end
+
+function check_species(desc::MultiDesc, Sp, ::Val{:AAAB})
+   if (length(Sp) == 4)&&(length(unique(Sp)) == 2)
+      if (Sp[1] == Sp[2])&&(Sp[2] == Sp[3])&&(Sp[3] !== Sp[4])
+         return true
+      elseif (Sp[1] !== Sp[2])&&(Sp[2] == Sp[3])&&(Sp[3] == Sp[4])
+         return true
+      elseif (Sp[1] == Sp[3])&&(Sp[3] == Sp[4])&&(Sp[1] !== Sp[2])
+         return true
+      elseif (Sp[1] == Sp[2])&&(Sp[2] == Sp[4])&&(Sp[1] !== Sp[3])
+         return true
+      end
+   else
+      return false
+   end
+end
+
+function check_species(desc::MultiDesc, Sp, ::Val{:AABB})
+   if (length(Sp) == 4)&&(length(unique(Sp)) == 2)
+      if (Sp[1] == Sp[2])&&(Sp[3] == Sp[4])&&(Sp[2] !== Sp[3])
+         return true
+      elseif (Sp[1] == Sp[3])&&(Sp[2] == Sp[4])&&(Sp[1] !== Sp[2])
+         return true
+      elseif (Sp[1] == Sp[4])&&(Sp[2] == Sp[3])&&(Sp[1] !== Sp[2])
+         return true
+      end
+   else
+      return false
+   end
+end
+
+function check_species(desc::MultiDesc, Sp, ::Val{:AABC})
+   return (length(Sp) == 4)&&(length(unique(Sp)) == 3)
+end
+
+function check_species(desc::MultiDesc, Sp, ::Val{:ABCD})
+   return (length(Sp) == 4)&&(length(unique(Sp))==4)
+end
+
+
+function check_species(desc::MultiDesc, Sp)
+   return (check_species(desc::MultiDesc, Sp, desc.sp_type))&&(Sp == sort(Sp))
+end
