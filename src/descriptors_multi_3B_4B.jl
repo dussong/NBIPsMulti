@@ -49,6 +49,34 @@ MultiDesc(transform::String, cutoff::Union{String, Tuple}, ::Val{:ABC}) =
          MultiDesc(SpaceTransform(transform), Cutoff(cutoff),
                    Val(:ABC), Val(3))
 
+# 4-Body
+
+MultiDesc(transform::String, cutoff::Union{String, Tuple}, ::Val{:AAAA}) =
+                            MultiDesc(SpaceTransform(transform), Cutoff(cutoff),
+                                      Val(:AAAA), Val(4))
+
+
+MultiDesc(transform::String, cutoff::Union{String, Tuple}, ::Val{:AAAB}) =
+                           MultiDesc(SpaceTransform(transform), Cutoff(cutoff),
+                                     Val(:AAAB), Val(4))
+
+
+MultiDesc(transform::String, cutoff::Union{String, Tuple}, ::Val{:AABB}) =
+                          MultiDesc(SpaceTransform(transform), Cutoff(cutoff),
+                                    Val(:AABB), Val(4))
+
+
+MultiDesc(transform::String, cutoff::Union{String, Tuple}, ::Val{:AABC}) =
+                         MultiDesc(SpaceTransform(transform), Cutoff(cutoff),
+                                   Val(:AABC), Val(4))
+
+
+MultiDesc(transform::String, cutoff::Union{String, Tuple}, ::Val{:ABCD}) =
+                           MultiDesc(SpaceTransform(transform), Cutoff(cutoff),
+                                     Val(:ABCD), Val(4))
+
+
+
 Dict(D::MultiDesc) = Dict( "__id__"    =>  "MultiDesc",
                             "transform" =>  Dict(D.transform),
                             "cutoff"    =>  Dict(D.cutoff),

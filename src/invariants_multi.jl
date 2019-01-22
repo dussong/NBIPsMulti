@@ -69,6 +69,7 @@ tdegrees(::Val{:AAA}) = (1, 2, 3), (0,)
 
 corners(::Val{:AAA}) = ( SVector(1,2), SVector(1,3), SVector(2,3) )
 
+
 # Case :AAB (two different species), using bond-angle invariants
 
 # x = (r1, r2, θ12) where 0 is the B species, 1 and 2 are A.
