@@ -161,6 +161,13 @@ end
 @inline skip_simplex(D::MultiDesc, ::Val{:AAB}, rθ) = (maximum(rθ[1]) > cutoff(D.cutoff))
 @inline skip_simplex(D::MultiDesc, ::Val{:ABC}, r) = (maximum(r) > cutoff(D.cutoff))
 
+# 4-body
+@inline skip_simplex(D::MultiDesc, ::Val{:AAAA}, r) = (maximum(r) > cutoff(D.cutoff))
+@inline skip_simplex(D::MultiDesc, ::Val{:AAAB}, rθ) = (maximum(rθ[1]) > cutoff(D.cutoff))
+@inline skip_simplex(D::MultiDesc, ::Val{:AABB}, r) = (maximum(r) > cutoff(D.cutoff))
+@inline skip_simplex(D::MultiDesc, ::Val{:AABC}, r) = (maximum(r) > cutoff(D.cutoff))
+@inline skip_simplex(D::MultiDesc, ::Val{:ABCD}, r) = (maximum(r) > cutoff(D.cutoff))
+
 # wrap-up
 @inline skip_simplex(D::MultiDesc, r) = skip_simplex(D, D.sp_type, r)
 
@@ -173,6 +180,13 @@ end
 @inline invariants(D::MultiDesc, ::Val{:AAA}, r) = MI.invariants(transform.(D, r),D.sp_type)
 @inline invariants(D::MultiDesc, ::Val{:AAB}, rθ) = MI.invariants(_rθ2x(D, rθ...),D.sp_type)
 @inline invariants(D::MultiDesc, ::Val{:ABC}, r) = MI.invariants(transform.(D, r),D.sp_type)
+
+# 4-body
+@inline invariants(D::MultiDesc, ::Val{:AAAA}, r) = MI.invariants(transform.(D, r),D.sp_type)
+@inline invariants(D::MultiDesc, ::Val{:AAAB}, rθ) = MI.invariants(_rθ2x(D, rθ...),D.sp_type)
+@inline invariants(D::MultiDesc, ::Val{:AABB}, r) = MI.invariants(transform.(D, r),D.sp_type)
+@inline invariants(D::MultiDesc, ::Val{:AABC}, r) = MI.invariants(transform.(D, r),D.sp_type)
+@inline invariants(D::MultiDesc, ::Val{:ABCD}, r) = MI.invariants(transform.(D, r),D.sp_type)
 
 # wrap-up
 @inline invariants(D::MultiDesc, r) = invariants(D, D.sp_type, r)
@@ -209,6 +223,43 @@ end
    x_d = transform_d.(D, r)
    return I1, I2, _sdot(x_d, DI1), _sdot(x_d, DI2)
 end
+
+# 4-body
+@inline function invariants_ed(D::MultiDesc, ::Val{:AAAA}, r)
+   x = transform.(D, r)
+   I1, I2, DI1, DI2 = MI.invariants_ed(x,D.sp_type)
+   x_d = transform_d.(D, r)
+   return I1, I2, _sdot(x_d, DI1), _sdot(x_d, DI2)
+end
+
+@inline function invariants_ed(D::MultiDesc, ::Val{:AAAB}, rθ)
+   x = _rθ2x(D, rθ...)
+   I1, I2, DI1, DI2 = MI.invariants_ed(x,D.sp_type)
+   x_d = _rθ2x_d(D, rθ...)
+   return I1, I2, _sdot(x_d, DI1), _sdot(x_d, DI2)
+end
+
+@inline function invariants_ed(D::MultiDesc, ::Val{:AABB}, r)
+   x = transform.(D, r)
+   I1, I2, DI1, DI2 = MI.invariants_ed(x,D.sp_type)
+   x_d = transform_d.(D, r)
+   return I1, I2, _sdot(x_d, DI1), _sdot(x_d, DI2)
+end
+
+@inline function invariants_ed(D::MultiDesc, ::Val{:AABC}, r)
+   x = transform.(D, r)
+   I1, I2, DI1, DI2 = MI.invariants_ed(x,D.sp_type)
+   x_d = transform_d.(D, r)
+   return I1, I2, _sdot(x_d, DI1), _sdot(x_d, DI2)
+end
+
+@inline function invariants_ed(D::MultiDesc, ::Val{:ABCD}, r)
+   x = transform.(D, r)
+   I1, I2, DI1, DI2 = MI.invariants_ed(x,D.sp_type)
+   x_d = transform_d.(D, r)
+   return I1, I2, _sdot(x_d, DI1), _sdot(x_d, DI2)
+end
+
 
 # wrap-up
 @inline invariants_ed(D::MultiDesc, r) = invariants_ed(D, D.sp_type, r)
@@ -247,6 +298,22 @@ _grad_len2pos!(dVsite, dV_dr, Rs, J, r)
 _grad_rθ2pos!(dVsite, dV_drθ, Rs, J, rθ...)
 
 @inline gradri2gradR!(::Val{:ABC}, dVsite, dV_dr, Rs, J, r) =
+_grad_len2pos!(dVsite, dV_dr, Rs, J, r)
+
+# 4-body
+@inline gradri2gradR!(::Val{:AAAA}, dVsite, dV_dr, Rs, J, r) =
+_grad_len2pos!(dVsite, dV_dr, Rs, J, r)
+
+@inline gradri2gradR!(::Val{:AAAB}, dVsite, dV_drθ, Rs, J, rθ) =
+_grad_rθ2pos!(dVsite, dV_drθ, Rs, J, rθ...)
+
+@inline gradri2gradR!(::Val{:AABB}, dVsite, dV_dr, Rs, J, r) =
+_grad_len2pos!(dVsite, dV_dr, Rs, J, r)
+
+@inline gradri2gradR!(::Val{:AABC}, dVsite, dV_dr, Rs, J, r) =
+_grad_len2pos!(dVsite, dV_dr, Rs, J, r)
+
+@inline gradri2gradR!(::Val{:ABCD}, dVsite, dV_dr, Rs, J, r) =
 _grad_len2pos!(dVsite, dV_dr, Rs, J, r)
 
 # wrap-up

@@ -138,6 +138,7 @@ invariants_d(x::SVector{6, T},::Val{:AAAA}) where {T} =  NBodyIPs.BLInvariants.i
 
 invariants_ed(x::SVector{6, T},::Val{:AAAA}) where {T} = NBodyIPs.BLInvariants.invariants_ed(x)
 
+tdegrees(::Val{:AAAA}) = NBodyIPs.BLInvariants.tdegrees(Val(4))
 
 # Case :AAAB (3+1 atoms), using bond-angle invariants
 
@@ -146,6 +147,8 @@ invariants(x::SVector{6, T},::Val{:AAAB}) where {T} = NBodyIPs.BAInvariants.inva
 invariants_d(x::SVector{6, T},::Val{:AAAB}) where {T} =  NBodyIPs.BAInvariants.invariants_d(x)
 
 invariants_ed(x::SVector{6, T},::Val{:AAAB}) where {T} = NBodyIPs.BAInvariants.invariants_ed(x)
+
+tdegrees(::Val{:AAAB}) = NBodyIPs.BAInvariants.tdegrees(Val(4))
 
 # Case AABB
 
