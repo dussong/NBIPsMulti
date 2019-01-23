@@ -7,4 +7,5 @@ using JuLIP, NBodyIPs, Base.Test, StaticArrays
    @testset "Energy_forces" begin include("test_energy_forces.jl") end
    @testset "2-body" begin include("test_2B.jl") end
    @testset "3-body" begin include("test_3B.jl") end
+   @testset "invariants" begin include("test_invariants.jl") end
 end

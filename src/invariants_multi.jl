@@ -147,5 +147,53 @@ invariants_d(x::SVector{6, T},::Val{:AAAB}) where {T} =  NBodyIPs.BAInvariants.i
 
 invariants_ed(x::SVector{6, T},::Val{:AAAB}) where {T} = NBodyIPs.BAInvariants.invariants_ed(x)
 
+# Case AABB
+
+include("NB_4B_AABB_invariants.jl")
+@inline invariants(x::SVector{6},::Val{:AABB}) = NB_4B_AABB.invariants_gen(x)
+@inline invariants_d(x::SVector{6},::Val{:AABB}) = NB_4B_AABB.invariants_d_gen(x)
+@inline invariants_ed(x::SVector{6},::Val{:AABB}) = NB_4B_AABB.invariants_ed_gen(x)
+
+# Case AABC
+
+include("NB_4B_AABC_invariants.jl")
+@inline invariants(x::SVector{6},::Val{:AABC}) = NB_4B_AABC.invariants_gen(x)
+@inline invariants_d(x::SVector{6},::Val{:AABC}) = NB_4B_AABC.invariants_d_gen(x)
+@inline invariants_ed(x::SVector{6},::Val{:AABC}) = NB_4B_AABC.invariants_ed_gen(x)
+
+
+# Case :ABCD (4 different atoms), only trivial invariants
+
+# x = (r1, r2, r3)
+
+# the 1.0 is a "secondary invariant"
+invariants(x::SVector{6, T},::Val{:ABCD}) where {T} =
+      (@SVector T[ x[1], x[2], x[3], x[4], x[5], x[6]]),
+      (@SVector T[ 1.0 ])
+
+
+invariants_d(x::SVector{6, T},::Val{:ABCD}) where {T} =
+      (@SVector [ (@SVector T[1.0, 0.0, 0.0, 0.0, 0.0, 0.0]),
+                  (@SVector T[0.0, 1.0, 0.0, 0.0, 0.0, 0.0]),
+                  (@SVector T[0.0, 0.0, 1.0, 0.0, 0.0, 0.0]),
+                  (@SVector T[0.0, 0.0, 0.0, 1.0, 0.0, 0.0]),
+                  (@SVector T[0.0, 0.0, 0.0, 0.0, 1.0, 0.0]),
+                  (@SVector T[0.0, 0.0, 0.0, 0.0, 0.0, 1.0]),
+                   ]),
+      (@SVector [ (@SVector T[0.0, 0.0, 0.0, 0.0, 0.0, 0.0]) ])
+
+invariants_ed(x::SVector{6, T},::Val{:ABCD}) where {T} =
+      (@SVector T[ x[1], x[2], x[3], x[4], x[5], x[6]]),
+      (@SVector T[ 1.0 ]),
+      (@SVector [ (@SVector T[1.0, 0.0, 0.0, 0.0, 0.0, 0.0]),
+                  (@SVector T[0.0, 1.0, 0.0, 0.0, 0.0, 0.0]),
+                  (@SVector T[0.0, 0.0, 1.0, 0.0, 0.0, 0.0]),
+                  (@SVector T[0.0, 0.0, 0.0, 1.0, 0.0, 0.0]),
+                  (@SVector T[0.0, 0.0, 0.0, 0.0, 1.0, 0.0]),
+                  (@SVector T[0.0, 0.0, 0.0, 0.0, 0.0, 1.0]),
+                   ]),
+      (@SVector [ (@SVector T[0.0, 0.0, 0.0, 0.0, 0.0, 0.0]) ])
+
+
 
 end

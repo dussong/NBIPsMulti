@@ -114,6 +114,13 @@ tdegrees(::MultiDesc, vN::Val{N}) where {N} = MI.tdegrees(vN)
 @inline fcut(D::MultiDesc, ::Val{:AAB}, rθ) = fcut(D.cutoff, rθ[1])
 @inline fcut(D::MultiDesc, ::Val{:ABC}, r) = fcut(D.cutoff, r)
 
+# 4-body
+@inline fcut(D::MultiDesc, ::Val{:AAAA}, r) = fcut(D.cutoff, r)
+@inline fcut(D::MultiDesc, ::Val{:AAAB}, rθ) = fcut(D.cutoff, rθ[1])
+@inline fcut(D::MultiDesc, ::Val{:AABB}, r) = fcut(D.cutoff, r)
+@inline fcut(D::MultiDesc, ::Val{:AABC}, r) = fcut(D.cutoff, r)
+@inline fcut(D::MultiDesc, ::Val{:ABCD}, r) = fcut(D.cutoff, r)
+
 # wrap-up
 @inline fcut(D::MultiDesc, r) = fcut(D::MultiDesc, D.sp_type, r)
 
@@ -130,6 +137,16 @@ tdegrees(::MultiDesc, vN::Val{N}) where {N} = MI.tdegrees(vN)
    return fc, vcat(fc_d, zero(typeof(rθ[2])))
 end
 @inline fcut_d(D::MultiDesc, ::Val{:ABC}, r) = fcut_d(D.cutoff, r)
+
+# 4-body
+@inline fcut_d(D::MultiDesc, ::Val{:AAAA}, r) = fcut_d(D.cutoff, r)
+@inline function fcut_d(D::MultiDesc, ::Val{:AAAB}, rθ)
+   fc, fc_d = fcut_d(D.cutoff, rθ[1])
+   return fc, vcat(fc_d, zero(typeof(rθ[2])))
+end
+@inline fcut_d(D::MultiDesc, ::Val{:AABB}, r) = fcut_d(D.cutoff, r)
+@inline fcut_d(D::MultiDesc, ::Val{:AABC}, r) = fcut_d(D.cutoff, r)
+@inline fcut_d(D::MultiDesc, ::Val{:ABCD}, r) = fcut_d(D.cutoff, r)
 
 # wrap-up
 @inline fcut_d(D::MultiDesc, r) = fcut_d(D, D.sp_type, r)
