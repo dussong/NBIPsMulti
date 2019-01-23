@@ -1,4 +1,5 @@
 # Test energy and forces
+# include("../src/NBIPsMulti.jl")
 using JuLIP, NBodyIPs, NBIPsMulti, StaticArrays
 using BenchmarkTools, Base.Test
 
@@ -19,6 +20,7 @@ r0 = 1.2*rnn(:Cu)
 
 valSp = [Val(:AAA),Val(:AAB),Val(:ABC)]
 Sp = [[29,29,29], [29,29,30], [29,30,31]]
+
 
 for i in 1:3
    println("-------------------------------------------------")
