@@ -91,17 +91,20 @@ end
 function skip_simplex_species_order!(desc::MultiDesc,
                                    Spi,Spj,Species,J,::Val{:AABB})
    if Spi == Species[1]
-      ind = sortperm([Spj[J[k]] for k=1:3])
-      J[1:3] = J[ind]
-      return false
-      # if (Spj[J[1]] == Species[2])
-      #    return false
-      # elseif (Spj[J[2]] == Species[2])
-      #    J[2], J[1] = J[1], J[2]
-      #    return false
-      # elseif (Spj[J[3]] == Species[2])
-      #    J[3], J[1] = J[1], J[3]
-      #    return false
+      # ind = sortperm([Spj[J[k]] for k=1:3])
+      # J[1],J[2],J[3] = J[ind[1]],J[ind[2]],J[ind[3]]
+      # return false
+      if (Spj[J[1]] == Species[2])
+         return false
+      elseif (Spj[J[2]] == Species[2])
+         J = [J[2],J[1],J[3]]
+         # J[2], J[1] = J[1], J[2]
+         return false
+      elseif (Spj[J[3]] == Species[2])
+         J = [J[3], J[2], J[1]]
+         # J[3], J[1] = J[1], J[3]
+         return false
+      end
    else
       return true
    end
@@ -111,7 +114,7 @@ function skip_simplex_species_order!(desc::MultiDesc,
                                    Spi,Spj,Species,J,::Val{:AABC})
    if Spi == Species[1]
       ind = sortperm([Spj[J[k]] for k=1:3])
-      J[1:3] = J[ind]
+      J = [J[ind[1]],J[ind[2]],J[ind[3]]]
       return false
    else
       return true
@@ -125,19 +128,24 @@ function skip_simplex_species_order!(desc::MultiDesc,
       if (Spj[J[1]] == Species[2])&&(Spj[J[2]] == Species[3])
          return false
       elseif (Spj[J[1]] == Species[2])&&(Spj[J[2]] == Species[4])
-         J[2], J[3] = J[3], J[2]
+         J = [J[1],J[3],J[2]]
+         # J[2], J[3] = J[3], J[2]
          return false
       elseif (Spj[J[1]] == Species[3])&&(Spj[J[2]] == Species[2])
-         J[2], J[1], J[3] = J[1], J[2], J[3]
+         J = [J[2], J[1], J[3]]
+         # J[2], J[1], J[3] = J[1], J[2], J[3]
          return false
       elseif (Spj[J[1]] == Species[3])&&(Spj[J[2]] == Species[4])
-         J[2], J[3], J[1] = J[1], J[2], J[3]
+         J = [J[3], J[1], J[2]]
+         # J[2], J[3], J[1] = J[1], J[2], J[3]
          return false
       elseif (Spj[J[1]] == Species[4])&&(Spj[J[2]] == Species[2])
-         J[3], J[1], J[2] = J[1], J[2], J[3]
+         J = [J[2],J[3],J[1]]
+         # J[3], J[1], J[2] = J[1], J[2], J[3]
          return false
       elseif (Spj[J[1]] == Species[4])&&(Spj[J[2]] == Species[3])
-         J[3], J[1] = J[1], J[3]
+         J = [J[3],J[2],J[1]]
+         # J[3], J[1] = J[1], J[3]
          return false
       else
          error("I shouldnt be here: skip_simplex_species_order")

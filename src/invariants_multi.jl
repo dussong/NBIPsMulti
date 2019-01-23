@@ -157,6 +157,8 @@ include("NB_4B_AABB_invariants.jl")
 @inline invariants_d(x::SVector{6},::Val{:AABB}) = NB_4B_AABB.invariants_d_gen(x)
 @inline invariants_ed(x::SVector{6},::Val{:AABB}) = NB_4B_AABB.invariants_ed_gen(x)
 
+tdegrees(::Val{:AABB}) = (1, 1, 1, 2, 2, 2,), (0, 3,)
+
 # Case AABC
 
 include("NB_4B_AABC_invariants.jl")
@@ -164,6 +166,7 @@ include("NB_4B_AABC_invariants.jl")
 @inline invariants_d(x::SVector{6},::Val{:AABC}) = NB_4B_AABC.invariants_d_gen(x)
 @inline invariants_ed(x::SVector{6},::Val{:AABC}) = NB_4B_AABC.invariants_ed_gen(x)
 
+tdegrees(::Val{:AABC}) = (1, 1, 1, 1, 2, 2,), (0, 2,)
 
 # Case :ABCD (4 different atoms), only trivial invariants
 
@@ -197,6 +200,6 @@ invariants_ed(x::SVector{6, T},::Val{:ABCD}) where {T} =
                    ]),
       (@SVector [ (@SVector T[0.0, 0.0, 0.0, 0.0, 0.0, 0.0]) ])
 
-
+tdegrees(::Val{:ABCD}) = (1, 1, 1, 1, 1, 1,), (0,)
 
 end
