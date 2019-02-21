@@ -20,4 +20,6 @@ include("invariants_multi.jl")
 
 include("descriptors_multi.jl")
 
+include("environ_multi.jl")
+
 end # module
