@@ -40,33 +40,24 @@ Vn = ("1.0/(1.0 + exp(1.0 / ($(1.5*r0) - r + 1e-2)))", 1.5*r0)
 ##
 info("Generate a 4B env basis ...")
 
-basis = NBIPsMulti.EnvIPsmulti.envpolysM(BL2, 14, Vn, 2, [6,6])
-
-B1 = basis[1]
-
-energy(basis[10],at,basis[10].Sp)
-site_energies(basis[10],at,basis[10].Sp)
-
-Vr(basis[10])
-
 basis = [
-      NBIPsMulti.EnvIPsmulti.envpolysM(BL2, 14, Vn, 2, [6,6]);
-      # nbpolys(BL2, 14, [1,1]);
-      # nbpolys(BL2, 14, [1,6]);
-      # nbpolys(BL3_AAA, 5, [1,1,1]);
-      # nbpolys(BL3_AAA, 5, [6,6,6]);
-      # nbpolys(BL3_AAB, 5, [1,1,6]);
-      # nbpolys(BL3_AAB, 5, [1,6,6]);
-      # nbpolys(BL4_AAAA, 3, [1,1,1,1]);
-      # nbpolys(BL4_AAAA, 3, [6,6,6,6]);
-      # nbpolys(BL4_AAAB, 3, [1,1,1,6]);
-      # nbpolys(BL4_AAAB, 3, [1,6,6,6]);
-      # nbpolys(BL4_AABB, 3, [1,1,6,6]);
+      envpolysM(BL2, 14, Vn, 2, [6,6]);
+      envpolysM(BL2, 14, Vn, 2, [1,1]);
+      envpolysM(BL2, 14, Vn, 2, [1,6]);
+      envpolysM(BL3_AAA, 5, Vn, 2, [1,1,1]);
+      envpolysM(BL3_AAA, 5,Vn, 2, [6,6,6]);
+      envpolysM(BL3_AAB, 5,Vn, 2, [1,1,6]);
+      envpolysM(BL3_AAB, 5,Vn, 2, [1,6,6]);
+      envpolysM(BL4_AAAA, 3,Vn, 2, [1,1,1,1]);
+      envpolysM(BL4_AAAA, 3,Vn, 2, [6,6,6,6]);
+      envpolysM(BL4_AAAB, 3,Vn, 2, [1,1,1,6]);
+      envpolysM(BL4_AAAB, 3,Vn, 2, [1,6,6,6]);
+      envpolysM(BL4_AABB, 3,Vn, 2, [1,1,6,6]);
    ]
 
 info("Assemble the LsqDB ...")
 @show length(basis)
-dbpath = homedir() * "/Gits/NBIPsMulti/data/Butane_4B"
+dbpath = homedir() * "/Gits/NBIPsMulti/data/Butane_4B_env"
 
 db =  LsqDB(dbpath, basis, data);
 db

@@ -9,4 +9,8 @@ using JuLIP, NBodyIPs, Base.Test, StaticArrays
    @testset "2-body" begin include("test_2B.jl") end
    @testset "3-body" begin include("test_3B.jl") end
    @testset "4-body" begin include("test_4B.jl") end
+
+   @testset "2-body-env" begin include("test_2B_env.jl") end
+   @testset "3-body-env" begin include("test_3B_env.jl") end
+   @testset "4-body-env" begin include("test_4B_env.jl") end
 end

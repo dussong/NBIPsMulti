@@ -150,90 +150,106 @@ forces(V::EnvIPM, at::Atoms) = forces(V,at,species(V))
 
 
 
-# function energy(B::Vector{TB}, at::Atoms{T}, typewarn=true
-#                 ) where {TB <: EnvIPM{N}, T} where {N}
-#    if typewarn
-#       !isleaftype(TB) && warn("TB is not a leaf type")
-#    end
-#
-#    Br = [Vr(b) for b in B]
-#
-#    rcut = cutoff(B[1])
-#    nlist = neighbourlist(at, rcut)
-#    temp = zeros(T, length(B))
-#    E = zeros(T, length(B))
-#    Etemp = zeros(T, length(B))
-#
-#    # all the site energies => should be trivial in terms of cost
-#    Ns = [ site_ns(V, at) for V in B ]
-#
-#    for (i, j, r, R) in sites(nlist)
-#       # evaluate all the site energies at the same time
-#       # for each simples, write the nB energies into temp
-#       # then add them to E, which is just passed through all the
-#       # various loops, so no need to update it here again
-#       fill!(Etemp, zero(T))
-#       eval_site_nbody!(Val(N), i, j, R, rcut, false,
-#                        (out, R, ii, J, temp) -> evaluate_many!(out, Br, R, ii, J),
-#                        Etemp, nothing)
-#       #
-#       for nb = 1:length(B)
-#          E[nb] += Etemp[nb] * Ns[nb][i]
-#       end
-#    end
-#    return E
-# end
+function energy(B::Vector{TB}, at::Atoms{T}
+                ) where {TB <: EnvIPM{N}, T} where {N}
+   #              , typewarn=true
+   # if typewarn
+   #    !isleaftype(TB) && warn("TB is not a leaf type")
+   # end
+
+   Br = [Vr(b) for b in B]
+
+   rcut = cutoff(B[1])
+   nlist = neighbourlist(at, rcut)
+   temp = zeros(T, length(B))
+   E = zeros(T, length(B))
+   Etemp = zeros(T, length(B))
+
+   # all the site energies => should be trivial in terms of cost
+   Ns = [ site_ns(V, at) for V in B ]
+
+   Z = atomic_numbers(at)
+   Species = [B[i].Sp for i=1:length(B)]
+
+   for (i, j, r, R) in sites(nlist)
+      Spi = Z[i]
+      Spj = Z[j]
+      # evaluate all the site energies at the same time
+      # for each simples, write the nB energies into temp
+      # then add them to E, which is just passed through all the
+      # various loops, so no need to update it here again
+      fill!(Etemp, zero(T))
+      eval_site_nbody!(Val(N), R, rcut,
+                       (out, R, J, temp,Spi,Spj,Species) -> evaluate_many!(out, Br, R, J, Spi, Spj,Species),
+                       Etemp, nothing, Spi,Spj,Species)
+      # eval_site_nbody!(Val(N), i, j, R, rcut, false,
+      #                  (out, R, ii, J, temp) -> evaluate_many!(out, Br, R, ii, J),
+      #                  Etemp, nothing)
+      #
+      for nb = 1:length(B)
+         E[nb] += Etemp[nb] * Ns[nb][i]
+      end
+   end
+   return E
+end
 
 
 
-# function forces(B::AbstractVector{TB}, at::Atoms{T}, typewarn=true
-#               )where {TB <: EnvIP{N}, T} where {N}
-#    if typewarn
-#       !isleaftype(TB) && warn("TB is not a leaf type")
-#    end
-#
-#    Br = [Vr(b) for b in B]
-#
-#    rcut = cutoff(B[1])
-#    nlist = neighbourlist(at, rcut)
-#    maxneigs = max_neigs(nlist)
-#    nedges = (N*(N-1))÷2
-#    nB = length(B)
-#    # forces
-#    F =      [ zeros(JVec{T}, length(at)) for n = 1:nB ]
-#    # site gradient
-#    dVsite = [ zeros(JVec{T}, maxneigs)   for n = 1:nB ]
-#
-#    # extras dfor Env
-#    dVn = zeros(JVec{T}, maxneigs)
-#    Etemp = zeros(T, length(B))
-#
-#    # compute the N-components
-#    Ns = [ site_ns(V, at) for V in B ]
-#    dNs = [ site_ns_ed(V, at)[2] for V in B ]
-#
-#    for (i, j, r, R) in sites(nlist)
-#       # clear dVsite and Etemp
-#       for n = 1:nB; fill!(dVsite[n], zero(JVec{T})); end
-#       fill!(Etemp, zero(T))
-#       # fill site energy and dVsite
-#       eval_site_nbody!(Val(N), i, j, R, rcut, false,
-#                        (out, R, ii, J, temp) -> evaluate_many!(out, Br, R, ii, J),
-#                        Etemp, nothing)
-#       eval_site_nbody!(Val(N), i, j, R, rcut, false,
-#                        (out, R, ii, J, temp) -> evaluate_many_d!(out, Br, R, ii, J),
-#                        dVsite, nothing)
-#
-#       # write it into the force vectors
-#       for ib = 1:nB, n = 1:length(j)
-#          site_n_d!(dVn, B[ib], r, R, Ns[ib][i], dNs[ib][i])
-#          f = (Ns[ib][i] * dVsite[ib][n] + dVn[n] * Etemp[ib])
-#          F[ib][j[n]] -= f
-#          F[ib][i] += f
-#       end
-#    end
-#    return F
-# end
+function forces(B::AbstractVector{TB}, at::Atoms{T}
+              )where {TB <: EnvIPM{N}, T} where {N}
+   #            , typewarn=true
+   # if typewarn
+   #    !isleaftype(TB) && warn("TB is not a leaf type")
+   # end
+
+   Br = [Vr(b) for b in B]
+
+   rcut = cutoff(B[1])
+   nlist = neighbourlist(at, rcut)
+   maxneigs = max_neigs(nlist)
+   nedges = (N*(N-1))÷2
+   nB = length(B)
+   # forces
+   F =      [ zeros(JVec{T}, length(at)) for n = 1:nB ]
+   # site gradient
+   dVsite = [ zeros(JVec{T}, maxneigs)   for n = 1:nB ]
+
+   # extras dfor Env
+   dVn = zeros(JVec{T}, maxneigs)
+   Etemp = zeros(T, length(B))
+
+   # compute the N-components
+   Ns = [ site_ns(V, at) for V in B ]
+   dNs = [ site_ns_ed(V, at)[2] for V in B ]
+
+   # multi-species
+   Species = [B[i].Sp for i=1:length(B)]
+   Z = atomic_numbers(at)
+
+   for (i, j, r, R) in sites(nlist)
+      Spi = Z[i]
+      Spj = Z[j]
+      # clear dVsite and Etemp
+      for n = 1:nB; fill!(dVsite[n], zero(JVec{T})); end
+      fill!(Etemp, zero(T))
+      # fill site energy and dVsite
+      eval_site_nbody!(Val(N), R, rcut,
+                      (out, R, J, temp,Spi,Spj,Species) -> evaluate_many!(out, Br, R, J, Spi, Spj,Species),
+                      Etemp, nothing, Spi,Spj,Species)
+      eval_site_nbody!(Val(N), R, rcut,
+                      (out, R, J, temp, Spi, Spj, Species) -> evaluate_many_d!(out, Br, R, J, Spi, Spj, Species),
+                      dVsite, nothing, Spi,Spj,Species)
+
+      # write it into the force vectors
+      for ib = 1:nB, n = 1:length(j)
+         site_n_d!(dVn, B[ib], r, R, Ns[ib][i], dNs[ib][i])
+         f = (Ns[ib][i] * dVsite[ib][n] + dVn[n] * Etemp[ib])
+         F[ib][j[n]] -= f
+         F[ib][i] += f
+      end
+   end
+   return F
+end
 
 
 # function virial(B::AbstractVector{TB}, at::Atoms{T}, typewarn=true
