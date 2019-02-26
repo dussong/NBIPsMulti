@@ -1,4 +1,5 @@
 
+using JuLIP
 using JuLIP: Atoms,
              neighbourlist,
              site_energies,
@@ -25,6 +26,11 @@ import NBodyIPs: evaluate_many!,
                  _grad_len2pos!,
                  TempEdV
 
+import NBodyIPs.EnvIPs: n_fun,
+                        n_fun_d,
+                        site_ns,
+                        site_ns_ed
+
 function cutoff(V::EnvIPM)
    @assert cutoff(Vn(V)) <= cutoff(Vr(V))
    return cutoff(Vr(V::EnvIPM))
@@ -44,8 +50,8 @@ end
 
 site_ns(V::EnvIPM, at) = n_fun.(V, site_energies(Vn(V), at))
 
-function site_ns_ed(V::EnvIPM, at, Species::Vector{Int})
-   Vns = site_energies(Vn(V), at, Species::Vector{Int})
+function site_ns_ed(V::EnvIPM, at)
+   Vns = site_energies(Vn(V), at)
    return n_fun.(V, Vns), n_fun_d.(V, Vns)
 end
 
@@ -57,51 +63,53 @@ function site_n_d!(dVn, V::EnvIPM, r, R, Ni, dNi)
 end
 
 function site_energies(V::EnvIPM, at::Atoms, Species::Vector{Int})
-      @show site_ns(V, at)
-      @show site_energies(Vr(V), at, Species)
       return site_ns(V, at) .* site_energies(Vr(V), at, Species)
 end
 
 energy(V::EnvIPM, at::Atoms, Species::Vector{Int}) = sum_kbn(site_energies(V, at, Species))
 
-
-# function forces(V::AbstractEnvIP{N}, at::Atoms{T}) where {N, T}
-#
-#    # compute the n values
-#    Ns, dNs = site_ns_ed(V, at)
-#    # compute the inner v values
-#    Vs = site_energies(Vr(V), at)
-#
-#    # now assemble site forces and use those to create
-#    # total forces by mixing N and V
-#    cutoff_n = cutoff(Vn(V))
-#    nlist = neighbourlist(at, cutoff(V))  # this checks that cutoff(Vn) <= cutoff(Vr)
-#    maxneigs = max_neigs(nlist)
-#    F = zeros(JVec{T}, length(at))
-#    dVsite = zeros(JVec{T}, maxneigs)
-#    dVn = zeros(JVec{T}, maxneigs)
-#
-#    for (i, j, r, R) in sites(nlist)
-#       # compute the site energy gradients
-#       fill!(dVsite, zero(JVec{T}))
-#       eval_site_nbody!(
-#             Val(N), i, j, R, cutoff(V), false,
-#             (out, R, i, J, temp) -> evaluate_d!(out, Vr(V), R, i, J),
-#             dVsite, nothing )   # dVsite == out, nothing == temp
-#       # compute the neighbour count gradients
-#       site_n_d!(dVn, V, r, R, Ns[i], dNs[i])
-#
-#       # write site energy gradient into forces
-#       for n = 1:length(j)
-#          f = Ns[i] * dVsite[n] + Vs[i] * dVn[n]
-#          F[j[n]] -= f
-#          F[i] += f
-#       end
-#    end
-#    return F
-# end
+energy(V::EnvIPM, at::Atoms) = energy(V,at,species(V))
 
 
+function forces(V::EnvIPM{N}, at::Atoms{T},Species::Vector{Int}) where {N, T}
+   Z = atomic_numbers(at)
+   # compute the n values
+   Ns, dNs = site_ns_ed(V, at)
+   # compute the inner v values
+   Vs = site_energies(Vr(V), at, species(V))
+
+   # now assemble site forces and use those to create
+   # total forces by mixing N and V
+   cutoff_n = cutoff(Vn(V))
+   nlist = neighbourlist(at, cutoff(V))  # this checks that cutoff(Vn) <= cutoff(Vr)
+   maxneigs = max_neigs(nlist)
+   F = zeros(JVec{T}, length(at))
+   dVsite = zeros(JVec{T}, maxneigs)
+   dVn = zeros(JVec{T}, maxneigs)
+
+
+   for (i, j, r, R) in sites(nlist)
+      Spi = Z[i]
+      Spj = Z[j]
+      # compute the site energy gradients
+      fill!(dVsite, zero(JVec{T}))
+      eval_site_nbody!(Val(N), R, cutoff(V),
+                               ((out, R, J, temp,Spi,Spj,Species) ->  evaluate_d!(out, Vr(V), descriptor(V), R, J,Spi,Spj,Species)), dVsite, nothing, Spi,Spj,Species)
+                               # dVsite == out, nothing == temp
+      # compute the neighbour count gradients
+      site_n_d!(dVn, V, r, R, Ns[i], dNs[i])
+
+      # write site energy gradient into forces
+      for n = 1:length(j)
+         f = Ns[i] * dVsite[n] + Vs[i] * dVn[n]
+         F[j[n]] -= f
+         F[i] += f
+      end
+   end
+   return F
+end
+
+forces(V::EnvIPM, at::Atoms) = forces(V,at,species(V))
 
 # function virial(V::AbstractEnvIP{N}, at::Atoms{T}) where {N, T}
 #    # compute the n values

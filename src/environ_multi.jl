@@ -5,7 +5,7 @@
 
 module EnvIPsmulti
 
-using NBIPsMulti:         MultiDesc
+using NBIPsMulti:         MultiDesc, NBPolyM, species, species_type
 using StaticArrays
 using JuLIP:              AbstractCalculator
 using JuLIP.Potentials:   Shift,
@@ -27,6 +27,7 @@ import NBodyIPs:          NBodyIP,
                           combiscriptor,
                           degree,
                           basisname
+import NBIPsMulti:        species, species_type
 
 export envpolysM
 
@@ -73,15 +74,14 @@ EnvIPM(D::Dict) = EnvIPM( D["t"],
 
 convert(::Val{:EnvIPM}, D::Dict) = EnvIPM(D)
 
-
-EnvIPM(t::Int, Vr, Vn, str_Vn::String, Sp::Vector{Int}, sp_type) =
-      EnvIPM(t, Vr, Vn, str_Vn, Val(bodyorder(Vr)), Val(t), Sp, sp_type)
-
-
 function EnvIPM(t, Vr, str_Vn::String, cutoff_Vn::AbstractFloat, Sp::Vector{Int}, sp_type)
    Vn = analyse_Vn(str_Vn, cutoff_Vn)
    return EnvIPM(t, Vr, Vn, str_Vn, Sp, sp_type)
 end
+
+EnvIPM(t::Int, Vr::NBPolyM, Vn, str_Vn::String) =
+      EnvIPM(t, Vr, Vn, str_Vn, Val(bodyorder(Vr)), Val(t), species(Vr), species_type(Vr))
+
 
 Vn(V::EnvIPM) = V.Vn
 Vr(V::EnvIPM) = V.Vr
@@ -108,12 +108,11 @@ basisname(::EnvIPM) = "EnvIPM"
 function envpolysM(D::MultiDesc, deg_poly::Integer,
                   Vn_descr, deg_n::Integer, Sp; kwargs...)
    B_poly = nbpolys(D, deg_poly, Sp; kwargs...)
-   @show B_poly
    B = EnvIPM[]
    str_Vn = Vn_descr[1]
    Vn = analyse_Vn(Vn_descr...)
    for deg = 0:deg_n
-      append!(B, [EnvIPM(deg, Vr, Vn, str_Vn, Sp, D.sp_type) for Vr in B_poly])
+      append!(B, [EnvIPM(deg, Vr, Vn, str_Vn) for Vr in B_poly])
    end
    return [b for b in B]
 end

@@ -41,7 +41,7 @@ import NBodyIPs:          fast,
 import NBodyIPs.PolyBasis: gen_tuples,
                            tdegree
 
-export NBPolyM, NBodyFunctionM
+export NBPolyM, NBodyFunctionM, MultiDesc
 
 
 # tdegrees(desc::MultiDesc, vN) = NBIPsMulti.MultiInvariants.tdegrees(vN)
@@ -54,7 +54,7 @@ abstract type NBodyFunctionM{N, DT, SP} <: NBodyFunction{N,DT} end
 
 
 
-export MultiDesc
+
 
 struct MultiDesc{TT <: SpaceTransform, TC <: Cutoff, SP, N} <: NBSiteDescriptor
    transform::TT

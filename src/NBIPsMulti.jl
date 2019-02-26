@@ -10,7 +10,7 @@ See `NBodyIPFitting` for the associated fitting and testing framework.
 """
 module NBIPsMulti
 
-# using Reexport
+using Reexport
 
 include("types_and_wrappers.jl")
 
@@ -21,5 +21,6 @@ include("invariants_multi.jl")
 include("descriptors_multi.jl")
 
 include("environ_multi.jl")
+@reexport using NBIPsMulti.EnvIPsmulti
 
 end # module

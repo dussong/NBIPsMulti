@@ -15,40 +15,23 @@ at.Z = Z1
 
 at_positions = copy(positions(at)) |> mat
 
-
-r0 = 2.3*rnn(:Cu)
+r0 = 1.7*rnn(:Cu)
 
 valSp = [Val(:AAA),Val(:AAB),Val(:ABC)]
 Sp = [[29,29,29], [29,29,30], [29,30,31]]
 
 
-# for i in 1:3
-#    println("-------------------------------------------------")
-#    println(" Tests $(valSp[i]) ")
-#    println("-------------------------------------------------")
+for i in 1:3
+   println("-------------------------------------------------")
+   println(" Tests $(valSp[i]) ")
+   println("-------------------------------------------------")
 
-i=1
+   BL3 = MultiDesc("exp( - 2 * (r/$r0-1))",
+                    "(:cos, $(r0-1.5), $(r0))",valSp[i])
 
-BL3 = MultiDesc("exp( - 2 * (r/$r0-1))",
-                 "(:cos, $(r0-1.5), $(r0))",valSp[i])
+   Vn = ("exp(- 3 * ((r/$r0)-1))", r0)
+   basis = [ envpolysM(BL3, 4, Vn, 2,  Sp[i]); ]
 
-Vn = ("exp(- 3 * ((r/$r0)-1))", r0)
-
-basis = [ envpolysM(BL3, 3, Vn, 2,  Sp[i]); ]
-
-basis[1]
-
-NBIPsMulti.EnvIPsmulti.site_ns_ed(basis[18],at)
-energy(basis[1],at,basis[1].Sp)
-site_energies(basis[1], at, [29,29,29])
-A = forces(basis[1],at,[29,29,29])
-
-B = forces(basis[1],at)
-energy(basis[1],at)
-
-2+2
-
-22222
 
 
    println("-------------------------------------------------")
@@ -135,4 +118,4 @@ energy(basis[1],at)
 #    print(vecnorm([vecnorm(F1[k]-F2[k],Inf) for k=1:length(basis)], Inf))
 #    @test vecnorm([vecnorm(F1[k]-F2[k],Inf) for k=1:length(basis)], Inf) <= 1e-10
 #
-# end
+end

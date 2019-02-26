@@ -44,9 +44,10 @@ basis = NBIPsMulti.EnvIPsmulti.envpolysM(BL2, 14, Vn, 2, [6,6])
 
 B1 = basis[1]
 
-env
+energy(basis[10],at,basis[10].Sp)
+site_energies(basis[10],at,basis[10].Sp)
 
-energy(B1,at,B1.Sp)
+Vr(basis[10])
 
 basis = [
       NBIPsMulti.EnvIPsmulti.envpolysM(BL2, 14, Vn, 2, [6,6]);
