@@ -61,7 +61,6 @@ dbpath = homedir() * "/Gits/NBIPsMulti/data/Butane_4B_env"
 
 db =  LsqDB(dbpath, basis, data);
 db
-
 # Check that energy and forces are non zero.
 # db1.kron_groups[":14EF"]["F"]
 # db1.kron_groups[":14EF"]["E"]

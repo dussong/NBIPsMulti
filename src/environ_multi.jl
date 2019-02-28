@@ -51,12 +51,13 @@ end
                              (V1.valP == V2.valP) &&
                              (V1.sp_type == V2.sp_type))
 
-Dict(V::EnvIPM) = Dict( "__id__" => "EnvIPM",
+Dict(V::EnvIPM{N, P, TVR, TVN, SP}) where {N, P, TVR, TVN, SP}  =
+                   Dict( "__id__" => "EnvIPM",
                        "t" => V.t,
                        "Vr" => Dict(V.Vr),
                        "str_Vn" => V.str_Vn,
                        "cutoff_Vn" => cutoff(V.Vn),
-                       "N" => V.valN,
+                       "N" => N,
                        "Sp" => V.Sp,
                        "Sp_type" => String(SP), )
 
