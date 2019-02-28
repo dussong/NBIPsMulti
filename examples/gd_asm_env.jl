@@ -44,22 +44,22 @@ basis = [
       envpolysM(BL2, 5, Vn, 2, [6,6]);
       envpolysM(BL2, 5, Vn, 2, [1,1]);
       envpolysM(BL2, 5, Vn, 2, [1,6]);
-      envpolysM(BL3_AAA, 3, Vn, 1, [1,1,1]);
-      envpolysM(BL3_AAA, 3,Vn, 1, [6,6,6]);
-      envpolysM(BL3_AAB, 3,Vn, 1, [1,1,6]);
-      envpolysM(BL3_AAB, 3,Vn, 1, [1,6,6]);
-      envpolysM(BL4_AAAA, 2,Vn, 1, [1,1,1,1]);
-      envpolysM(BL4_AAAA, 2,Vn, 1, [6,6,6,6]);
-      envpolysM(BL4_AAAB, 2,Vn, 1, [1,1,1,6]);
-      envpolysM(BL4_AAAB, 2,Vn, 1, [1,6,6,6]);
-      envpolysM(BL4_AABB, 2,Vn, 1, [1,1,6,6]);
+      # envpolysM(BL3_AAA, 3, Vn, 1, [1,1,1]);
+      # envpolysM(BL3_AAA, 3,Vn, 1, [6,6,6]);
+      # envpolysM(BL3_AAB, 3,Vn, 1, [1,1,6]);
+      # envpolysM(BL3_AAB, 3,Vn, 1, [1,6,6]);
+      # envpolysM(BL4_AAAA, 2,Vn, 1, [1,1,1,1]);
+      # envpolysM(BL4_AAAA, 2,Vn, 1, [6,6,6,6]);
+      # envpolysM(BL4_AAAB, 2,Vn, 1, [1,1,1,6]);
+      # envpolysM(BL4_AAAB, 2,Vn, 1, [1,6,6,6]);
+      # envpolysM(BL4_AABB, 2,Vn, 1, [1,1,6,6]);
    ]
 
 info("Assemble the LsqDB ...")
 @show length(basis)
 dbpath = homedir() * "/Gits/NBIPsMulti/data/Butane_4B_env"
 
-db =  LsqDB(dbpath, basis, data[1:10]);
+db =  LsqDB(dbpath, basis, data);
 db
 
 # Check that energy and forces are non zero.

@@ -123,8 +123,7 @@ function combinebasis(basis::AbstractVector{TV}, coeffs) where {TV <: EnvIPM}
    # combine the Vr components of the basis functions
    # (we get to do this because all t (=P) are the same
    Vr = combinebasis( [b.Vr for b in basis], coeffs )
-   return EnvIPM(basis[1].t, Vr, basis[1].Vn, basis[1].str_Vn,
-                 basis[1].Sp, basis[1].sp_type)
+   return EnvIPM(basis[1].t, Vr, basis[1].Vn, basis[1].str_Vn)
 end
 
 
