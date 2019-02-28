@@ -41,25 +41,25 @@ Vn = ("1.0/(1.0 + exp(1.0 / ($(1.5*r0) - r + 1e-2)))", 1.5*r0)
 info("Generate a 4B env basis ...")
 
 basis = [
-      envpolysM(BL2, 14, Vn, 2, [6,6]);
-      envpolysM(BL2, 14, Vn, 2, [1,1]);
-      envpolysM(BL2, 14, Vn, 2, [1,6]);
-      envpolysM(BL3_AAA, 5, Vn, 2, [1,1,1]);
-      envpolysM(BL3_AAA, 5,Vn, 2, [6,6,6]);
-      envpolysM(BL3_AAB, 5,Vn, 2, [1,1,6]);
-      envpolysM(BL3_AAB, 5,Vn, 2, [1,6,6]);
-      envpolysM(BL4_AAAA, 3,Vn, 2, [1,1,1,1]);
-      envpolysM(BL4_AAAA, 3,Vn, 2, [6,6,6,6]);
-      envpolysM(BL4_AAAB, 3,Vn, 2, [1,1,1,6]);
-      envpolysM(BL4_AAAB, 3,Vn, 2, [1,6,6,6]);
-      envpolysM(BL4_AABB, 3,Vn, 2, [1,1,6,6]);
+      envpolysM(BL2, 5, Vn, 2, [6,6]);
+      envpolysM(BL2, 5, Vn, 2, [1,1]);
+      envpolysM(BL2, 5, Vn, 2, [1,6]);
+      envpolysM(BL3_AAA, 3, Vn, 1, [1,1,1]);
+      envpolysM(BL3_AAA, 3,Vn, 1, [6,6,6]);
+      envpolysM(BL3_AAB, 3,Vn, 1, [1,1,6]);
+      envpolysM(BL3_AAB, 3,Vn, 1, [1,6,6]);
+      envpolysM(BL4_AAAA, 2,Vn, 1, [1,1,1,1]);
+      envpolysM(BL4_AAAA, 2,Vn, 1, [6,6,6,6]);
+      envpolysM(BL4_AAAB, 2,Vn, 1, [1,1,1,6]);
+      envpolysM(BL4_AAAB, 2,Vn, 1, [1,6,6,6]);
+      envpolysM(BL4_AABB, 2,Vn, 1, [1,1,6,6]);
    ]
 
 info("Assemble the LsqDB ...")
 @show length(basis)
 dbpath = homedir() * "/Gits/NBIPsMulti/data/Butane_4B_env"
 
-db =  LsqDB(dbpath, basis, data);
+db =  LsqDB(dbpath, basis, data[1:10]);
 db
 
 # Check that energy and forces are non zero.
@@ -79,7 +79,7 @@ configweights = Dict(""  => (1.0,p))
 
 
 IP, info = lsqfit( db; E0 = E0,
-                       solver = (:svd,2),
+                       # solver = (:svd,2),
                        dataweights=dataweights,
                        configweights=configweights,
                        # Ibasis = collect(1:45)

@@ -62,7 +62,7 @@ Dict(V::EnvIPM) = Dict( "__id__" => "EnvIPM",
 
 species(V::EnvIPM) = V.Sp
 
-species_type(V::EnvIPM) = V.Sp_type
+species_type(V::EnvIPM) = V.sp_type
 
 EnvIPM(D::Dict) = EnvIPM( D["t"],
                         _decode_dict(D["Vr"]),
@@ -92,7 +92,7 @@ combiscriptor(V::EnvIPM) = (EnvIPM,
                            combiscriptor(V.Vr),
                            V.str_Vn,
                            V.t,
-                           V.Sp, V.Sp_type)
+                           V.Sp, V.sp_type)
 
 function degree(V::EnvIPM)
    if length(V.Vr) == 1
