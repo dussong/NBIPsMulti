@@ -1,7 +1,9 @@
 ##
 info("Load libraries ...")
 
-include("../src/NBIPsMulti.jl")
+if !isdefined(:NBIPsMulti)
+    include("../src/NBIPsMulti.jl")
+end
 
 using JuLIP, NBodyIPs, NBIPsMulti, NBodyIPFitting
 

@@ -1,13 +1,16 @@
 info("Load libraries...")
 
-# include("../src/NBIPsMulti.jl")
+if !isdefined(:NBIPsMulti)
+    include("../src/NBIPsMulti.jl")
+end
 
 using NBodyIPs, NBodyIPFitting, JuLIP, NBIPsMulti
 include(homedir() * "/Gits/NBIPsMulti/src/Butane.jl")
 E0 = Butane.get_E0()
 
 info("Load database...")
-dbpath = homedir() * "/Gits/NBIPsMulti/data/Butane_3B"
+dbpath = homedir() * "/Gits/NBIPsMulti/data/Butane_4B_env"
+
 db = LsqDB(dbpath)
 db
 # summary(db)
@@ -23,8 +26,6 @@ IP, info = lsqfit( db; E0 = E0,
                        # Ibasis = Ibasis
                        )
 info
-
-IP
 
 table_absolute(info["errors"])
 table_relative(info["errors"])

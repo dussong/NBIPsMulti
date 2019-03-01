@@ -58,6 +58,7 @@ Dict(V::EnvIPM{N, P, TVR, TVN, SP}) where {N, P, TVR, TVN, SP}  =
                        "str_Vn" => V.str_Vn,
                        "cutoff_Vn" => cutoff(V.Vn),
                        "N" => N,
+                       "P" => P,
                        "Sp" => V.Sp,
                        "Sp_type" => String(SP), )
 
@@ -70,8 +71,10 @@ EnvIPM(D::Dict) = EnvIPM( D["t"],
                         analyse_Vn(D["str_Vn"], D["cutoff_Vn"]),
                         D["str_Vn"],
                         Val(D["N"]),
+                        Val(D["P"]),
                         Vector{Int}(D["Sp"]),
                         Val(Symbol(D["Sp_type"])))
+
 
 convert(::Val{:EnvIPM}, D::Dict) = EnvIPM(D)
 
@@ -82,7 +85,6 @@ end
 
 EnvIPM(t::Int, Vr::NBPolyM, Vn, str_Vn::String) =
       EnvIPM(t, Vr, Vn, str_Vn, Val(bodyorder(Vr)), Val(t), species(Vr), species_type(Vr))
-
 
 Vn(V::EnvIPM) = V.Vn
 Vr(V::EnvIPM) = V.Vr
