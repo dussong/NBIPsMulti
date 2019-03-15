@@ -1,5 +1,5 @@
 ##
-info("Load libraries ...")
+@info("Load libraries ...")
 
 include("../src/NBIPsMulti.jl")
 

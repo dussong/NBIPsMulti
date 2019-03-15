@@ -10,7 +10,7 @@ using NBodyIPs:        BondLengthDesc,
                        _decode_dict,
                        bodyorder,
                        SpaceTransform,
-                       Cutoff,
+                       NBCutoff,
                        NBSiteDescriptor
 
 using NBodyIPs.Polys:  Tup,
@@ -36,7 +36,8 @@ import NBodyIPs:          fast,
                           evaluate_I,
                           evaluate_I_ed,
                           basisname,
-                          nbpolys
+                          nbpolys,
+                          NBCutoff
 
 import NBodyIPs.PolyBasis: gen_tuples,
                            tdegree
@@ -56,7 +57,7 @@ abstract type NBodyFunctionM{N, DT, SP} <: NBodyFunction{N,DT} end
 
 
 
-struct MultiDesc{TT <: SpaceTransform, TC <: Cutoff, SP, N} <: NBSiteDescriptor
+struct MultiDesc{TT <: SpaceTransform, TC <: NBCutoff, SP, N} <: NBSiteDescriptor
    transform::TT
    cutoff::TC
    sp_type::Val{SP}
@@ -67,7 +68,7 @@ end
 #           Polynomials of Invariants
 # ==================================================================
 
-@pot struct NBPolyM{N, M, T, TD, SP} <: NBodyFunctionM{N, TD, SP}
+struct NBPolyM{N, M, T, TD, SP} <: NBodyFunctionM{N, TD, SP}
    t::VecTup{M}               # tuples M = #edges + 1
    c::Vector{T}               # coefficients
    D::TD                      # Descriptor
@@ -80,6 +81,8 @@ end
                         use `NBodyIPs.OneBody{T}` for 1-body.""")
              : new{N, M, T, TD, SP}(t, c, D, valN, Sp, Sp_type))
 end
+
+@pot NBPolyM
 
 """
 `struct NBPolyM`  (N-Body Polynomial with attached species, slow implementation)
@@ -105,7 +108,6 @@ where `I1, I2` are the 4-body invariants.
 
 * `Sp_type`
 """
-NBPolyM
 
 ==(V1::NBPolyM, V2::NBPolyM) = ( (V1.t == V2.t) && (V1.c == V2.c) && (V1.D == V2.D) && (V1.Sp == V2.Sp)  && (V1.Sp_type == V2.Sp_type) )
 

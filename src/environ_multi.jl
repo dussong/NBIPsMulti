@@ -33,7 +33,7 @@ export envpolysM
 
 abstract type AbstractEnvIP{N} <: AbstractCalculator end
 
-@pot struct EnvIPM{N, P, TVR, TVN, SP} <: AbstractEnvIP{N}
+struct EnvIPM{N, P, TVR, TVN, SP} <: AbstractEnvIP{N}
    t::Int
    Vr::TVR     # N-body potential -> multi
    Vn::TVN     # neighbour counter
@@ -43,6 +43,8 @@ abstract type AbstractEnvIP{N} <: AbstractCalculator end
    Sp::Vector{Int}            #encodes the species
    sp_type::Val{SP}
 end
+
+@pot EnvIPM
 
 ==(V1::EnvIPM, V2::EnvIPM) = ( (V1.t == V2.t) &&
                              (V1.Vr == V2.Vr) &&

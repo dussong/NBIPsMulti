@@ -1,6 +1,6 @@
 using JuLIP: JVec
 using NBodyIPs: SpaceTransform,
-                Cutoff,
+                NBCutoff,
                 edge_lengths,
                 fcut,
                 fcut_d,
@@ -292,32 +292,30 @@ end
 
 # 3-body
 @inline gradri2gradR!(::Val{:AAA}, dVsite, dV_dr, Rs, J, r) =
-_grad_len2pos!(dVsite, dV_dr, Rs, J, r)
+   _grad_len2pos!(dVsite, dV_dr, Rs, J, r)
 
 @inline gradri2gradR!(::Val{:AAB}, dVsite, dV_drθ, Rs, J, rθ) =
-_grad_rθ2pos!(dVsite, dV_drθ, Rs, J, rθ...)
+   _grad_rθ2pos!(dVsite, dV_drθ, Rs, J, rθ...)
 
 @inline gradri2gradR!(::Val{:ABC}, dVsite, dV_dr, Rs, J, r) =
-_grad_len2pos!(dVsite, dV_dr, Rs, J, r)
+   _grad_len2pos!(dVsite, dV_dr, Rs, J, r)
 
 # 4-body
 @inline gradri2gradR!(::Val{:AAAA}, dVsite, dV_dr, Rs, J, r) =
-_grad_len2pos!(dVsite, dV_dr, Rs, J, r)
+   _grad_len2pos!(dVsite, dV_dr, Rs, J, r)
 
 @inline gradri2gradR!(::Val{:AAAB}, dVsite, dV_drθ, Rs, J, rθ) =
-_grad_rθ2pos!(dVsite, dV_drθ, Rs, J, rθ...)
+   _grad_rθ2pos!(dVsite, dV_drθ, Rs, J, rθ...)
 
 @inline gradri2gradR!(::Val{:AABB}, dVsite, dV_dr, Rs, J, r) =
-_grad_len2pos!(dVsite, dV_dr, Rs, J, r)
+   _grad_len2pos!(dVsite, dV_dr, Rs, J, r)
 
 @inline gradri2gradR!(::Val{:AABC}, dVsite, dV_dr, Rs, J, r) =
-_grad_len2pos!(dVsite, dV_dr, Rs, J, r)
+   _grad_len2pos!(dVsite, dV_dr, Rs, J, r)
 
 @inline gradri2gradR!(::Val{:ABCD}, dVsite, dV_dr, Rs, J, r) =
-_grad_len2pos!(dVsite, dV_dr, Rs, J, r)
+   _grad_len2pos!(dVsite, dV_dr, Rs, J, r)
 
 # wrap-up
-@inline gradri2gradR!(D::MultiDesc, dVsite, dV_dr, Rs, J, r) = gradri2gradR!(D.sp_type, dVsite, dV_dr, Rs, J, r)
-
-
-# -------------- Kernel Functions --------------
+@inline gradri2gradR!(D::MultiDesc, dVsite, dV_dr, Rs, J, r) =
+   gradri2gradR!(D.sp_type, dVsite, dV_dr, Rs, J, r)

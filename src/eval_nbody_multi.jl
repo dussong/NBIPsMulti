@@ -20,7 +20,6 @@ import NBodyIPs: evaluate,
 using NeighbourLists: nbodies,
                       maptosites!,
                       maptosites_d!,
-                      virial!,
                       max_neigs,
                       sites
 

@@ -2,7 +2,6 @@ module NB_4B_AABB
 
 using NBodyIPs.FastPolys
 using StaticArrays
-using BenchmarkTools: @btime
 
 import NBodyIPs.tdegrees
 
