@@ -5,7 +5,7 @@ include("../src/NBIPsMulti.jl")
 
 using JuLIP, NBodyIPs, NBIPsMulti, NBodyIPFitting
 
-info("Load Butane database ...")
+@info("Load Butane database ...")
 
 include(homedir() * "/Gits/NBIPsMulti/src/Butane.jl")
 data = Butane.load_xyz() # ; include = ["hess_bcc", "hess_hcp"])
@@ -20,7 +20,7 @@ rcut2 = 2.8 * r0
 rcut3 = 2.3 * r0
 rcut4 = 1.9 * r0
 
-info("Generate descriptors...")
+@info("Generate descriptors...")
 
 BL2 = MultiDesc("exp( - 2 * (r/$r0-1))", "(:cos, $(rcut2-1.5), $(rcut2))",Val(:AA))
 
@@ -35,7 +35,7 @@ BL4_AAAB = MultiDesc("exp( - 2.5 * (r/$r0-1))", "(:cos2s, $(0.7*r0), $(0.88*r0),
 BL4_AABB = MultiDesc("exp( - 2.5 * (r/$r0-1))", "(:cos2s, $(0.7*r0), $(0.88*r0), $(1.8*r0), $(rcut3))",Val(:AABB))
 
 ##
-info("Generate a 4B basis ...")
+@info("Generate a 4B basis ...")
 basis = [
       nbpolys(BL2, 14, [6,6]);
       nbpolys(BL2, 14, [1,1]);
@@ -51,7 +51,7 @@ basis = [
       nbpolys(BL4_AABB, 3, [1,1,6,6]);
    ]
 
-info("Assemble the LsqDB ...")
+@info("Assemble the LsqDB ...")
 @show length(basis)
 dbpath = homedir() * "/Gits/NBIPsMulti/data/Butane_4B"
 
@@ -65,7 +65,7 @@ db
 # -------------------------
 # To do the fit right away
 # -------------------------
-info("Fit Butane Database basis...")
+@info("Fit Butane Database basis...")
 
 p = 0.5
 

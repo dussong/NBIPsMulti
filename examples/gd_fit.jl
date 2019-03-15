@@ -1,4 +1,4 @@
-info("Load libraries...")
+@info("Load libraries...")
 
 if !isdefined(:NBIPsMulti)
     include("../src/NBIPsMulti.jl")
@@ -8,14 +8,14 @@ using NBodyIPs, NBodyIPFitting, JuLIP, NBIPsMulti
 include(homedir() * "/Gits/NBIPsMulti/src/Butane.jl")
 E0 = Butane.get_E0()
 
-info("Load database...")
+@info("Load database...")
 dbpath = homedir() * "/Gits/NBIPsMulti/data/Butane_4B_env"
 
 db = LsqDB(dbpath)
 db
 # summary(db)
 ##
-info("Fit Butane Database basis...")
+@info("Fit Butane Database basis...")
 
 dataweights = Dict("E" => 10.0, "F" => 1.0, "V" => 1.0)
 configweights = Dict(""  => 1.0)

@@ -28,6 +28,7 @@ import NBodyIPs:          NBodyIP,
                           degree,
                           basisname
 import NBIPsMulti:        species, species_type
+import NBodyIPs.Polys: info
 
 export envpolysM
 
@@ -132,7 +133,7 @@ function combinebasis(basis::AbstractVector{TV}, coeffs) where {TV <: EnvIPM}
 end
 
 
-function Base.info(B::Vector{T}; indent = 2) where T <: EnvIPM
+function info(B::Vector{T}; indent = 2) where T <: EnvIPM
    ind = repeat(" ", indent)
    println(ind * "EnvIPM with P = $(B[1].t)")
    println(ind * "           Vn : $(B[1].str_Vn)")

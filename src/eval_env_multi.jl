@@ -13,6 +13,8 @@ using JuLIP.Potentials: site_virial,
 
 using NeighbourLists: max_neigs
 
+using KahanSummation
+
 import JuLIP: site_energies,
               energy,
               forces,
@@ -48,11 +50,11 @@ function n_fun_d(V::EnvIPM, n)
    end
 end
 
-site_ns(V::EnvIPM, at) = n_fun.(V, site_energies(Vn(V), at))
+site_ns(V::EnvIPM, at) = n_fun.(Ref(V), site_energies(Vn(V), at))
 
 function site_ns_ed(V::EnvIPM, at)
    Vns = site_energies(Vn(V), at)
-   return n_fun.(V, Vns), n_fun_d.(V, Vns)
+   return n_fun.(Ref(V), Vns), n_fun_d.(Ref(V), Vns)
 end
 
 function site_n_d!(dVn, V::EnvIPM, r, R, Ni, dNi)

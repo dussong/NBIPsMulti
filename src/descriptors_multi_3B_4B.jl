@@ -14,7 +14,8 @@ using NBodyIPs: SpaceTransform,
                 lengths_and_angles,
                 _rθ2x,
                 _rθ2x_d,
-                _grad_rθ2pos!
+                _grad_rθ2pos!,
+                fcut_analyse
 
 const MI = MultiInvariants
 
@@ -35,48 +36,48 @@ to_str(::Val{T}) where {T} = string(T)
 get_val(v::Val{T}) where {T} = T
 
 MultiDesc(transform::String, cutoff::Union{String, Tuple}, sp_type, valN) =
-         MultiDesc(SpaceTransform(transform), Cutoff(cutoff),sp_type, valN)
+         MultiDesc(SpaceTransform(transform), fcut_analyse(cutoff),sp_type, valN)
 
 MultiDesc(transform::String, cutoff::Union{String, Tuple}, ::Val{:AA}) =
-         MultiDesc(SpaceTransform(transform), Cutoff(cutoff),
+         MultiDesc(SpaceTransform(transform), fcut_analyse(cutoff),
                    Val(:AA), Val(2))
 
 MultiDesc(transform::String, cutoff::Union{String, Tuple}, ::Val{:AAA}) =
-         MultiDesc(SpaceTransform(transform), Cutoff(cutoff),
+         MultiDesc(SpaceTransform(transform), fcut_analyse(cutoff),
                    Val(:AAA), Val(3))
 
 MultiDesc(transform::String, cutoff::Union{String, Tuple}, ::Val{:AAB}) =
-         MultiDesc(SpaceTransform(transform), Cutoff(cutoff),
+         MultiDesc(SpaceTransform(transform), fcut_analyse(cutoff),
                    Val(:AAB), Val(3))
 
 MultiDesc(transform::String, cutoff::Union{String, Tuple}, ::Val{:ABC}) =
-         MultiDesc(SpaceTransform(transform), Cutoff(cutoff),
+         MultiDesc(SpaceTransform(transform), fcut_analyse(cutoff),
                    Val(:ABC), Val(3))
 
 # 4-Body
 
 MultiDesc(transform::String, cutoff::Union{String, Tuple}, ::Val{:AAAA}) =
-                            MultiDesc(SpaceTransform(transform), Cutoff(cutoff),
+                            MultiDesc(SpaceTransform(transform), fcut_analyse(cutoff),
                                       Val(:AAAA), Val(4))
 
 
 MultiDesc(transform::String, cutoff::Union{String, Tuple}, ::Val{:AAAB}) =
-                           MultiDesc(SpaceTransform(transform), Cutoff(cutoff),
+                           MultiDesc(SpaceTransform(transform), fcut_analyse(cutoff),
                                      Val(:AAAB), Val(4))
 
 
 MultiDesc(transform::String, cutoff::Union{String, Tuple}, ::Val{:AABB}) =
-                          MultiDesc(SpaceTransform(transform), Cutoff(cutoff),
+                          MultiDesc(SpaceTransform(transform), fcut_analyse(cutoff),
                                     Val(:AABB), Val(4))
 
 
 MultiDesc(transform::String, cutoff::Union{String, Tuple}, ::Val{:AABC}) =
-                         MultiDesc(SpaceTransform(transform), Cutoff(cutoff),
+                         MultiDesc(SpaceTransform(transform), fcut_analyse(cutoff),
                                    Val(:AABC), Val(4))
 
 
 MultiDesc(transform::String, cutoff::Union{String, Tuple}, ::Val{:ABCD}) =
-                           MultiDesc(SpaceTransform(transform), Cutoff(cutoff),
+                           MultiDesc(SpaceTransform(transform), fcut_analyse(cutoff),
                                      Val(:ABCD), Val(4))
 
 
@@ -174,19 +175,19 @@ end
 
 # ------------- invariants function ---------------
 # 2-body
-@inline invariants(D::MultiDesc, ::Val{:AA}, r) = MI.invariants(transform.(D, r),D.sp_type)
+@inline invariants(D::MultiDesc, ::Val{:AA}, r) = MI.invariants(transform.(Ref(D), r),D.sp_type)
 
 # 3-body
-@inline invariants(D::MultiDesc, ::Val{:AAA}, r) = MI.invariants(transform.(D, r),D.sp_type)
+@inline invariants(D::MultiDesc, ::Val{:AAA}, r) = MI.invariants(transform.(Ref(D), r),D.sp_type)
 @inline invariants(D::MultiDesc, ::Val{:AAB}, rθ) = MI.invariants(_rθ2x(D, rθ...),D.sp_type)
-@inline invariants(D::MultiDesc, ::Val{:ABC}, r) = MI.invariants(transform.(D, r),D.sp_type)
+@inline invariants(D::MultiDesc, ::Val{:ABC}, r) = MI.invariants(transform.(Ref(D), r),D.sp_type)
 
 # 4-body
-@inline invariants(D::MultiDesc, ::Val{:AAAA}, r) = MI.invariants(transform.(D, r),D.sp_type)
+@inline invariants(D::MultiDesc, ::Val{:AAAA}, r) = MI.invariants(transform.(Ref(D), r),D.sp_type)
 @inline invariants(D::MultiDesc, ::Val{:AAAB}, rθ) = MI.invariants(_rθ2x(D, rθ...),D.sp_type)
-@inline invariants(D::MultiDesc, ::Val{:AABB}, r) = MI.invariants(transform.(D, r),D.sp_type)
-@inline invariants(D::MultiDesc, ::Val{:AABC}, r) = MI.invariants(transform.(D, r),D.sp_type)
-@inline invariants(D::MultiDesc, ::Val{:ABCD}, r) = MI.invariants(transform.(D, r),D.sp_type)
+@inline invariants(D::MultiDesc, ::Val{:AABB}, r) = MI.invariants(transform.(Ref(D), r),D.sp_type)
+@inline invariants(D::MultiDesc, ::Val{:AABC}, r) = MI.invariants(transform.(Ref(D), r),D.sp_type)
+@inline invariants(D::MultiDesc, ::Val{:ABCD}, r) = MI.invariants(transform.(Ref(D), r),D.sp_type)
 
 # wrap-up
 @inline invariants(D::MultiDesc, r) = invariants(D, D.sp_type, r)
@@ -196,17 +197,17 @@ end
 # ------------- invariants_ed function ---------------
 # 2-body
 @inline function invariants_ed(D::MultiDesc, ::Val{:AA}, r)
-   x = transform.(D, r)
+   x = transform.(Ref(D), r)
    I1, I2, DI1, DI2 = MI.invariants_ed(x,D.sp_type)
-   x_d = transform_d.(D, r)
+   x_d = transform_d.(Ref(D), r)
    return I1, I2, _sdot(x_d, DI1), _sdot(x_d, DI2)
 end
 
 # 3-body
 @inline function invariants_ed(D::MultiDesc, ::Val{:AAA}, r)
-   x = transform.(D, r)
+   x = transform.(Ref(D), r)
    I1, I2, DI1, DI2 = MI.invariants_ed(x,D.sp_type)
-   x_d = transform_d.(D, r)
+   x_d = transform_d.(Ref(D), r)
    return I1, I2, _sdot(x_d, DI1), _sdot(x_d, DI2)
 end
 
@@ -218,17 +219,17 @@ end
 end
 
 @inline function invariants_ed(D::MultiDesc, ::Val{:ABC}, r)
-   x = transform.(D, r)
+   x = transform.(Ref(D), r)
    I1, I2, DI1, DI2 = MI.invariants_ed(x,D.sp_type)
-   x_d = transform_d.(D, r)
+   x_d = transform_d.(Ref(D), r)
    return I1, I2, _sdot(x_d, DI1), _sdot(x_d, DI2)
 end
 
 # 4-body
 @inline function invariants_ed(D::MultiDesc, ::Val{:AAAA}, r)
-   x = transform.(D, r)
+   x = transform.(Ref(D), r)
    I1, I2, DI1, DI2 = MI.invariants_ed(x,D.sp_type)
-   x_d = transform_d.(D, r)
+   x_d = transform_d.(Ref(D), r)
    return I1, I2, _sdot(x_d, DI1), _sdot(x_d, DI2)
 end
 
@@ -240,23 +241,23 @@ end
 end
 
 @inline function invariants_ed(D::MultiDesc, ::Val{:AABB}, r)
-   x = transform.(D, r)
+   x = transform.(Ref(D), r)
    I1, I2, DI1, DI2 = MI.invariants_ed(x,D.sp_type)
-   x_d = transform_d.(D, r)
+   x_d = transform_d.(Ref(D), r)
    return I1, I2, _sdot(x_d, DI1), _sdot(x_d, DI2)
 end
 
 @inline function invariants_ed(D::MultiDesc, ::Val{:AABC}, r)
-   x = transform.(D, r)
+   x = transform.(Ref(D), r)
    I1, I2, DI1, DI2 = MI.invariants_ed(x,D.sp_type)
-   x_d = transform_d.(D, r)
+   x_d = transform_d.(Ref(D), r)
    return I1, I2, _sdot(x_d, DI1), _sdot(x_d, DI2)
 end
 
 @inline function invariants_ed(D::MultiDesc, ::Val{:ABCD}, r)
-   x = transform.(D, r)
+   x = transform.(Ref(D), r)
    I1, I2, DI1, DI2 = MI.invariants_ed(x,D.sp_type)
-   x_d = transform_d.(D, r)
+   x_d = transform_d.(Ref(D), r)
    return I1, I2, _sdot(x_d, DI1), _sdot(x_d, DI2)
 end
 

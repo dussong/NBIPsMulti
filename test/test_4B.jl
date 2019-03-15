@@ -1,7 +1,8 @@
-# Test energy and forces
-# include("../src/NBIPsMulti.jl")
+# Test energy and forces: 4-body
 using JuLIP, NBodyIPs, NBIPsMulti, StaticArrays
-using BenchmarkTools, Base.Test
+using Test
+using LinearAlgebra: norm
+using Printf
 
 using NBodyIPs: tdegrees, invariants, invariants_d, invariants_ed
 
@@ -43,7 +44,8 @@ Sp = [
 
 
 
-for i in 1:length(valSp)
+# for i in 1:length(valSp)
+   i=1
    println("-------------------------------------------------")
    println(" Tests $(valSp[i]) ")
    println("-------------------------------------------------")
@@ -86,7 +88,7 @@ for i in 1:length(valSp)
          at_positions[j] -= h
          set_positions!(at,at_positions)
       end
-      push!(errs, vecnorm(dEh - dE, Inf))
+      push!(errs, norm(dEh - dE, Inf))
       @printf(" %d | %.2e \n", p, errs[end])
    end
    println("---------------")
@@ -122,7 +124,7 @@ for i in 1:length(valSp)
          at_positions[j] -= h
          set_positions!(at,at_positions)
       end
-      push!(errs, maximum(vecnorm(dEh[k] - dE[k], Inf) for k=1:length(basis)))
+      push!(errs, maximum(norm(dEh[k] - dE[k], Inf) for k=1:length(basis)))
       @printf(" %d | %.2e \n", p, errs[end])
    end
    println("---------------")
@@ -136,15 +138,15 @@ for i in 1:length(valSp)
    println(" Energy difference between 2 implementations - ")
    E1 = energy(basis, at)
    E2 = [energy(basis[k], at) for k=1:length(basis)]
-   print(vecnorm(E1-E2,Inf))
-   @test vecnorm(E1-E2,Inf) <= 1e-9
+   print(norm(E1-E2,Inf))
+   @test norm(E1-E2,Inf) <= 1e-9
 
    println(" Forces difference between 2 implementations -")
    F = forces(basis,at)
    F1 = [mat(F[i]) for i = 1:length(F)]
    F2 = [mat(forces(basis[k], at)) for k=1:length(basis)]
-   print(vecnorm([vecnorm(F1[k]-F2[k],Inf) for k=1:length(basis)], Inf))
-   @test vecnorm([vecnorm(F1[k]-F2[k],Inf) for k=1:length(basis)], Inf) <= 1e-10
+   print(norm([norm(F1[k]-F2[k],Inf) for k=1:length(basis)], Inf))
+   @test norm([norm(F1[k]-F2[k],Inf) for k=1:length(basis)], Inf) <= 1e-10
 
 end
 
@@ -187,7 +189,7 @@ end
 #       at_positions[j] -= h
 #       set_positions!(at,at_positions)
 #    end
-#    push!(errs, vecnorm(dEh - dE, Inf))
+#    push!(errs, norm(dEh - dE, Inf))
 #    @printf(" %d | %.2e \n", p, errs[end])
 # end
 # println("---------------")

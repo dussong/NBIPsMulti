@@ -1,7 +1,5 @@
-include("../src/NBIPsMulti.jl")
-
 using NBIPsMulti
-using JuLIP, NBodyIPs, Base.Test, StaticArrays
+using JuLIP, NBodyIPs, Test, StaticArrays
 
 @testset "NBodyIPsMulti" begin
    @testset "invariants" begin include("test_invariants.jl") end

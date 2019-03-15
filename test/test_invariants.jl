@@ -1,8 +1,7 @@
-# include("../src/NBIPsMulti.jl")
-
 using NBodyIPs, NBIPsMulti
-using JuLIP, Base.Test, StaticArrays, ForwardDiff, Combinatorics
-using BenchmarkTools
+using JuLIP, Test, StaticArrays, ForwardDiff, Combinatorics
+using Printf
+using LinearAlgebra: norm
 
 using JuLIP.Potentials: evaluate, evaluate_d
 
@@ -49,7 +48,7 @@ for (i,sp_type) in enumerate(Sp_type)
          dIh[:, j] = (Ih - I) / h
          r0[j] -= h
       end
-      push!(errs, vecnorm(dIh - dI, Inf))
+      push!(errs, norm(dIh - dI, Inf))
       @printf(" %d | %.2e \n", p, errs[end])
    end
    println("---------------")

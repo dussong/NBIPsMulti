@@ -39,6 +39,8 @@ import NBodyIPs:          fast,
                           nbpolys,
                           NBCutoff
 
+import NBodyIPs.Polys: info
+
 import NBodyIPs.PolyBasis: gen_tuples,
                            tdegree
 
@@ -166,7 +168,7 @@ function degree(V::NBPolyM)
 end
 
 
-function Base.info(B::Vector{T}; indent = 2) where T <: NBPolyM
+function info(B::Vector{T}; indent = 2) where T <: NBPolyM
    ind = repeat(" ", indent)
    println(ind * "body-order = $(bodyorder(B[1]))")
    println(ind * "    length = $(length(B))")
@@ -338,7 +340,7 @@ function gen_tuples(desc::MultiDesc, vN::Val{N}, vK::Val{K}, deg, tuplebound) wh
          if lastinc == K
             return A
          end
-         α[1:lastinc] = 0
+         α[1:lastinc] .= 0
          α[lastinc+1] += 1
          lastinc += 1
       end
