@@ -44,6 +44,7 @@ import NBodyIPs.Polys: info
 import NBodyIPs.PolyBasis: gen_tuples,
                            tdegree
 
+import Base: hash
 export NBPolyM, NBodyFunctionM, MultiDesc
 
 
@@ -86,6 +87,8 @@ end
 
 @pot NBPolyM
 
+const BASIS = Val{:basis}
+
 """
 `struct NBPolyM`  (N-Body Polynomial with attached species, slow implementation)
 
@@ -121,7 +124,11 @@ species_type(V::NBPolyM) = V.Sp_type
 
 basisname(::NBPolyM) = "NBPolyM"
 
-combiscriptor(V::NBPolyM) = (NBPolyM, bodyorder(V), combiscriptor(V.D), V.Sp, V.Sp_type)
+# combiscriptor(V::NBPolyM) = (NBPolyM, bodyorder(V), combiscriptor(V.D), V.Sp, V.Sp_type)
+
+hash(::BASIS, V::NBPolyM) =
+   hash( (hash(NBPolyM), hash(bodyorder(V)), hash(BASIS(), V.D),
+        hash(V.Sp), hash(V.Sp_type)))
 
 # standard constructor (N can be inferred)
 NBPolyM(t::VecTup{K}, c, D, Sp, Sp_type) where {K} = NBPolyM(t, c, D, Val(edges2bo(K-1)), Sp, Sp_type)
@@ -155,6 +162,8 @@ function match_dictionary(V::NBPolyM, V1::NBPolyM)
    end
    return NBPolyM(V.t, V.c, V1.D, V.valN, V.Sp, V.Sp_type)
 end
+
+
 
 combinebasis(basis::AbstractVector{TV}, coeffs) where {TV <: NBPolyM} =
       NBPolyM(basis, coeffs, basis[1].D, basis[1].Sp, basis[1].Sp_type)

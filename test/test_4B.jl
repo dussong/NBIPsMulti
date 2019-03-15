@@ -44,8 +44,7 @@ Sp = [
 
 
 
-# for i in 1:length(valSp)
-   i=1
+for i in 1:length(valSp)
    println("-------------------------------------------------")
    println(" Tests $(valSp[i]) ")
    println("-------------------------------------------------")

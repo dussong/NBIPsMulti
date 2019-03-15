@@ -1,8 +1,6 @@
 ##
 @info("Load libraries ...")
 
-include("../src/NBIPsMulti.jl")
-
 using JuLIP, NBodyIPs, NBIPsMulti, NBodyIPFitting
 
 @info("Load Butane database ...")
@@ -13,7 +11,7 @@ data
 @show length(data)
 data[1]
 
-r0 = 3.*round(rnn(:C),2)
+r0 = 3*round(rnn(:C),digits=2)
 E0 = Butane.get_E0()
 
 rcut2 = 2.8 * r0
@@ -40,15 +38,15 @@ basis = [
       nbpolys(BL2, 14, [6,6]);
       nbpolys(BL2, 14, [1,1]);
       nbpolys(BL2, 14, [1,6]);
-      nbpolys(BL3_AAA, 5, [1,1,1]);
-      nbpolys(BL3_AAA, 5, [6,6,6]);
-      nbpolys(BL3_AAB, 5, [1,1,6]);
-      nbpolys(BL3_AAB, 5, [1,6,6]);
-      nbpolys(BL4_AAAA, 3, [1,1,1,1]);
-      nbpolys(BL4_AAAA, 3, [6,6,6,6]);
-      nbpolys(BL4_AAAB, 3, [1,1,1,6]);
-      nbpolys(BL4_AAAB, 3, [1,6,6,6]);
-      nbpolys(BL4_AABB, 3, [1,1,6,6]);
+      # nbpolys(BL3_AAA, 5, [1,1,1]);
+      # nbpolys(BL3_AAA, 5, [6,6,6]);
+      # nbpolys(BL3_AAB, 5, [1,1,6]);
+      # nbpolys(BL3_AAB, 5, [1,6,6]);
+      # nbpolys(BL4_AAAA, 3, [1,1,1,1]);
+      # nbpolys(BL4_AAAA, 3, [6,6,6,6]);
+      # nbpolys(BL4_AAAB, 3, [1,1,1,6]);
+      # nbpolys(BL4_AAAB, 3, [1,6,6,6]);
+      # nbpolys(BL4_AABB, 3, [1,1,6,6]);
    ]
 
 @info("Assemble the LsqDB ...")

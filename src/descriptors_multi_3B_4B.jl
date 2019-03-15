@@ -30,7 +30,7 @@ import NBodyIPs: ricoords,
                  invariants_ed,
                  gradri2gradR!
 
-
+import Base: hash
 # -------------- IO -------------------
 to_str(::Val{T}) where {T} = string(T)
 get_val(v::Val{T}) where {T} = T
@@ -94,6 +94,9 @@ MultiDesc(D::Dict) = MultiDesc( SpaceTransform(D["transform"]),
                                           Val(Symbol(D["sp_type"])),
                                           Val(D["valN"])
                                           )
+
+const BASIS = Val{:basis}
+hash(::BASIS, D::MultiDesc) = hash((hash(BASIS(), D.transform), hash(BASIS(), D.cutoff), hash(D.sp_type), hash(D.valN)))
 
 ==(D1::MultiDesc, D2::MultiDesc) =
       ( (D1.transform == D2.transform) && (D1.cutoff == D2.cutoff)

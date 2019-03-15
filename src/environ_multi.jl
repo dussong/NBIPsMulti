@@ -24,11 +24,13 @@ import NBodyIPs:          NBodyIP,
                           combinebasis,
                           _decode_dict,
                           descriptor,
-                          combiscriptor,
+                          # combiscriptor,
                           degree,
                           basisname
 import NBIPsMulti:        species, species_type
 import NBodyIPs.Polys: info
+
+import Base: hash
 
 export envpolysM
 
