@@ -38,15 +38,15 @@ basis = [
       nbpolys(BL2, 14, [6,6]);
       nbpolys(BL2, 14, [1,1]);
       nbpolys(BL2, 14, [1,6]);
-      # nbpolys(BL3_AAA, 5, [1,1,1]);
-      # nbpolys(BL3_AAA, 5, [6,6,6]);
-      # nbpolys(BL3_AAB, 5, [1,1,6]);
-      # nbpolys(BL3_AAB, 5, [1,6,6]);
-      # nbpolys(BL4_AAAA, 3, [1,1,1,1]);
-      # nbpolys(BL4_AAAA, 3, [6,6,6,6]);
-      # nbpolys(BL4_AAAB, 3, [1,1,1,6]);
-      # nbpolys(BL4_AAAB, 3, [1,6,6,6]);
-      # nbpolys(BL4_AABB, 3, [1,1,6,6]);
+      nbpolys(BL3_AAA, 5, [1,1,1]);
+      nbpolys(BL3_AAA, 5, [6,6,6]);
+      nbpolys(BL3_AAB, 5, [1,1,6]);
+      nbpolys(BL3_AAB, 5, [1,6,6]);
+      nbpolys(BL4_AAAA, 3, [1,1,1,1]);
+      nbpolys(BL4_AAAA, 3, [6,6,6,6]);
+      nbpolys(BL4_AAAB, 3, [1,1,1,6]);
+      nbpolys(BL4_AAAB, 3, [1,6,6,6]);
+      nbpolys(BL4_AABB, 3, [1,1,6,6]);
    ]
 
 @info("Assemble the LsqDB ...")
@@ -65,20 +65,20 @@ db
 # -------------------------
 @info("Fit Butane Database basis...")
 
-p = 0.5
+p = 1.
 
-dataweights = Dict("E" => 1.0, "F" => 1.0)
-configweights = Dict(""  => (1.0,p))
+obsweights = Dict("E" => 1.0, "F" => 1.0)
+configweights = Dict(""  => 1.0)
+
+Y, W = NBodyIPFitting.Lsq.collect_observations(db, configweights, dataweights, OneBody(E0))
 
 
-
-IP, info = lsqfit( db; E0 = E0,
-                       solver = (:svd,2),
-                       dataweights=dataweights,
+IP, lsqinfo = lsqfit( db; E0 = E0,
+                       obsweights=obsweights,
                        configweights=configweights,
                        # Ibasis = collect(1:45)
+                       Vref = OneBody(E0)
                        )
-info
 
-table_absolute(info["errors"])
-table_relative(info["errors"])
+errs = lsqinfo["errors"]
+rmse_table(rmse(errs)...)

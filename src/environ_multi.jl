@@ -96,11 +96,11 @@ Vr(V::EnvIPM) = V.Vr
 
 descriptor(V::EnvIPM) = descriptor(V.Vr)
 
-combiscriptor(V::EnvIPM) = (EnvIPM,
-                           combiscriptor(V.Vr),
-                           V.str_Vn,
-                           V.t,
-                           V.Sp, V.sp_type)
+# combiscriptor(V::EnvIPM) = (EnvIPM,
+#                            combiscriptor(V.Vr),
+#                            V.str_Vn,
+#                            V.t,
+#                            V.Sp, V.sp_type)
 
 function degree(V::EnvIPM)
    if length(V.Vr) == 1
