@@ -35,48 +35,48 @@ import Base: hash
 to_str(::Val{T}) where {T} = string(T)
 get_val(v::Val{T}) where {T} = T
 
-MultiDesc(transform::String, cutoff::Union{String, Tuple}, sp_type, valN) =
+MultiDesc(transform::String, cutoff, sp_type, valN) =
          MultiDesc(SpaceTransform(transform), fcut_analyse(cutoff),sp_type, valN)
 
-MultiDesc(transform::String, cutoff::Union{String, Tuple}, ::Val{:AA}) =
+MultiDesc(transform::String, cutoff, ::Val{:AA}) =
          MultiDesc(SpaceTransform(transform), fcut_analyse(cutoff),
                    Val(:AA), Val(2))
 
-MultiDesc(transform::String, cutoff::Union{String, Tuple}, ::Val{:AAA}) =
+MultiDesc(transform::String, cutoff, ::Val{:AAA}) =
          MultiDesc(SpaceTransform(transform), fcut_analyse(cutoff),
                    Val(:AAA), Val(3))
 
-MultiDesc(transform::String, cutoff::Union{String, Tuple}, ::Val{:AAB}) =
+MultiDesc(transform::String, cutoff, ::Val{:AAB}) =
          MultiDesc(SpaceTransform(transform), fcut_analyse(cutoff),
                    Val(:AAB), Val(3))
 
-MultiDesc(transform::String, cutoff::Union{String, Tuple}, ::Val{:ABC}) =
+MultiDesc(transform::String, cutoff, ::Val{:ABC}) =
          MultiDesc(SpaceTransform(transform), fcut_analyse(cutoff),
                    Val(:ABC), Val(3))
 
 # 4-Body
 
-MultiDesc(transform::String, cutoff::Union{String, Tuple}, ::Val{:AAAA}) =
+MultiDesc(transform::String, cutoff, ::Val{:AAAA}) =
                             MultiDesc(SpaceTransform(transform), fcut_analyse(cutoff),
                                       Val(:AAAA), Val(4))
 
 
-MultiDesc(transform::String, cutoff::Union{String, Tuple}, ::Val{:AAAB}) =
+MultiDesc(transform::String, cutoff, ::Val{:AAAB}) =
                            MultiDesc(SpaceTransform(transform), fcut_analyse(cutoff),
                                      Val(:AAAB), Val(4))
 
 
-MultiDesc(transform::String, cutoff::Union{String, Tuple}, ::Val{:AABB}) =
+MultiDesc(transform::String, cutoff, ::Val{:AABB}) =
                           MultiDesc(SpaceTransform(transform), fcut_analyse(cutoff),
                                     Val(:AABB), Val(4))
 
 
-MultiDesc(transform::String, cutoff::Union{String, Tuple}, ::Val{:AABC}) =
+MultiDesc(transform::String, cutoff, ::Val{:AABC}) =
                          MultiDesc(SpaceTransform(transform), fcut_analyse(cutoff),
                                    Val(:AABC), Val(4))
 
 
-MultiDesc(transform::String, cutoff::Union{String, Tuple}, ::Val{:ABCD}) =
+MultiDesc(transform::String, cutoff, ::Val{:ABCD}) =
                            MultiDesc(SpaceTransform(transform), fcut_analyse(cutoff),
                                      Val(:ABCD), Val(4))
 
@@ -90,10 +90,10 @@ Dict(D::MultiDesc) = Dict( "__id__"    =>  "MultiDesc",
                              )
 
 MultiDesc(D::Dict) = MultiDesc( SpaceTransform(D["transform"]),
-                                          decode_dict(D["cutoff"]),
-                                          Val(Symbol(D["sp_type"])),
-                                          Val(D["valN"])
-                                          )
+                                decode_dict(D["cutoff"]),
+                                Val(Symbol(D["sp_type"])),
+                                Val(D["valN"])
+                                )
 
 const BASIS = Val{:basis}
 hash(::BASIS, D::MultiDesc) = hash((hash(BASIS(), D.transform), hash(BASIS(), D.cutoff), hash(D.sp_type), hash(D.valN)))

@@ -20,7 +20,7 @@ rcut4 = 1.9 * r0
 
 @info("Generate descriptors...")
 
-BL2 = MultiDesc("exp( - 2 * (r/$r0-1))", "(:cos, $(rcut2-1.5), $(rcut2))",Val(:AA))
+BL2 = MultiDesc("exp( - 2 * (r/$r0-1))", CosCut(rcut2-1.5,rcut2),Val(:AA))
 
 BL3_AAA = MultiDesc("exp( - 2.5 * (r/$r0-1))", "(:cos2s, $(0.7*r0), $(0.88*r0), $(1.8*r0), $(rcut3))",Val(:AAA))
 
@@ -32,21 +32,22 @@ BL4_AAAB = MultiDesc("exp( - 2.5 * (r/$r0-1))", "(:cos2s, $(0.7*r0), $(0.88*r0),
 
 BL4_AABB = MultiDesc("exp( - 2.5 * (r/$r0-1))", "(:cos2s, $(0.7*r0), $(0.88*r0), $(1.8*r0), $(rcut3))",Val(:AABB))
 
+
 ##
 @info("Generate a 4B basis ...")
 basis = [
       nbpolys(BL2, 14, [6,6]);
       nbpolys(BL2, 14, [1,1]);
       nbpolys(BL2, 14, [1,6]);
-      nbpolys(BL3_AAA, 5, [1,1,1]);
-      nbpolys(BL3_AAA, 5, [6,6,6]);
-      nbpolys(BL3_AAB, 5, [1,1,6]);
-      nbpolys(BL3_AAB, 5, [1,6,6]);
-      nbpolys(BL4_AAAA, 3, [1,1,1,1]);
-      nbpolys(BL4_AAAA, 3, [6,6,6,6]);
-      nbpolys(BL4_AAAB, 3, [1,1,1,6]);
-      nbpolys(BL4_AAAB, 3, [1,6,6,6]);
-      nbpolys(BL4_AABB, 3, [1,1,6,6]);
+      nbpolys(BL3_AAA, 3, [1,1,1]);
+      nbpolys(BL3_AAA, 3, [6,6,6]);
+      nbpolys(BL3_AAB, 3, [1,1,6]);
+      nbpolys(BL3_AAB, 3, [1,6,6]);
+      nbpolys(BL4_AAAA, 2, [1,1,1,1]);
+      nbpolys(BL4_AAAA, 2, [6,6,6,6]);
+      nbpolys(BL4_AAAB, 2, [1,1,1,6]);
+      nbpolys(BL4_AAAB, 2, [1,6,6,6]);
+      nbpolys(BL4_AABB, 2, [1,1,6,6]);
    ]
 
 @info("Assemble the LsqDB ...")
