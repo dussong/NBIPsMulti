@@ -39,7 +39,3 @@ function convert_db(; fname = filename() * ".jld2", kwargs...)
 end
 
 end
-
-# if length(ARGS) > 0 && ARGS[1] in ["-convert", "convert"]
-#    Butane.convert_db()
-# end

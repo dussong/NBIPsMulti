@@ -34,6 +34,8 @@ import Base: hash
 
 export envpolysM
 
+const BASIS = Val{:basis}
+
 abstract type AbstractEnvIP{N} <: AbstractCalculator end
 
 struct EnvIPM{N, P, TVR, TVN, SP} <: AbstractEnvIP{N}
@@ -101,6 +103,15 @@ descriptor(V::EnvIPM) = descriptor(V.Vr)
 #                            V.str_Vn,
 #                            V.t,
 #                            V.Sp, V.sp_type)
+
+hash(::BASIS, V::EnvIPM) = hash((hash(EnvIPM),
+                                 hash(V.valN),
+                                 hash(V.valP),
+                                 hash(BASIS(), V.Vr),
+                                 hash(V.str_Vn),
+                                 hash(V.t),
+                                 hash(V.Sp),
+                                 hash(V.sp_type)))
 
 function degree(V::EnvIPM)
    if length(V.Vr) == 1

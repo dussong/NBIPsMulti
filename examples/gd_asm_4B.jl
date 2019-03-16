@@ -5,8 +5,8 @@ using JuLIP, NBodyIPs, NBIPsMulti, NBodyIPFitting
 
 @info("Load Butane database ...")
 
-include(homedir() * "/Gits/NBIPsMulti/src/Butane.jl")
-data = Butane.load_xyz() # ; include = ["hess_bcc", "hess_hcp"])
+include(homedir() * "/.julia/dev/NBIPsMulti/src/Butane.jl")
+data = Butane.load_xyz()
 data
 @show length(data)
 data[1]
@@ -51,7 +51,7 @@ basis = [
 
 @info("Assemble the LsqDB ...")
 @show length(basis)
-dbpath = homedir() * "/Gits/NBIPsMulti/data/Butane_4B"
+dbpath = homedir() * "/.julia/dev/NBIPsMulti/data/Butane_4B"
 
 db =  LsqDB(dbpath, basis, data);
 db

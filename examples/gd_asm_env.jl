@@ -1,21 +1,17 @@
 ##
 @info("Load libraries ...")
 
-if !isdefined(:NBIPsMulti)
-    include("../src/NBIPsMulti.jl")
-end
-
 using JuLIP, NBodyIPs, NBIPsMulti, NBodyIPFitting
 
 @info("Load Butane database ...")
 
-include(homedir() * "/Gits/NBIPsMulti/src/Butane.jl")
-data = Butane.load_xyz() # ; include = ["hess_bcc", "hess_hcp"])
+include(homedir() * "/.julia/dev/NBIPsMulti/src/Butane.jl")
+data = Butane.load_xyz()
 data
 @show length(data)
 data[1]
 
-r0 = 3.*round(rnn(:C),2)
+r0 = 3 .*round(rnn(:C),digits=2)
 E0 = Butane.get_E0()
 
 rcut2 = 2.8 * r0
@@ -46,11 +42,11 @@ basis = [
       envpolysM(BL2, 5, Vn, 2, [6,6]);
       envpolysM(BL2, 5, Vn, 2, [1,1]);
       envpolysM(BL2, 5, Vn, 2, [1,6]);
-      # envpolysM(BL3_AAA, 3, Vn, 1, [1,1,1]);
+      envpolysM(BL3_AAA, 3, Vn, 1, [1,1,1]);
       # envpolysM(BL3_AAA, 3,Vn, 1, [6,6,6]);
       # envpolysM(BL3_AAB, 3,Vn, 1, [1,1,6]);
       # envpolysM(BL3_AAB, 3,Vn, 1, [1,6,6]);
-      # envpolysM(BL4_AAAA, 2,Vn, 1, [1,1,1,1]);
+      envpolysM(BL4_AAAA, 2,Vn, 1, [1,1,1,1]);
       # envpolysM(BL4_AAAA, 2,Vn, 1, [6,6,6,6]);
       # envpolysM(BL4_AAAB, 2,Vn, 1, [1,1,1,6]);
       # envpolysM(BL4_AAAB, 2,Vn, 1, [1,6,6,6]);
@@ -59,33 +55,26 @@ basis = [
 
 @info("Assemble the LsqDB ...")
 @show length(basis)
-dbpath = homedir() * "/Gits/NBIPsMulti/data/Butane_4B_env"
+dbpath = homedir() * "/.julia/dev/NBIPsMulti/data/Butane_4B_env"
 
 db =  LsqDB(dbpath, basis, data);
 db
-# Check that energy and forces are non zero.
-# db1.kron_groups[":14EF"]["F"]
-# db1.kron_groups[":14EF"]["E"]
 
 # -------------------------
 # To do the fit right away
 # -------------------------
 @info("Fit Butane Database basis...")
 
-p = 0.5
-
-dataweights = Dict("E" => 1.0, "F" => 1.0)
-configweights = Dict(""  => (1.0,p))
+obsweights = Dict("E" => 1.0, "F" => 1.0)
+configweights = Dict(""  => 1.0)
 
 
 
-IP, info = lsqfit( db; E0 = E0,
-                       # solver = (:svd,2),
-                       dataweights=dataweights,
+IP, lsqinfo = lsqfit( db; E0 = E0,
+                       obsweights=obsweights,
                        configweights=configweights,
                        # Ibasis = collect(1:45)
                        )
-info
 
-table_absolute(info["errors"])
-table_relative(info["errors"])
+errs = lsqinfo["errors"]
+rmse_table(rmse(errs)...)

@@ -148,18 +148,18 @@ length(V::NBPolyM) = length(V.t)
 
 cutoff(V::NBPolyM) = cutoff(V.D)
 
-function match_dictionary(V::NBPolyM, V1::NBPolyM)
-   if V.D != V1.D
-      if V.D.s != V1.D.s
-         if V.Sp != V1.Sp
-            if V.Sp_type != V1.Sp_type
-               @warn("matching two non-matching dictionaries!")
-            end
-         end
-      end
-   end
-   return NBPolyM(V.t, V.c, V1.D, V.valN, V.Sp, V.Sp_type)
-end
+# function match_dictionary(V::NBPolyM, V1::NBPolyM)
+#    if V.D != V1.D
+#       if V.D.s != V1.D.s
+#          if V.Sp != V1.Sp
+#             if V.Sp_type != V1.Sp_type
+#                @warn("matching two non-matching dictionaries!")
+#             end
+#          end
+#       end
+#    end
+#    return NBPolyM(V.t, V.c, V1.D, V.valN, V.Sp, V.Sp_type)
+# end
 
 
 

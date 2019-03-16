@@ -1,4 +1,4 @@
-using JuLIP: JVec
+using JuLIP: JVec, decode_dict
 using NBodyIPs: SpaceTransform,
                 NBCutoff,
                 edge_lengths,
@@ -90,7 +90,7 @@ Dict(D::MultiDesc) = Dict( "__id__"    =>  "MultiDesc",
                              )
 
 MultiDesc(D::Dict) = MultiDesc( SpaceTransform(D["transform"]),
-                                          Cutoff(D["cutoff"]),
+                                          decode_dict(D["cutoff"]),
                                           Val(Symbol(D["sp_type"])),
                                           Val(D["valN"])
                                           )
