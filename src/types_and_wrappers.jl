@@ -48,6 +48,7 @@ import Base: hash
 export NBPolyM, NBodyFunctionM, MultiDesc
 
 
+const BASIS = Val{:basis}
 # tdegrees(desc::MultiDesc, vN) = NBIPsMulti.MultiInvariants.tdegrees(vN)
 
 # ==================================================================
@@ -57,10 +58,8 @@ export NBPolyM, NBodyFunctionM, MultiDesc
 abstract type NBodyFunctionM{N, DT, SP} <: NBodyFunction{N,DT} end
 
 
-
-
-
-struct MultiDesc{TT <: SpaceTransform, TC <: NBCutoff, SP, N} <: NBSiteDescriptor
+struct MultiDesc{TT <: SpaceTransform,
+                 TC <: NBCutoff, SP, N} <: NBSiteDescriptor
    transform::TT
    cutoff::TC
    sp_type::Val{SP}
@@ -87,7 +86,6 @@ end
 
 @pot NBPolyM
 
-const BASIS = Val{:basis}
 
 """
 `struct NBPolyM`  (N-Body Polynomial with attached species, slow implementation)
@@ -155,7 +153,7 @@ function match_dictionary(V::NBPolyM, V1::NBPolyM)
       if V.D.s != V1.D.s
          if V.Sp != V1.Sp
             if V.Sp_type != V1.Sp_type
-               warn("matching two non-matching dictionaries!")
+               @warn("matching two non-matching dictionaries!")
             end
          end
       end
@@ -233,9 +231,7 @@ end
 # bodyorder(::Val{:AAB}) = 3
 # bodyorder(::Val{:ABC}) = 3
 
-# -------------- Infrastructure to read/write NBPoly  --------
-
-
+# -------------- Infrastructure to read/write NBPolyM  --------
 Dict(V::NBPolyM{N, M, T, TD, SP}) where {N, M, T, TD, SP} = Dict(
                         "__id__" => "NBPolyM",
                         "t" => V.t,

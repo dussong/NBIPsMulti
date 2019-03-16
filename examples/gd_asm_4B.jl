@@ -56,27 +56,18 @@ dbpath = homedir() * "/Gits/NBIPsMulti/data/Butane_4B"
 db =  LsqDB(dbpath, basis, data);
 db
 
-# Check that energy and forces are non zero.
-# db1.kron_groups[":14EF"]["F"]
-# db1.kron_groups[":14EF"]["E"]
-
 # -------------------------
 # To do the fit right away
 # -------------------------
 @info("Fit Butane Database basis...")
 
-p = 1.
-
 obsweights = Dict("E" => 1.0, "F" => 1.0)
 configweights = Dict(""  => 1.0)
-
-Y, W = NBodyIPFitting.Lsq.collect_observations(db, configweights, dataweights, OneBody(E0))
-
 
 IP, lsqinfo = lsqfit( db; E0 = E0,
                        obsweights=obsweights,
                        configweights=configweights,
-                       # Ibasis = collect(1:45)
+                       Ibasis = collect(1:45),
                        Vref = OneBody(E0)
                        )
 
