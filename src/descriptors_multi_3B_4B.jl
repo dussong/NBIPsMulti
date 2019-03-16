@@ -43,8 +43,10 @@ MultiDesc(transform::String, cutoff, ::Val{:AA}) =
                    Val(:AA), Val(2))
 
 MultiDesc(transform::String, cutoff, ::Val{:AAA}) =
-         MultiDesc(SpaceTransform(transform), fcut_analyse(cutoff),
-                   Val(:AAA), Val(3))
+         MultiDesc(SpaceTransform(transform),
+                   fcut_analyse(cutoff),
+                   Val(:AAA),
+                   Val(3))
 
 MultiDesc(transform::String, cutoff, ::Val{:AAB}) =
          MultiDesc(SpaceTransform(transform), fcut_analyse(cutoff),
@@ -57,28 +59,38 @@ MultiDesc(transform::String, cutoff, ::Val{:ABC}) =
 # 4-Body
 
 MultiDesc(transform::String, cutoff, ::Val{:AAAA}) =
-                            MultiDesc(SpaceTransform(transform), fcut_analyse(cutoff),
-                                      Val(:AAAA), Val(4))
+          MultiDesc(SpaceTransform(transform),
+                    fcut_analyse(cutoff),
+                    Val(:AAAA),
+                    Val(4))
 
 
 MultiDesc(transform::String, cutoff, ::Val{:AAAB}) =
-                           MultiDesc(SpaceTransform(transform), fcut_analyse(cutoff),
-                                     Val(:AAAB), Val(4))
+          MultiDesc(SpaceTransform(transform),
+                    fcut_analyse(cutoff),
+                    Val(:AAAB),
+                    Val(4))
 
 
 MultiDesc(transform::String, cutoff, ::Val{:AABB}) =
-                          MultiDesc(SpaceTransform(transform), fcut_analyse(cutoff),
-                                    Val(:AABB), Val(4))
+          MultiDesc(SpaceTransform(transform),
+                    fcut_analyse(cutoff),
+                    Val(:AABB),
+                    Val(4))
 
 
 MultiDesc(transform::String, cutoff, ::Val{:AABC}) =
-                         MultiDesc(SpaceTransform(transform), fcut_analyse(cutoff),
-                                   Val(:AABC), Val(4))
+          MultiDesc(SpaceTransform(transform),
+                    fcut_analyse(cutoff),
+                    Val(:AABC),
+                    Val(4))
 
 
 MultiDesc(transform::String, cutoff, ::Val{:ABCD}) =
-                           MultiDesc(SpaceTransform(transform), fcut_analyse(cutoff),
-                                     Val(:ABCD), Val(4))
+          MultiDesc(SpaceTransform(transform),
+                    fcut_analyse(cutoff),
+                    Val(:ABCD),
+                    Val(4))
 
 
 
