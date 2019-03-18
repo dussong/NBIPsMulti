@@ -43,6 +43,7 @@ struct EnvIPM{N, P, TVR, TVN, SP} <: AbstractEnvIP{N}
    Vr::TVR     # N-body potential -> multi
    Vn::TVN     # neighbour counter
    str_Vn::String  # string describing the neighbour counter
+   weights::Dict{Tuple{Int64,Int64},Float64}
    valN::Val{N}
    valP::Val{P}
    Sp::Vector{Int}            #encodes the species
@@ -51,9 +52,11 @@ end
 
 @pot EnvIPM
 
+
 ==(V1::EnvIPM, V2::EnvIPM) = ( (V1.t == V2.t) &&
                              (V1.Vr == V2.Vr) &&
                              (V1.str_Vn == V2.str_Vn) &&
+                             (V1.weights == V2.weigths) &&
                              (V1.valN == V2.valN) &&
                              (V1.valP == V2.valP) &&
                              (V1.sp_type == V2.sp_type))
@@ -63,6 +66,7 @@ Dict(V::EnvIPM{N, P, TVR, TVN, SP}) where {N, P, TVR, TVN, SP}  =
                        "t" => V.t,
                        "Vr" => Dict(V.Vr),
                        "str_Vn" => V.str_Vn,
+                       "weights" => weights,
                        "cutoff_Vn" => cutoff(V.Vn),
                        "N" => N,
                        "P" => P,
@@ -76,6 +80,7 @@ species_type(V::EnvIPM) = V.sp_type
 EnvIPM(D::Dict) = EnvIPM( D["t"],
                         _decode_dict(D["Vr"]),
                         analyse_Vn(D["str_Vn"], D["cutoff_Vn"]),
+                        D["weights"],
                         D["str_Vn"],
                         Val(D["N"]),
                         Val(D["P"]),
@@ -85,13 +90,18 @@ EnvIPM(D::Dict) = EnvIPM( D["t"],
 
 convert(::Val{:EnvIPM}, D::Dict) = EnvIPM(D)
 
-function EnvIPM(t, Vr, str_Vn::String, cutoff_Vn::AbstractFloat, Sp::Vector{Int}, sp_type)
+function EnvIPM(t, Vr,
+                str_Vn::String,
+                cutoff_Vn::AbstractFloat,
+                weights::Dict{Tuple{Int64,Int64},Float64},
+                Sp::Vector{Int},
+                sp_type)
    Vn = analyse_Vn(str_Vn, cutoff_Vn)
    return EnvIPM(t, Vr, Vn, str_Vn, Sp, sp_type)
 end
 
-EnvIPM(t::Int, Vr::NBPolyM, Vn, str_Vn::String) =
-      EnvIPM(t, Vr, Vn, str_Vn, Val(bodyorder(Vr)), Val(t), species(Vr), species_type(Vr))
+EnvIPM(t::Int, Vr::NBPolyM, Vn, str_Vn::String, weights) =
+      EnvIPM(t, Vr, Vn, str_Vn, weights, Val(bodyorder(Vr)), Val(t), species(Vr), species_type(Vr))
 
 Vn(V::EnvIPM) = V.Vn
 Vr(V::EnvIPM) = V.Vr
@@ -104,6 +114,7 @@ descriptor(V::EnvIPM) = descriptor(V.Vr)
 #                            V.t,
 #                            V.Sp, V.sp_type)
 
+# TODO: add hash for weights
 hash(::BASIS, V::EnvIPM) = hash((hash(EnvIPM),
                                  hash(V.valN),
                                  hash(V.valP),
@@ -112,6 +123,7 @@ hash(::BASIS, V::EnvIPM) = hash((hash(EnvIPM),
                                  hash(V.t),
                                  hash(V.Sp),
                                  hash(V.sp_type)))
+
 
 function degree(V::EnvIPM)
    if length(V.Vr) == 1
@@ -125,13 +137,13 @@ basisname(::EnvIPM) = "EnvIPM"
 # ----------------- generate basis / IP / convert ----------------
 
 function envpolysM(D::MultiDesc, deg_poly::Integer,
-                  Vn_descr, deg_n::Integer, Sp; kwargs...)
+                  Vn_descr, deg_n::Integer, weights, Sp; kwargs...)
    B_poly = nbpolys(D, deg_poly, Sp; kwargs...)
    B = EnvIPM[]
    str_Vn = Vn_descr[1]
    Vn = analyse_Vn(Vn_descr...)
    for deg = 0:deg_n
-      append!(B, [EnvIPM(deg, Vr, Vn, str_Vn) for Vr in B_poly])
+      append!(B, [EnvIPM(deg, Vr, Vn, str_Vn, weights) for Vr in B_poly])
    end
    return [b for b in B]
 end
@@ -142,7 +154,7 @@ function combinebasis(basis::AbstractVector{TV}, coeffs) where {TV <: EnvIPM}
    # combine the Vr components of the basis functions
    # (we get to do this because all t (=P) are the same
    Vr = combinebasis( [b.Vr for b in basis], coeffs )
-   return EnvIPM(basis[1].t, Vr, basis[1].Vn, basis[1].str_Vn)
+   return EnvIPM(basis[1].t, Vr, basis[1].Vn, basis[1].str_Vn, basis[1].weights)
 end
 
 

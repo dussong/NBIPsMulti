@@ -6,7 +6,7 @@ N-Body expansion (ANOVA, HDMR, ...) with multispecies.
 
 See `NBodyIPs` for the single species case
 
-See `NBodyIPFitting` for the associated fitting and testing framework.
+See `IPFitting` for the associated fitting and testing framework.
 """
 module NBIPsMulti
 

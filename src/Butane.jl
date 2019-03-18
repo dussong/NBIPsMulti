@@ -1,8 +1,8 @@
 
 module Butane
 
-using NBodyIPFitting, FileIO
-using NBodyIPFitting: configtype
+using IPFitting, FileIO
+using IPFitting: configtype
 
 export read_Butane
 
@@ -28,7 +28,7 @@ function load_xyz(; md=true, hessians=true, perturb=true, kwargs...)
    data = Dat[]
    if md
       fname = filename() * ".xyz"
-      data = NBodyIPFitting.Data.read_xyz(fname; kwargs...)
+      data = IPFitting.Data.read_xyz(fname; kwargs...)
    end
    return data
 end

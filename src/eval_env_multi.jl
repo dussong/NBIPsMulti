@@ -11,7 +11,8 @@ using JuLIP.Potentials: site_virial,
                         evaluate_d,
                         evaluate_d!
 
-using NeighbourLists: max_neigs
+using NeighbourLists: max_neigs,
+                      pairs
 
 using KahanSummation
 
@@ -33,6 +34,8 @@ import NBodyIPs.EnvIPs: n_fun,
                         site_ns,
                         site_ns_ed
 
+
+
 function cutoff(V::EnvIPM)
    @assert cutoff(Vn(V)) <= cutoff(Vr(V))
    return cutoff(Vr(V::EnvIPM))
@@ -50,16 +53,47 @@ function n_fun_d(V::EnvIPM, n)
    end
 end
 
-site_ns(V::EnvIPM, at) = n_fun.(Ref(V), site_energies(Vn(V), at))
+# site_ns(V::EnvIPM, at) = n_fun.(Ref(V), site_energies(Vn(V), at))
 
-function site_ns_ed(V::EnvIPM, at)
-   Vns = site_energies(Vn(V), at)
-   return n_fun.(Ref(V), Vns), n_fun_d.(Ref(V), Vns)
+function site_ns(V::EnvIPM, at)
+   E = zeros(length(at))
+   w = V.weights
+   for (i, j, r, R) in pairs(at,cutoff(Vn(V)))
+      zi = at.Z[i]
+      zj = at.Z[j]
+      E[i] += w[(zi,zj)]*evaluate(Vn(V),r)
+   end
+   return n_fun.(Ref(V),E)
 end
 
-function site_n_d!(dVn, V::EnvIPM, r, R, Ni, dNi)
+
+# function site_ns_ed(V::EnvIPM, at)
+#    Vns = site_energies(Vn(V), at)
+#    return n_fun.(Ref(V), Vns), n_fun_d.(Ref(V), Vns)
+# end
+
+function site_ns_ed(V::EnvIPM, at)
+   w = V.weights
+   E = zeros(length(at))
+   for (i, j, r, R) in pairs(at,cutoff(Vn(V)))
+         zi = at.Z[i]
+         zj = at.Z[j]
+         E[i] += w[(zi,zj)]*evaluate(Vn(V),r)
+   end
+   return n_fun.(Ref(V),E), n_fun_d.(Ref(V), E)
+end
+
+# function site_n_d!(dVn, V::EnvIPM, r, R, Ni, dNi)
+#    for n = 1:length(r)
+#       dVn[n] = 0.5 * dNi * evaluate_d(Vn(V), r[n]) * R[n] / r[n]
+#    end
+#    return dVn
+# end
+
+function site_n_d!(dVn, V::EnvIPM, r, R, Ni, dNi, Spi, Spj)
+   w = V.weights
    for n = 1:length(r)
-      dVn[n] = 0.5 * dNi * evaluate_d(Vn(V), r[n]) * R[n] / r[n]
+      dVn[n] = 0.5 * dNi * evaluate_d(Vn(V), r[n]) * R[n] / r[n] * w[(Spi,Spj[n])]
    end
    return dVn
 end
@@ -99,7 +133,7 @@ function forces(V::EnvIPM{N}, at::Atoms{T},Species::Vector{Int}) where {N, T}
                                ((out, R, J, temp,Spi,Spj,Species) ->  evaluate_d!(out, Vr(V), descriptor(V), R, J,Spi,Spj,Species)), dVsite, nothing, Spi,Spj,Species)
                                # dVsite == out, nothing == temp
       # compute the neighbour count gradients
-      site_n_d!(dVn, V, r, R, Ns[i], dNs[i])
+      site_n_d!(dVn, V, r, R, Ns[i], dNs[i], Spi, Spj)
 
       # write site energy gradient into forces
       for n = 1:length(j)
@@ -203,7 +237,6 @@ function forces(B::AbstractVector{TB}, at::Atoms{T}
    # if typewarn
    #    !isleaftype(TB) && warn("TB is not a leaf type")
    # end
-
    Br = [Vr(b) for b in B]
 
    rcut = cutoff(B[1])
@@ -244,7 +277,7 @@ function forces(B::AbstractVector{TB}, at::Atoms{T}
 
       # write it into the force vectors
       for ib = 1:nB, n = 1:length(j)
-         site_n_d!(dVn, B[ib], r, R, Ns[ib][i], dNs[ib][i])
+         site_n_d!(dVn, B[ib], r, R, Ns[ib][i], dNs[ib][i], Spi, Spj)
          f = (Ns[ib][i] * dVsite[ib][n] + dVn[n] * Etemp[ib])
          F[ib][j[n]] -= f
          F[ib][i] += f

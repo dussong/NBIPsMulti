@@ -1,7 +1,7 @@
 ##
 @info("Load libraries ...")
 
-using JuLIP, NBodyIPs, NBIPsMulti, NBodyIPFitting
+using JuLIP, NBodyIPs, NBIPsMulti, IPFitting
 
 @info("Load Butane database ...")
 
