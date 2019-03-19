@@ -61,7 +61,7 @@ function site_ns(V::EnvIPM, at)
    for (i, j, r, R) in pairs(at,cutoff(Vn(V)))
       zi = at.Z[i]
       zj = at.Z[j]
-      E[i] += w[(zi,zj)]*evaluate(Vn(V),r)
+      E[i] += 0.5 * w[(zi,zj)] * evaluate(Vn(V),r)
    end
    return n_fun.(Ref(V),E)
 end
@@ -75,14 +75,12 @@ end
 function site_ns_ed(V::EnvIPM, at)
    w = V.weights
    E = zeros(length(at))
-   dE = zeros(length(at))
    for (i, j, r, R) in pairs(at,cutoff(Vn(V)))
          zi = at.Z[i]
          zj = at.Z[j]
-         E[i] += w[(zi,zj)]*evaluate(Vn(V),r)
-         dE[i] += w[(zi,zj)]*evaluate_d(Vn(V),r)
+         E[i] += 0.5 * w[(zi,zj)] * evaluate(Vn(V),r)
    end
-   return n_fun.(Ref(V),E), n_fun_d.(Ref(V), E).*dE
+   return n_fun.(Ref(V),E), n_fun_d.(Ref(V), E)
 end
 
 # function site_n_d!(dVn, V::EnvIPM, r, R, Ni, dNi)

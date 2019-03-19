@@ -22,7 +22,7 @@ valSp = [Val(:AA),Val(:AA)]
 Sp = [[29,29], [29,30]]
 
 # for i in 1:2
-   i = 1
+   i=1
    println("-------------------------------------------------")
    println(" Tests $(valSp[i]) ")
    println("-------------------------------------------------")
@@ -37,11 +37,11 @@ Sp = [[29,29], [29,30]]
    println("-------------------------------------------------")
    println(" Test finite difference energy vs forces - implementation with evaluate ")
    println("-------------------------------------------------")
-   for i=1:length(basis)
-      E = energy(basis[i], at)
+   for l=1:length(basis)
+      E = energy(basis[l], at)
       @show E
 
-      dE = -forces(basis[i], at) |> mat
+      dE = -forces(basis[l], at) |> mat
 
       errs = []
       # loop through finite-difference step-lengths
@@ -55,7 +55,7 @@ Sp = [[29,29], [29,30]]
          for j = 1:length(at_positions)
             at_positions[j] += h
             set_positions!(at,at_positions)
-            Eh = energy(basis[i],at)
+            Eh = energy(basis[l],at)
             dEh[j] =  (Eh - E) / h
             at_positions[j] -= h
             set_positions!(at,at_positions)
@@ -71,12 +71,8 @@ Sp = [[29,29], [29,30]]
    println(" Test finite difference energy vs forces - implementation with evaluate_many ")
    println("-------------------------------------------------")
    E = energy(basis, at)
-   Et = [energy(basisi,at) for basisi in basis]
-   @show norm(E-Et)
    F = -forces(basis, at)
    dE = [mat(F[i]) for i = 1:length(F)]
-   F2 = [mat(-forces(basisi,at)) for basisi in basis]
-   @show norm(dE[1]-F2[1])
 
    errs = []
    # loop through finite-difference step-lengths
@@ -101,11 +97,10 @@ Sp = [[29,29], [29,30]]
          set_positions!(at,at_positions)
       end
       push!(errs, maximum(norm(dEh[k] - dE[k], Inf) for k=1:length(basis)))
-      @show errs
       @printf(" %d | %.2e \n", p, errs[end])
    end
    println("---------------")
-   # @test minimum(errs) <= 1e-3 * maximum(errs)
+   @test minimum(errs) <= 1e-3 * maximum(errs)
 
 
    # println("-------------------------------------------------")
@@ -162,48 +157,3 @@ Sp = [[29,29], [29,30]]
    @test norm([norm(F1[k]-F2[k],Inf) for k=1:length(basis)], Inf) <= 1e-10
 
 end
-
-# r0 = 2.5
-# V = bapolys(2, "($r0/r)^4", "(:cos, 3.6, 4.8)", 4)
-# Vcucu = V[3]
-#
-# Species = [30,30]
-#
-# # :Cu = 29, :Zn = 30
-# at = rattle!(bulk(:Cu, cubic=true) * 2, 0.02)
-# Z1 = atomic_numbers(at)
-# Z1[2] = 30
-# Z1[10] = 30
-# at.Z = Z1
-#
-# at_positions = copy(positions(at)) |> mat
-#
-# E = energy(Vcucu, at, Species)
-# dE = -forces(Vcucu, at, Species) |> mat
-#
-# println("-------------------------------------------------")
-# println(" Test finite difference energy vs forces ")
-# println("-------------------------------------------------")
-#
-# errs = []
-# # loop through finite-difference step-lengths
-# @printf("---------|----------- \n")
-# @printf("    p    | error \n")
-# @printf("---------|----------- \n")
-# for p = 2:9
-#    h = .1^p
-#    dEh = zeros(size(at_positions))
-#    for j = 1:length(at_positions)
-#       at_positions[j] += h
-#       set_positions!(at,at_positions)
-#       Eh = energy(Vcucu,at,Species)
-#       # Eh = energy(Vcucu,at)
-#       dEh[j] =  (Eh - E) / h
-#       at_positions[j] -= h
-#       set_positions!(at,at_positions)
-#    end
-#    push!(errs, norm(dEh - dE, Inf))
-#    @printf(" %d | %.2e \n", p, errs[end])
-# end
-# println("---------------")
-# @test minimum(errs) <= 1e-3 * maximum(errs)
