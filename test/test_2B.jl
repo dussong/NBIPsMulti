@@ -21,6 +21,7 @@ r0 = 1.2*rnn(:Cu)
 valSp = [Val(:AA),Val(:AA)]
 Sp = [[29,29], [29,30]]
 
+
 for i in 1:2
    println("-------------------------------------------------")
    println(" Tests $(valSp[i]) ")
