@@ -97,7 +97,7 @@ function EnvIPM(t, Vr,
                 Sp::Vector{Int},
                 sp_type)
    Vn = analyse_Vn(str_Vn, cutoff_Vn)
-   return EnvIPM(t, Vr, Vn, str_Vn, Sp, sp_type)
+   return EnvIPM(t, Vr, Vn, str_Vn, weights, Sp, sp_type)
 end
 
 EnvIPM(t::Int, Vr::NBPolyM, Vn, str_Vn::String, weights) =

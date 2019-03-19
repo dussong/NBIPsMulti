@@ -75,12 +75,14 @@ end
 function site_ns_ed(V::EnvIPM, at)
    w = V.weights
    E = zeros(length(at))
+   dE = zeros(length(at))
    for (i, j, r, R) in pairs(at,cutoff(Vn(V)))
          zi = at.Z[i]
          zj = at.Z[j]
          E[i] += w[(zi,zj)]*evaluate(Vn(V),r)
+         dE[i] += w[(zi,zj)]*evaluate_d(Vn(V),r)
    end
-   return n_fun.(Ref(V),E), n_fun_d.(Ref(V), E)
+   return n_fun.(Ref(V),E), n_fun_d.(Ref(V), E).*dE
 end
 
 # function site_n_d!(dVn, V::EnvIPM, r, R, Ni, dNi)
@@ -112,7 +114,7 @@ function forces(V::EnvIPM{N}, at::Atoms{T},Species::Vector{Int}) where {N, T}
    # compute the n values
    Ns, dNs = site_ns_ed(V, at)
    # compute the inner v values
-   Vs = site_energies(Vr(V), at, species(V))
+   Vs = site_energies(Vr(V), at, Species)
 
    # now assemble site forces and use those to create
    # total forces by mixing N and V
@@ -192,6 +194,7 @@ function energy(B::Vector{TB}, at::Atoms{T}
    # if typewarn
    #    !isleaftype(TB) && warn("TB is not a leaf type")
    # end
+   # @show "energy with evaluate_many"
 
    Br = [Vr(b) for b in B]
 
