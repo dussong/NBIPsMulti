@@ -1,11 +1,12 @@
 @info("Load libraries...")
 
-using NBodyIPs, NBodyIPFitting, JuLIP, NBIPsMulti
+using NBodyIPs, IPFitting, JuLIP, NBIPsMulti
 include(homedir() * "/.julia/dev/NBIPsMulti/src/Butane.jl")
 E0 = Butane.get_E0()
 
 @info("Load database...")
-dbpath = homedir() * "/.julia/dev/NBIPsMulti/data/Butane_4B_env"
+dbpath = homedir() * "/.julia/dev/NBIPsMulti/data/Butane_4B_env2"
+
 
 db = LsqDB(dbpath)
 db
@@ -19,6 +20,8 @@ configweights = Dict(""  => 1.0)
 IP, lsqinfo = lsqfit( db; E0 = E0,
                        obsweights=obsweights,
                        configweights=configweights,
+                       solver = (:rrqr, 1e-16),
+                       combineIP = NBodyIP,
                        # Ibasis = Ibasis
                        )
 

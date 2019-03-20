@@ -56,7 +56,7 @@ end
 ==(V1::EnvIPM, V2::EnvIPM) = ( (V1.t == V2.t) &&
                              (V1.Vr == V2.Vr) &&
                              (V1.str_Vn == V2.str_Vn) &&
-                             (V1.weights == V2.weigths) &&
+                             (V1.weights == V2.weights) &&
                              (V1.valN == V2.valN) &&
                              (V1.valP == V2.valP) &&
                              (V1.sp_type == V2.sp_type))
@@ -66,7 +66,7 @@ Dict(V::EnvIPM{N, P, TVR, TVN, SP}) where {N, P, TVR, TVN, SP}  =
                        "t" => V.t,
                        "Vr" => Dict(V.Vr),
                        "str_Vn" => V.str_Vn,
-                       "weights" => weights,
+                       "weights" => V.weights,
                        "cutoff_Vn" => cutoff(V.Vn),
                        "N" => N,
                        "P" => P,
@@ -77,11 +77,22 @@ species(V::EnvIPM) = V.Sp
 
 species_type(V::EnvIPM) = V.sp_type
 
+function _decode_weights(D::Dict)
+   Dout = Dict{Tuple{Int64,Int64},Float64}()
+   for k in keys(D)
+      k1 = parse(Int64,split(split(split(k,"(")[2],")")[1],",")[1])
+      k2 = parse(Int64,split(split(split(k,"(")[2],")")[1],",")[2])
+      Dout[(k1,k2)] = D[k]
+   end
+   return Dout
+end
+
+
 EnvIPM(D::Dict) = EnvIPM( D["t"],
                         _decode_dict(D["Vr"]),
                         analyse_Vn(D["str_Vn"], D["cutoff_Vn"]),
-                        D["weights"],
                         D["str_Vn"],
+                        _decode_weights(D["weights"]),
                         Val(D["N"]),
                         Val(D["P"]),
                         Vector{Int}(D["Sp"]),

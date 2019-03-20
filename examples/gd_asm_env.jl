@@ -35,22 +35,28 @@ BL4_AABB = MultiDesc("exp( - 2.5 * (r/$r0-1))", "(:cos2s, $(0.7*r0), $(0.88*r0),
 Vn = ("1.0/(1.0 + exp(1.0 / ($(1.5*r0) - r + 1e-2)))", 1.5*r0)
 
 
+weights = Dict( (1,1)=> 1.0,
+                (1,6)=> 2.0,
+                (6,1)=> 2.0,
+                (6,6)=> 5.0
+                )
+
 ##
 @info("Generate a 4B env basis ...")
 
 basis = [
-      envpolysM(BL2, 5, Vn, 2, [6,6]);
-      envpolysM(BL2, 5, Vn, 2, [1,1]);
-      envpolysM(BL2, 5, Vn, 2, [1,6]);
-      envpolysM(BL3_AAA, 3, Vn, 1, [1,1,1]);
-      envpolysM(BL3_AAA, 3,Vn, 1, [6,6,6]);
-      envpolysM(BL3_AAB, 3,Vn, 1, [1,1,6]);
-      envpolysM(BL3_AAB, 3,Vn, 1, [1,6,6]);
-      envpolysM(BL4_AAAA, 2,Vn, 1, [1,1,1,1]);
-      envpolysM(BL4_AAAA, 2,Vn, 1, [6,6,6,6]);
-      envpolysM(BL4_AAAB, 2,Vn, 1, [1,1,1,6]);
-      envpolysM(BL4_AAAB, 2,Vn, 1, [1,6,6,6]);
-      envpolysM(BL4_AABB, 2,Vn, 1, [1,1,6,6]);
+      envpolysM(BL2, 5, Vn, 2, weights, [6,6]);
+      envpolysM(BL2, 5, Vn, 2, weights, [1,1]);
+      envpolysM(BL2, 5, Vn, 2, weights, [1,6]);
+      envpolysM(BL3_AAA, 3, Vn, 1, weights, [1,1,1]);
+      envpolysM(BL3_AAA, 3,Vn, 1, weights, [6,6,6]);
+      envpolysM(BL3_AAB, 3,Vn, 1, weights, [1,1,6]);
+      envpolysM(BL3_AAB, 3,Vn, 1, weights, [1,6,6]);
+      envpolysM(BL4_AAAA, 2,Vn, 1, weights, [1,1,1,1]);
+      envpolysM(BL4_AAAA, 2,Vn, 1, weights, [6,6,6,6]);
+      envpolysM(BL4_AAAB, 2,Vn, 1, weights, [1,1,1,6]);
+      envpolysM(BL4_AAAB, 2,Vn, 1, weights, [1,6,6,6]);
+      envpolysM(BL4_AABB, 2,Vn, 1, weights, [1,1,6,6]);
    ]
 
 @info("Assemble the LsqDB ...")
@@ -73,6 +79,8 @@ configweights = Dict(""  => 1.0)
 IP, lsqinfo = lsqfit( db; E0 = E0,
                        obsweights=obsweights,
                        configweights=configweights,
+                       solver = (:rrqr, 1e-16),
+                       combineIP = NBodyIP,
                        # Ibasis = collect(1:45)
                        )
 
