@@ -86,3 +86,7 @@ IP, lsqinfo = lsqfit( db; E0 = E0,
 
 errs = lsqinfo["errors"]
 rmse_table(rmse(errs)...)
+
+NBodyIPs.save_ip(homedir() * "/.julia/dev/NBIPsMulti/data/Butene_Ethene_Ethane_env_18_14_12_4B.json", IP, lsqinfo)
+
+NBodyIPs.load_ip(homedir() * "/.julia/dev/NBIPsMulti/data/Butene_Ethene_Ethane_env_18_14_12_4B.json")

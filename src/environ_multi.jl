@@ -80,9 +80,13 @@ species_type(V::EnvIPM) = V.sp_type
 function _decode_weights(D::Dict)
    Dout = Dict{Tuple{Int64,Int64},Float64}()
    for k in keys(D)
-      k1 = parse(Int64,split(split(split(k,"(")[2],")")[1],",")[1])
-      k2 = parse(Int64,split(split(split(k,"(")[2],")")[1],",")[2])
-      Dout[(k1,k2)] = D[k]
+      if typeof(k) == Tuple{Int64,Int64}
+         Dout[k] = D[k]
+      else
+         k1 = parse(Int64,split(split(split(k,"(")[2],")")[1],",")[1])
+         k2 = parse(Int64,split(split(split(k,"(")[2],")")[1],",")[2])
+         Dout[(k1,k2)] = D[k]
+      end
    end
    return Dout
 end

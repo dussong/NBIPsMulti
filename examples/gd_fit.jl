@@ -5,7 +5,7 @@ include(homedir() * "/.julia/dev/NBIPsMulti/src/Butane.jl")
 E0 = Butane.get_E0()
 
 @info("Load database...")
-dbpath = homedir() * "/.julia/dev/NBIPsMulti/data/Butane_4B_env2"
+dbpath = homedir() * "/.julia/dev/NBIPsMulti/data/Butane_4B_env"
 
 
 db = LsqDB(dbpath)
@@ -28,5 +28,3 @@ IP, lsqinfo = lsqfit( db; E0 = E0,
 
 errs = lsqinfo["errors"]
 rmse_table(rmse(errs)...)
-
-# NBodyIPs.save_ip("Butane_4B_env.json", IP, info)
