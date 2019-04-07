@@ -61,7 +61,12 @@ function site_ns(V::EnvIPM, at)
    for (i, j, r, R) in pairs(at,cutoff(Vn(V)))
       zi = at.Z[i]
       zj = at.Z[j]
-      E[i] += 0.5 * evaluate(Vn(V),r * w[(zi,zj)])
+      
+      # Must be within weighted cutoff 
+      if r < ( cutoff(Vn(V)) / w[(zi,zj)] )
+          E[i] += 0.5 * evaluate(Vn(V),r * w[(zi,zj)])
+      end
+
    end
    return n_fun.(Ref(V),E)
 end
@@ -75,10 +80,15 @@ end
 function site_ns_ed(V::EnvIPM, at)
    w = V.weights
    E = zeros(length(at))
-   for (i, j, r, R) in pairs(at,cutoff(Vn(V)))
+   for (i, j, r, R) in pairs(at, cutoff(Vn(V)) )
          zi = at.Z[i]
          zj = at.Z[j]
-         E[i] += 0.5 * evaluate(Vn(V),r * w[(zi,zj)])
+
+      # Must be within weighted cutoff 
+      if r < ( cutoff(Vn(V)) / w[(zi,zj)] )
+          E[i] += 0.5 * evaluate(Vn(V),r * w[(zi,zj)])
+      end
+
    end
    return n_fun.(Ref(V),E), n_fun_d.(Ref(V), E)
 end
@@ -93,7 +103,7 @@ end
 function site_n_d!(dVn, V::EnvIPM, r, R, Ni, dNi, Spi, Spj)
    w = V.weights
    for n = 1:length(r)
-      dVn[n] = 0.5 * dNi * evaluate_d(Vn(V), r[n] * w[(Spi,Spj[n])]) * R[n] / r[n] * w[(Spi,Spj[n])]
+      dVn[n] = 0.5 * dNi * evaluate_d(Vn(V), r[n] * w[(Spi,Spj[n])]) * R[n] /  r[n] * w[(Spi,Spj[n]) ]
    end
    return dVn
 end
