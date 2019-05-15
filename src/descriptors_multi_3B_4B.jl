@@ -29,7 +29,10 @@ import NBodyIPs: ricoords,
                  fcut_d,
                  invariants,
                  invariants_ed,
-                 gradri2gradR!
+                 gradri2gradR!,
+                 _rθ2x,
+                 _rθ2x_d
+
 
 import Base: hash
 # -------------- IO -------------------
@@ -190,6 +193,9 @@ end
 
 
 # ------------- invariants function ---------------
+@inline _rθ2x(D, r, θ) = vcat(transform.(Ref(D), r), θ)
+@inline _rθ2x_d(D, r, θ::SVector{K}) where {K} = vcat(transform_d.(Ref(D), r), @SVector ones(K))
+
 # 2-body
 @inline invariants(D::MultiDesc, ::Val{:AA}, r) = MI.invariants(transform.(Ref(D), r),D.sp_type)
 
