@@ -60,23 +60,23 @@ weights = Dict( (1,1)=> 1.0,
 #    ]
 
 basis = [
-      envpolysM(BL2, 5, Vn, 0, weights, [6,6]);
-      envpolysM(BL2, 5, Vn, 0, weights, [1,1]);
-      envpolysM(BL2, 5, Vn, 0, weights, [1,6]);
-      envpolysM(BL3_AAA, 3, Vn, 0, weights, [1,1,1]);
-      envpolysM(BL3_AAA, 3,Vn, 0, weights, [6,6,6]);
-      envpolysM(BL3_AAB, 3,Vn, 0, weights, [1,1,6]);
-      envpolysM(BL3_AAB, 3,Vn, 0, weights, [1,6,6]);
-      envpolysM(BL4_AAAA, 2,Vn, 0, weights, [1,1,1,1]);
-      envpolysM(BL4_AAAA, 2,Vn, 0, weights, [6,6,6,6]);
-      envpolysM(BL4_AAAB, 2,Vn, 0, weights, [1,1,1,6]);
-      envpolysM(BL4_AAAB, 2,Vn, 0, weights, [1,6,6,6]);
-      envpolysM(BL4_AABB, 2,Vn, 0, weights, [1,1,6,6]);
+      envpolysM(BL2, 10, Vn, 2, weights, [6,6]);
+      envpolysM(BL2, 10, Vn, 2, weights, [1,1]);
+      envpolysM(BL2, 10, Vn, 2, weights, [1,6]);
+      envpolysM(BL3_AAA, 5,Vn, 0, weights, [1,1,1]);
+      envpolysM(BL3_AAA, 5,Vn, 0, weights, [6,6,6]);
+      envpolysM(BL3_AAB, 5,Vn, 0, weights, [1,1,6]);
+      envpolysM(BL3_AAB, 5,Vn, 0, weights, [1,6,6]);
+      envpolysM(BL4_AAAA, 4,Vn, 0, weights, [1,1,1,1]);
+      envpolysM(BL4_AAAA, 4,Vn, 0, weights, [6,6,6,6]);
+      envpolysM(BL4_AAAB, 4,Vn, 0, weights, [1,1,1,6]);
+      envpolysM(BL4_AAAB, 4,Vn, 0, weights, [1,6,6,6]);
+      envpolysM(BL4_AABB, 4,Vn, 0, weights, [1,1,6,6]);
    ]
 
 @info("Assemble the LsqDB ...")
 @show length(basis)
-dbpath = homedir() * "/.julia/dev/NBIPsMulti/data/Butane_4B_env2"
+dbpath = homedir() * "/.julia/dev/NBIPsMulti/data/Butane_4B_env3"
 
 db =  LsqDB(dbpath, basis, data);
 db

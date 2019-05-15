@@ -5,7 +5,7 @@
 
 module EnvIPsmulti
 
-using NBIPsMulti:         MultiDesc, NBPolyM, species, species_type
+using NBIPsMulti:         MultiDesc, NBPolyM, species_type
 using StaticArrays
 using JuLIP:              AbstractCalculator
 using JuLIP.Potentials:   Shift,
@@ -26,8 +26,10 @@ import NBodyIPs:          NBodyIP,
                           descriptor,
                           # combiscriptor,
                           degree,
-                          basisname
-import NBIPsMulti:        species, species_type
+                          basisname,
+                          bodyorder
+import NBodyIPs.Regularisers: species
+import NBIPsMulti:        species_type
 import NBodyIPs.Polys: info
 
 import Base: hash
@@ -76,6 +78,8 @@ Dict(V::EnvIPM{N, P, TVR, TVN, SP}) where {N, P, TVR, TVN, SP}  =
 species(V::EnvIPM) = V.Sp
 
 species_type(V::EnvIPM) = V.sp_type
+
+bodyorder(V::EnvIPM{N, P, TVR, TVN, SP}) where {N, P, TVR, TVN, SP} = N
 
 function _decode_weights(D::Dict)
    Dout = Dict{Tuple{Int64,Int64},Float64}()

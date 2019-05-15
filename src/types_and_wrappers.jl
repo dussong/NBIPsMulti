@@ -37,8 +37,9 @@ import NBodyIPs:          fast,
                           evaluate_I_ed,
                           basisname,
                           nbpolys,
-                          NBCutoff
-
+                          NBCutoff,
+                          bodyorder
+import NBodyIPs.Regularisers: species
 import NBodyIPs.Polys: info
 
 import NBodyIPs.PolyBasis: gen_tuples,
@@ -121,6 +122,9 @@ species(V::NBPolyM) = V.Sp
 species_type(V::NBPolyM) = V.Sp_type
 
 basisname(::NBPolyM) = "NBPolyM"
+
+bodyorder(V::NBPolyM{N, M, T, TD, SP}) where {N, M, T, TD, SP} = N
+
 
 # combiscriptor(V::NBPolyM) = (NBPolyM, bodyorder(V), combiscriptor(V.D), V.Sp, V.Sp_type)
 
