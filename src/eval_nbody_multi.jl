@@ -65,7 +65,7 @@ function skip_simplex_species_order!(desc::MultiDesc,
       if Spj[J[1]] == Species[2]
          return false
       elseif Spj[J[1]] == Species[3]
-         J[1],J[2] = J[2],J[1]
+         J = [J[2],J[1]]
          return false
       else
          error("I shouldnt be here: skip_simplex_species_order")
