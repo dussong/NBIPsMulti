@@ -42,6 +42,11 @@ get_val(v::Val{T}) where {T} = T
 MultiDesc(transform::String, cutoff, sp_type, valN) =
          MultiDesc(AnalyticTransform(transform), fcut_analyse(cutoff),sp_type, valN)
 
+MultiDesc(transform::SpaceTransform, cutoff, sp_type, valN) =
+         MultiDesc(transform, fcut_analyse(cutoff),sp_type, valN)
+
+# ------------------------
+# 3B
 MultiDesc(transform::String, cutoff, ::Val{:AA}) =
          MultiDesc(AnalyticTransform(transform), fcut_analyse(cutoff),
                    Val(:AA), Val(2))
@@ -96,7 +101,63 @@ MultiDesc(transform::String, cutoff, ::Val{:ABCD}) =
                     Val(:ABCD),
                     Val(4))
 
+# ---------------------------------------
 
+MultiDesc(transform::SpaceTransform, cutoff, ::Val{:AA}) =
+         MultiDesc(transform, fcut_analyse(cutoff),
+                   Val(:AA), Val(2))
+
+MultiDesc(transform::SpaceTransform, cutoff, ::Val{:AAA}) =
+         MultiDesc(transform,
+                   fcut_analyse(cutoff),
+                   Val(:AAA),
+                   Val(3))
+
+MultiDesc(transform::SpaceTransform, cutoff, ::Val{:AAB}) =
+         MultiDesc(transform, fcut_analyse(cutoff),
+                   Val(:AAB), Val(3))
+
+MultiDesc(transform::SpaceTransform, cutoff, ::Val{:ABC}) =
+         MultiDesc(transform, fcut_analyse(cutoff),
+                   Val(:ABC), Val(3))
+
+# 4-Body
+
+MultiDesc(transform::SpaceTransform, cutoff, ::Val{:AAAA}) =
+          MultiDesc(transform,
+                    fcut_analyse(cutoff),
+                    Val(:AAAA),
+                    Val(4))
+
+
+MultiDesc(transform::SpaceTransform, cutoff, ::Val{:AAAB}) =
+          MultiDesc(transform,
+                    fcut_analyse(cutoff),
+                    Val(:AAAB),
+                    Val(4))
+
+
+MultiDesc(transform::SpaceTransform, cutoff, ::Val{:AABB}) =
+          MultiDesc(transform,
+                    fcut_analyse(cutoff),
+                    Val(:AABB),
+                    Val(4))
+
+
+MultiDesc(transform::SpaceTransform, cutoff, ::Val{:AABC}) =
+          MultiDesc(transform,
+                    fcut_analyse(cutoff),
+                    Val(:AABC),
+                    Val(4))
+
+
+MultiDesc(transform::SpaceTransform, cutoff, ::Val{:ABCD}) =
+          MultiDesc(transform,
+                    fcut_analyse(cutoff),
+                    Val(:ABCD),
+                    Val(4))
+
+# --------------------------
 
 Dict(D::MultiDesc) = Dict( "__id__"    =>  "MultiDesc",
                             "transform" =>  Dict(D.transform),
