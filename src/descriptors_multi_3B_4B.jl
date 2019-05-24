@@ -32,7 +32,8 @@ import NBodyIPs: ricoords,
                  invariants_ed,
                  gradri2gradR!,
                  _rθ2x,
-                 _rθ2x_d
+                 _rθ2x_d,
+                 combinebasis
 
 
 import Base: hash
