@@ -39,15 +39,15 @@ basis = [
       nbpolys(BL2, 14, [6,6]);
       nbpolys(BL2, 14, [1,1]);
       nbpolys(BL2, 14, [1,6]);
-      nbpolys(BL3_AAA, 3, [1,1,1]);
-      nbpolys(BL3_AAA, 3, [6,6,6]);
-      nbpolys(BL3_AAB, 3, [1,1,6]);
-      nbpolys(BL3_AAB, 3, [1,6,6]);
-      nbpolys(BL4_AAAA, 2, [1,1,1,1]);
-      nbpolys(BL4_AAAA, 2, [6,6,6,6]);
-      nbpolys(BL4_AAAB, 2, [1,1,1,6]);
-      nbpolys(BL4_AAAB, 2, [1,6,6,6]);
-      nbpolys(BL4_AABB, 2, [1,1,6,6]);
+      # nbpolys(BL3_AAA, 3, [1,1,1]);
+      # nbpolys(BL3_AAA, 3, [6,6,6]);
+      # nbpolys(BL3_AAB, 3, [1,1,6]);
+      # nbpolys(BL3_AAB, 3, [1,6,6]);
+      # nbpolys(BL4_AAAA, 2, [1,1,1,1]);
+      # nbpolys(BL4_AAAA, 2, [6,6,6,6]);
+      # nbpolys(BL4_AAAB, 2, [1,1,1,6]);
+      # nbpolys(BL4_AAAB, 2, [1,6,6,6]);
+      # nbpolys(BL4_AABB, 2, [1,1,6,6]);
    ]
 
 @info("Assemble the LsqDB ...")

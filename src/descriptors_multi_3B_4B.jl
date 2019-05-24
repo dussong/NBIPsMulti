@@ -1,4 +1,4 @@
-using JuLIP: JVec, decode_dict
+using JuLIP: JVec, decode_dict, MOneBody
 using NBodyIPs: SpaceTransform,
                 NBCutoff,
                 edge_lengths,
@@ -16,7 +16,8 @@ using NBodyIPs: SpaceTransform,
                 _rθ2x_d,
                 _grad_rθ2pos!,
                 fcut_analyse,
-                AnalyticTransform
+                AnalyticTransform,
+                combinebasis
 
 const MI = MultiInvariants
 
@@ -35,6 +36,18 @@ import NBodyIPs: ricoords,
 
 
 import Base: hash
+# one-body multi
+hash(::BASIS, ::MOneBody) = hash(MOneBody)
+
+function combinebasis(Vs::AbstractVector{<: MOneBody{T}}, Cs::AbstractVector{<: Real}) where {T}
+    D = Dict{Symbol,T}()
+    for sp in keys(Vs[1].E0)
+      @warn("the different MOneBody must be similar - not checked")
+       D[sp] = sum( V.E0[sp] * c for (V, c) in zip(Vs, Cs) )
+    end
+    return MOneBody(D)
+end
+
 # -------------- IO -------------------
 to_str(::Val{T}) where {T} = string(T)
 get_val(v::Val{T}) where {T} = T

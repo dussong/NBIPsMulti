@@ -17,6 +17,8 @@ db
 obsweights = Dict("E" => 10.0, "F" => 1.0, "V" => 1.0)
 configweights = Dict(""  => 1.0)
 
+oneB = MOneBody(Dict("E0" => Dict(:H => 1., :C => 2.)))
+
 IP, lsqinfo = lsqfit( db; E0 = E0,
                        obsweights=obsweights,
                        configweights=configweights,
@@ -24,6 +26,7 @@ IP, lsqinfo = lsqfit( db; E0 = E0,
                        # solver = (:qr,),
                        combineIP = NBodyIP,
                        # Ibasis = Ibasis
+                       Vref = oneB
                        )
 
 
