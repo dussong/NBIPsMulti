@@ -38,7 +38,9 @@ import NBodyIPs:          fast,
                           basisname,
                           nbpolys,
                           NBCutoff,
-                          bodyorder
+                          bodyorder,
+                          evaluate,
+                          evaluate_d
 import NBodyIPs.Regularisers: species
 import NBodyIPs.Polys: info
 
@@ -453,4 +455,23 @@ end
 
 function check_species(desc::MultiDesc, Sp)
    return (check_species(desc::MultiDesc, Sp, desc.sp_type))&&(Sp == sort(Sp))
+end
+
+
+# Evaluate functions
+evaluate(V::NBodyFunctionM{2}, r::T) where {T <: AbstractFloat} =
+      evaluate(V, SVector(r))
+evaluate_d(V::NBodyFunctionM{2}, r::T) where {T <: AbstractFloat} =
+      evaluate_d(V, SVector(r))[1]
+
+function evaluate(V::NBodyFunctionM{2}, r::SVector{1})
+   D = descriptor(V)
+   return evaluate_I(V, invariants(D, r)) * fcut(D, r)
+end
+
+function evaluate_d(V::NBodyFunction{2}, r::SVector{1})
+   D = descriptor(V)
+   fc, fc_d = fcut_d(D, r)
+   Vn, Vn_d = evaluate_I_ed(V, invariants_ed(D, r))
+   return fc * Vn_d + fc_d * Vn
 end

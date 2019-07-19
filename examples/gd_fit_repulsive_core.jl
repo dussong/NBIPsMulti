@@ -1,11 +1,12 @@
 @info("Load libraries...")
 
 using NBodyIPs, IPFitting, JuLIP, NBIPsMulti
+
 include(homedir() * "/.julia/dev/NBIPsMulti/src/Butane.jl")
 E0 = Butane.get_E0()
 
 @info("Load database...")
-dbpath = homedir() * "/.julia/dev/NBIPsMulti/data/Butane_4B_env"
+dbpath = homedir() * "/.julia/dev/NBIPsMulti/data/Butane_4B"
 
 
 db = LsqDB(dbpath)
@@ -35,6 +36,22 @@ IP, lsqinfo = lsqfit( db;
 errs = lsqinfo["errors"]
 rmse_table(rmse(errs)...)
 
-save_ip(homedir() * "/.julia/dev/NBIPsMulti/data/Butane_4B_env_IP.json", IP, lsqinfo)
+save_ip(homedir() * "/.julia/dev/NBIPsMulti/data/Butane_4B_IP.json", IP, lsqinfo)
 
-load_ip(homedir() * "/.julia/dev/NBIPsMulti/data/Butane_4B_env_IP.json")
+
+## 2B repulsion
+using NBodyIPs.Repulsion: RepulsiveCore
+
+V2_1 = IP.components[2]
+V2_2 = IP.components[3]
+V2_3 = IP.components[4]
+
+V2rep_1 = RepulsiveCore(V2_1, 0.89*r0, -1.)
+V2rep_2 = RepulsiveCore(V2_2, 0.89*r0, -1.)
+V2rep_3 = RepulsiveCore(V2_3, 0.89*r0, -1.)
+
+
+IP.components[2] = V2rep_1
+IP.components[3] = V2rep_2
+IP.components[4] = V2rep_3
+save_ip("pot_with_rep_core.json", IP, lsqinfo)
