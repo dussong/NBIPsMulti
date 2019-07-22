@@ -75,6 +75,10 @@ MultiDesc(transform::String, cutoff, ::Val{:AAB}) =
          MultiDesc(AnalyticTransform(transform), fcut_analyse(cutoff),
                    Val(:AAB), Val(3))
 
+MultiDesc(transform::String, cutoff, ::Val{:AABba}) =
+        MultiDesc(AnalyticTransform(transform), fcut_analyse(cutoff),
+                  Val(:AABba), Val(3))
+
 MultiDesc(transform::String, cutoff, ::Val{:ABC}) =
          MultiDesc(AnalyticTransform(transform), fcut_analyse(cutoff),
                    Val(:ABC), Val(3))
@@ -94,6 +98,11 @@ MultiDesc(transform::String, cutoff, ::Val{:AAAB}) =
                     Val(:AAAB),
                     Val(4))
 
+MultiDesc(transform::String, cutoff, ::Val{:AAABba}) =
+          MultiDesc(AnalyticTransform(transform),
+                    fcut_analyse(cutoff),
+                    Val(:AAABba),
+                    Val(4))
 
 MultiDesc(transform::String, cutoff, ::Val{:AABB}) =
           MultiDesc(AnalyticTransform(transform),
@@ -206,12 +215,14 @@ tdegrees(::MultiDesc, vN::Val{N}) where {N} = MI.tdegrees(vN)
 
 # 3-body
 @inline fcut(D::MultiDesc, ::Val{:AAA}, r) = fcut(D.cutoff, r)
-@inline fcut(D::MultiDesc, ::Val{:AAB}, rθ) = fcut(D.cutoff, rθ[1])
+@inline fcut(D::MultiDesc, ::Val{:AAB}, r) = fcut(D.cutoff, r)
+@inline fcut(D::MultiDesc, ::Val{:AABba}, rθ) = fcut(D.cutoff, rθ[1])
 @inline fcut(D::MultiDesc, ::Val{:ABC}, r) = fcut(D.cutoff, r)
 
 # 4-body
 @inline fcut(D::MultiDesc, ::Val{:AAAA}, r) = fcut(D.cutoff, r)
-@inline fcut(D::MultiDesc, ::Val{:AAAB}, rθ) = fcut(D.cutoff, rθ[1])
+@inline fcut(D::MultiDesc, ::Val{:AAAB}, r) = fcut(D.cutoff, r)
+@inline fcut(D::MultiDesc, ::Val{:AAABba}, rθ) = fcut(D.cutoff, rθ[1])
 @inline fcut(D::MultiDesc, ::Val{:AABB}, r) = fcut(D.cutoff, r)
 @inline fcut(D::MultiDesc, ::Val{:AABC}, r) = fcut(D.cutoff, r)
 @inline fcut(D::MultiDesc, ::Val{:ABCD}, r) = fcut(D.cutoff, r)
@@ -227,7 +238,8 @@ tdegrees(::MultiDesc, vN::Val{N}) where {N} = MI.tdegrees(vN)
 
 # 3-body
 @inline fcut_d(D::MultiDesc, ::Val{:AAA}, r) = fcut_d(D.cutoff, r)
-@inline function fcut_d(D::MultiDesc, ::Val{:AAB}, rθ)
+@inline fcut_d(D::MultiDesc, ::Val{:AAB}, r) = fcut_d(D.cutoff, r)
+@inline function fcut_d(D::MultiDesc, ::Val{:AABba}, rθ)
    fc, fc_d = fcut_d(D.cutoff, rθ[1])
    return fc, vcat(fc_d, zero(typeof(rθ[2])))
 end
@@ -235,7 +247,8 @@ end
 
 # 4-body
 @inline fcut_d(D::MultiDesc, ::Val{:AAAA}, r) = fcut_d(D.cutoff, r)
-@inline function fcut_d(D::MultiDesc, ::Val{:AAAB}, rθ)
+@inline fcut_d(D::MultiDesc, ::Val{:AAAB}, r) = fcut_d(D.cutoff, r)
+@inline function fcut_d(D::MultiDesc, ::Val{:AAABba}, rθ)
    fc, fc_d = fcut_d(D.cutoff, rθ[1])
    return fc, vcat(fc_d, zero(typeof(rθ[2])))
 end
@@ -253,12 +266,14 @@ end
 
 # 3-body
 @inline skip_simplex(D::MultiDesc, ::Val{:AAA}, r) = (maximum(r) > cutoff(D.cutoff))
-@inline skip_simplex(D::MultiDesc, ::Val{:AAB}, rθ) = (maximum(rθ[1]) > cutoff(D.cutoff))
+@inline skip_simplex(D::MultiDesc, ::Val{:AAB}, r) = (maximum(r) > cutoff(D.cutoff))
+@inline skip_simplex(D::MultiDesc, ::Val{:AABba}, rθ) = (maximum(rθ[1]) > cutoff(D.cutoff))
 @inline skip_simplex(D::MultiDesc, ::Val{:ABC}, r) = (maximum(r) > cutoff(D.cutoff))
 
 # 4-body
 @inline skip_simplex(D::MultiDesc, ::Val{:AAAA}, r) = (maximum(r) > cutoff(D.cutoff))
-@inline skip_simplex(D::MultiDesc, ::Val{:AAAB}, rθ) = (maximum(rθ[1]) > cutoff(D.cutoff))
+@inline skip_simplex(D::MultiDesc, ::Val{:AAAB}, r) = (maximum(r) > cutoff(D.cutoff))
+@inline skip_simplex(D::MultiDesc, ::Val{:AAABba}, rθ) = (maximum(rθ[1]) > cutoff(D.cutoff))
 @inline skip_simplex(D::MultiDesc, ::Val{:AABB}, r) = (maximum(r) > cutoff(D.cutoff))
 @inline skip_simplex(D::MultiDesc, ::Val{:AABC}, r) = (maximum(r) > cutoff(D.cutoff))
 @inline skip_simplex(D::MultiDesc, ::Val{:ABCD}, r) = (maximum(r) > cutoff(D.cutoff))
@@ -276,12 +291,14 @@ end
 
 # 3-body
 @inline invariants(D::MultiDesc, ::Val{:AAA}, r) = MI.invariants(transform.(Ref(D), r),D.sp_type)
-@inline invariants(D::MultiDesc, ::Val{:AAB}, rθ) = MI.invariants(_rθ2x(D, rθ...),D.sp_type)
+@inline invariants(D::MultiDesc, ::Val{:AAB}, r) = MI.invariants(transform.(Ref(D), r),D.sp_type)
+@inline invariants(D::MultiDesc, ::Val{:AABba}, rθ) = MI.invariants(_rθ2x(D, rθ...),D.sp_type)
 @inline invariants(D::MultiDesc, ::Val{:ABC}, r) = MI.invariants(transform.(Ref(D), r),D.sp_type)
 
 # 4-body
 @inline invariants(D::MultiDesc, ::Val{:AAAA}, r) = MI.invariants(transform.(Ref(D), r),D.sp_type)
-@inline invariants(D::MultiDesc, ::Val{:AAAB}, rθ) = MI.invariants(_rθ2x(D, rθ...),D.sp_type)
+@inline invariants(D::MultiDesc, ::Val{:AAAB}, r) = MI.invariants(transform.(Ref(D), r),D.sp_type)
+@inline invariants(D::MultiDesc, ::Val{:AAABba}, rθ) = MI.invariants(_rθ2x(D, rθ...),D.sp_type)
 @inline invariants(D::MultiDesc, ::Val{:AABB}, r) = MI.invariants(transform.(Ref(D), r),D.sp_type)
 @inline invariants(D::MultiDesc, ::Val{:AABC}, r) = MI.invariants(transform.(Ref(D), r),D.sp_type)
 @inline invariants(D::MultiDesc, ::Val{:ABCD}, r) = MI.invariants(transform.(Ref(D), r),D.sp_type)
@@ -308,7 +325,14 @@ end
    return I1, I2, _sdot(x_d, DI1), _sdot(x_d, DI2)
 end
 
-@inline function invariants_ed(D::MultiDesc, ::Val{:AAB}, rθ)
+@inline function invariants_ed(D::MultiDesc, ::Val{:AAB}, r)
+   x = transform.(Ref(D), r)
+   I1, I2, DI1, DI2 = MI.invariants_ed(x,D.sp_type)
+   x_d = transform_d.(Ref(D), r)
+   return I1, I2, _sdot(x_d, DI1), _sdot(x_d, DI2)
+end
+
+@inline function invariants_ed(D::MultiDesc, ::Val{:AABba}, rθ)
    x = _rθ2x(D, rθ...)
    I1, I2, DI1, DI2 = MI.invariants_ed(x,D.sp_type)
    x_d = _rθ2x_d(D, rθ...)
@@ -330,7 +354,14 @@ end
    return I1, I2, _sdot(x_d, DI1), _sdot(x_d, DI2)
 end
 
-@inline function invariants_ed(D::MultiDesc, ::Val{:AAAB}, rθ)
+@inline function invariants_ed(D::MultiDesc, ::Val{:AAAB}, r)
+   x = transform.(Ref(D), r)
+   I1, I2, DI1, DI2 = MI.invariants_ed(x,D.sp_type)
+   x_d = transform_d.(Ref(D), r)
+   return I1, I2, _sdot(x_d, DI1), _sdot(x_d, DI2)
+end
+
+@inline function invariants_ed(D::MultiDesc, ::Val{:AAABba}, rθ)
    x = _rθ2x(D, rθ...)
    I1, I2, DI1, DI2 = MI.invariants_ed(x,D.sp_type)
    x_d = _rθ2x_d(D, rθ...)
@@ -369,12 +400,14 @@ end
 
 # 3-body
 @inline ricoords(::Val{:AAA}, Rs, J) = edge_lengths(Rs, J)
-@inline ricoords(::Val{:AAB}, Rs, J) = lengths_and_angles(Rs, J)
+@inline ricoords(::Val{:AAB}, Rs, J) = edge_lengths(Rs, J)
+@inline ricoords(::Val{:AABba}, Rs, J) = lengths_and_angles(Rs, J)
 @inline ricoords(::Val{:ABC}, Rs, J) = edge_lengths(Rs, J)
 
 # 4-body
 @inline ricoords(::Val{:AAAA}, Rs, J) = edge_lengths(Rs, J)
-@inline ricoords(::Val{:AAAB}, Rs, J) = lengths_and_angles(Rs, J)
+@inline ricoords(::Val{:AAAB}, Rs, J) = edge_lengths(Rs, J)
+@inline ricoords(::Val{:AAABba}, Rs, J) = lengths_and_angles(Rs, J)
 @inline ricoords(::Val{:AABB}, Rs, J) = edge_lengths(Rs, J)
 @inline ricoords(::Val{:AABC}, Rs, J) = edge_lengths(Rs, J)
 @inline ricoords(::Val{:ABCD}, Rs, J) = edge_lengths(Rs, J)
@@ -392,7 +425,10 @@ end
 @inline gradri2gradR!(::Val{:AAA}, dVsite, dV_dr, Rs, J, r) =
    _grad_len2pos!(dVsite, dV_dr, Rs, J, r)
 
-@inline gradri2gradR!(::Val{:AAB}, dVsite, dV_drθ, Rs, J, rθ) =
+@inline gradri2gradR!(::Val{:AAB}, dVsite, dV_dr, Rs, J, r) =
+  _grad_len2pos!(dVsite, dV_dr, Rs, J, r)
+
+@inline gradri2gradR!(::Val{:AABba}, dVsite, dV_drθ, Rs, J, rθ) =
    _grad_rθ2pos!(dVsite, dV_drθ, Rs, J, rθ...)
 
 @inline gradri2gradR!(::Val{:ABC}, dVsite, dV_dr, Rs, J, r) =
@@ -402,7 +438,10 @@ end
 @inline gradri2gradR!(::Val{:AAAA}, dVsite, dV_dr, Rs, J, r) =
    _grad_len2pos!(dVsite, dV_dr, Rs, J, r)
 
-@inline gradri2gradR!(::Val{:AAAB}, dVsite, dV_drθ, Rs, J, rθ) =
+@inline gradri2gradR!(::Val{:AAAB}, dVsite, dV_dr, Rs, J, r) =
+  _grad_len2pos!(dVsite, dV_dr, Rs, J, r)
+
+@inline gradri2gradR!(::Val{:AAABba}, dVsite, dV_drθ, Rs, J, rθ) =
    _grad_rθ2pos!(dVsite, dV_drθ, Rs, J, rθ...)
 
 @inline gradri2gradR!(::Val{:AABB}, dVsite, dV_dr, Rs, J, r) =

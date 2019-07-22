@@ -30,6 +30,7 @@ r0 = 1.2*rnn(:Cu)
 valSp = [
          Val(:AAAA),
          Val(:AAAB),Val(:AAAB),
+         Val(:AAABba),Val(:AAABba),
          Val(:AABB),
          Val(:AABC),
          Val(:ABCD)

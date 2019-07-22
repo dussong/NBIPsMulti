@@ -14,6 +14,7 @@ include("aux_testing.jl")
 all_minvariants(r,sp_type) = vcat(minvariants(r,sp_type)...)  # [I1; I2]
 ad_minvariants(r,sp_type) = ForwardDiff.jacobian(all_minvariants, r)
 
+
 println("-------------------------------------------")
 println("   Testing implementation of `minvariants`")
 println("-------------------------------------------")
@@ -21,12 +22,13 @@ println("-------------------------------------------")
 # TODO: test correctness of the minvariants implementation
 #       against the MAGMA output
 
-println("3-Body ")
+println("3 and 4-Body ")
 println("-------------------------------------------")
 
-Sp_type = [Val(:AAA), Val(:AAB), Val(:ABC),
-           Val(:AAAA), Val(:AAAB), Val(:AABB), Val(:AABC), Val(:ABCD)]
-dim = [3,3,3,6,6,6,6,6]
+Sp_type = [Val(:AAA), Val(:AAB), Val(:ABC), Val(:AABba),
+           Val(:AAAA), Val(:AAAB), Val(:AAABba),
+           Val(:AABB), Val(:AABC), Val(:ABCD)]
+dim = [3,3,3,3,6,6,6,6,6,6]
 
 for (i,sp_type) in enumerate(Sp_type)
    println(sp_type)

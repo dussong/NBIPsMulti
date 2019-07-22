@@ -14,11 +14,17 @@ const G_3B_AAA = [
 simplex_permutations(x::SVector{3},::Val{:AAA}) = [x[G_3B_AAA[i]] for i=1:length(G_3B_AAA)]
 
 
-const G_3B_AAB = [
+const G_3B_AAB_BA = [
 [ 1, 2, 3 ]
 ,[ 2, 1, 3 ]
 ,]
-simplex_permutations(x::SVector{3},::Val{:AAB}) = [x[G_3B_AAB[i]] for i=1:length(G_3B_AAB)]
+simplex_permutations(x::SVector{3},::Val{:AABba}) = [x[G_3B_AAB_BA[i]] for i=1:length(G_3B_AAB_BA)]
+
+const G_3B_AAB_BL = [
+[ 1, 2, 3 ]
+,[ 2, 1, 3 ]
+,]
+simplex_permutations(x::SVector{3},::Val{:AAB}) = [x[G_3B_AAB_BL[i]] for i=1:length(G_3B_AAB_BL)]
 
 const G_3B_ABC = [
 [ 1, 2, 3 ]
@@ -41,13 +47,22 @@ simplex_permutations(x::SVector{6},::Val{:AAAA}) =
               for πX in permutations(1:4) ]  )
 
 
-const G_4B_AAAB = [
+const G_4B_AAAB_BA = [
 [ 1, 2, 3, 4, 5, 6 ]
 ,[ 2, 3, 1, 6, 4, 5 ]
 ,[ 3, 1, 2, 5, 6, 4 ]
 ,]
-simplex_permutations(x::SVector{6},::Val{:AAAB}) = [x[G_4B_AAAB[i]] for i=1:3]
+simplex_permutations(x::SVector{6},::Val{:AAABba}) = [x[G_4B_AAAB_BA[i]] for i=1:3]
 
+const G_NB_4B_AAAB_BL = [
+[ 1, 2, 3, 4, 5, 6 ]
+,[ 2, 3, 1, 6, 4, 5 ]
+,[ 3, 1, 2, 5, 6, 4 ]
+,[ 2, 1, 3, 4, 6, 5 ]
+,[ 3, 2, 1, 6, 5, 4 ]
+,[ 1, 3, 2, 5, 4, 6 ]
+,]
+simplex_permutations(x::SVector{6},::Val{:AAAB}) = [x[G_NB_4B_AAAB_BL[i]] for i=1:6]
 
 const G_NB_4B_AABB = [
 [ 1, 2, 3, 4, 5, 6 ]

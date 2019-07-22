@@ -60,6 +60,11 @@ function skip_simplex_species_order!(desc::MultiDesc,
 end
 
 function skip_simplex_species_order!(desc::MultiDesc,
+                                     Spi,Spj,Species,J,::Val{:AABba})
+   return Spj[J[1]] != Spj[J[2]]
+end
+
+function skip_simplex_species_order!(desc::MultiDesc,
                                      Spi,Spj,Species,J,::Val{:ABC})
    if Spi == Species[1]
       if Spj[J[1]] == Species[2]
@@ -83,6 +88,12 @@ skip_simplex_species_order!(desc::MultiDesc,
 
 function skip_simplex_species_order!(desc::MultiDesc,
                                    Spi,Spj,Species,J,::Val{:AAAB})
+   return (Spj[J[1]] != Spj[J[2]])||(Spj[J[1]] != Spj[J[3]])||(
+         Spj[J[2]] != Spj[J[3]])
+end
+
+function skip_simplex_species_order!(desc::MultiDesc,
+                                   Spi,Spj,Species,J,::Val{:AAABba})
    return (Spj[J[1]] != Spj[J[2]])||(Spj[J[1]] != Spj[J[3]])||(
          Spj[J[2]] != Spj[J[3]])
 end

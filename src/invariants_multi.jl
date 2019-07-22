@@ -76,6 +76,34 @@ corners(::Val{:AAA}) = ( SVector(1,2), SVector(1,3), SVector(2,3) )
 # x = (r1, r2, θ12) where 0 is the B species, 1 and 2 are A.
 
 # the 1.0 is a "secondary invariant"
+invariants(x::SVector{3, T},::Val{:AABba}) where {T} =
+      (@SVector T[ x[1] + x[2], x[1] * x[2], x[3] ]),
+      (@SVector T[ 1.0 ])
+
+
+invariants_d(x::SVector{3, T},::Val{:AABba}) where {T} =
+      (@SVector [ (@SVector T[1.0, 1.0, 0.0]),
+                  (@SVector T[x[2], x[1], 0.0]),
+                  (@SVector T[0.0, 0.0, 1.0]) ]),
+      (@SVector [ (@SVector T[0.0, 0.0, 0.0]) ])
+
+invariants_ed(x::SVector{3, T},::Val{:AABba}) where {T} =
+      (@SVector T[ x[1] + x[2], x[1] * x[2], x[3] ]),
+      (@SVector T[ 1.0 ]),
+      (@SVector [ (@SVector T[1.0, 1.0, 0.0]),
+                  (@SVector T[x[2], x[1], 0.0]),
+                  (@SVector T[0.0, 0.0, 1.0]) ]),
+      (@SVector [ (@SVector T[0.0, 0.0, 0.0]) ])
+
+
+tdegrees(::Val{:AABba}) = (1, 2, 1), (0,)
+
+
+# Case :AAB (two different species), using bond-length variables
+
+# x = (r12, r13, r23) where 1 is the B species, 2 and 3 are A.
+
+# the 1.0 is a "secondary invariant"
 invariants(x::SVector{3, T},::Val{:AAB}) where {T} =
       (@SVector T[ x[1] + x[2], x[1] * x[2], x[3] ]),
       (@SVector T[ 1.0 ])
@@ -97,6 +125,9 @@ invariants_ed(x::SVector{3, T},::Val{:AAB}) where {T} =
 
 
 tdegrees(::Val{:AAB}) = (1, 2, 1), (0,)
+
+
+
 
    # Case :ABC (two different species), no real invariants since there is no symmetry
 
@@ -140,15 +171,29 @@ invariants_ed(x::SVector{6, T},::Val{:AAAA}) where {T} = NBodyIPs.BLInvariants.i
 
 tdegrees(::Val{:AAAA}) = NBodyIPs.BLInvariants.tdegrees(Val(4))
 
+
+
 # Case :AAAB (3+1 atoms), using bond-angle invariants
 
-invariants(x::SVector{6, T},::Val{:AAAB}) where {T} = NBodyIPs.BAInvariants.invariants(x)
+invariants(x::SVector{6, T},::Val{:AAABba}) where {T} = NBodyIPs.BAInvariants.invariants(x)
 
-invariants_d(x::SVector{6, T},::Val{:AAAB}) where {T} =  NBodyIPs.BAInvariants.invariants_d(x)
+invariants_d(x::SVector{6, T},::Val{:AAABba}) where {T} =  NBodyIPs.BAInvariants.invariants_d(x)
 
-invariants_ed(x::SVector{6, T},::Val{:AAAB}) where {T} = NBodyIPs.BAInvariants.invariants_ed(x)
+invariants_ed(x::SVector{6, T},::Val{:AAABba}) where {T} = NBodyIPs.BAInvariants.invariants_ed(x)
 
-tdegrees(::Val{:AAAB}) = NBodyIPs.BAInvariants.tdegrees(Val(4))
+tdegrees(::Val{:AAABba}) = NBodyIPs.BAInvariants.tdegrees(Val(4))
+
+
+# Case AAAB with bond-length
+
+include("NB_4B_AAAB_BL_invariants.jl")
+@inline invariants(x::SVector{6},::Val{:AAAB}) = NB_4B_AAAB_BL.invariants_gen(x)
+@inline invariants_d(x::SVector{6},::Val{:AAAB}) = NB_4B_AAAB_BL.invariants_d_gen(x)
+@inline invariants_ed(x::SVector{6},::Val{:AAAB}) = NB_4B_AAAB_BL.invariants_ed_gen(x)
+
+tdegrees(::Val{:AAAB}) = (1, 1, 2, 2, 3, 3,), (0, 2, 3, 3,)
+
+
 
 # Case AABB
 
