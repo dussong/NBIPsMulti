@@ -26,7 +26,7 @@ println("3 and 4-Body ")
 println("-------------------------------------------")
 
 Sp_type = [Val(:AAA), Val(:AAB), Val(:ABC), Val(:AABba),
-           Val(:AAAA), Val(:AAAB), Val(:AAABba),
+           Val(:AAAA), Val(:AAABba), Val(:AAAB),
            Val(:AABB), Val(:AABC), Val(:ABCD)]
 dim = [3,3,3,3,6,6,6,6,6,6]
 

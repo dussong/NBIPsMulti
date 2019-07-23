@@ -56,11 +56,11 @@ simplex_permutations(x::SVector{6},::Val{:AAABba}) = [x[G_4B_AAAB_BA[i]] for i=1
 
 const G_NB_4B_AAAB_BL = [
 [ 1, 2, 3, 4, 5, 6 ]
-,[ 2, 3, 1, 6, 4, 5 ]
-,[ 3, 1, 2, 5, 6, 4 ]
+,[ 4, 1, 5, 2, 6, 3 ]
+,[ 2, 4, 6, 1, 3, 5 ]
+,[ 1, 4, 5, 2, 3, 6 ]
+,[ 4, 2, 6, 1, 5, 3 ]
 ,[ 2, 1, 3, 4, 6, 5 ]
-,[ 3, 2, 1, 6, 5, 4 ]
-,[ 1, 3, 2, 5, 4, 6 ]
 ,]
 simplex_permutations(x::SVector{6},::Val{:AAAB}) = [x[G_NB_4B_AAAB_BL[i]] for i=1:6]
 
