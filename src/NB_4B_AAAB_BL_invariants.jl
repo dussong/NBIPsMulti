@@ -7,39 +7,39 @@ import NBodyIPs.tdegrees
 
 const G_NB_4B_AAAB_BL = [
 [ 1, 2, 3, 4, 5, 6 ]
-,[ 2, 3, 1, 6, 4, 5 ]
-,[ 3, 1, 2, 5, 6, 4 ]
+,[ 4, 1, 5, 2, 6, 3 ]
+,[ 2, 4, 6, 1, 3, 5 ]
+,[ 1, 4, 5, 2, 3, 6 ]
+,[ 4, 2, 6, 1, 5, 3 ]
 ,[ 2, 1, 3, 4, 6, 5 ]
-,[ 3, 2, 1, 6, 5, 4 ]
-,[ 1, 3, 2, 5, 4, 6 ]
 ,]
 simplex_permutations(x::SVector{6}) = [x[G_NB_4B_AAAB_BL[i]] for i=1:6]
 # Primary invariants for NB_4B_AAAB_BL
  # : definitions at the beginning of the file
-const P1_1 = (1,3,2,)
+const P1_1 = (1,2,4,)
 
-const P2_1 = (4,5,6,)
+const P2_1 = (3,6,5,)
 
-const P3_1 = (1,3,2,)
+const P3_1 = (1,2,4,)
 
-const P4_1 = (4,5,6,)
+const P4_1 = (3,6,5,)
 
-const P5_1 = (1,3,2,)
+const P5_1 = (1,2,4,)
 
-const P6_1 = (4,5,6,)
+const P6_1 = (3,6,5,)
 
 # Irreducible secondaries for group NB_4B_AAAB_BL
  # : definitions at the beginning of the file
-const IS1_1 = (1,3,2,)
-const IS1_2 = (6,4,5,)
+const IS1_1 = (1,2,3,)
+const IS1_2 = (6,5,4,)
 
-const IS2_1 = (1,1,2,1,2,1,)
-const IS2_2 = (2,3,3,2,3,3,)
-const IS2_3 = (5,6,4,6,5,4,)
+const IS2_1 = (1,2,1,1,2,1,)
+const IS2_2 = (2,3,4,3,4,2,)
+const IS2_3 = (5,4,6,4,5,6,)
 
-const IS3_1 = (1,3,2,2,3,1,)
-const IS3_2 = (4,4,5,4,4,5,)
-const IS3_3 = (6,5,6,5,6,6,)
+const IS3_1 = (1,2,3,1,3,2,)
+const IS3_2 = (3,5,4,5,4,3,)
+const IS3_3 = (6,6,5,6,6,5,)
 
 
 # Primary invariants for NB_4B_AAAB_BL

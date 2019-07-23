@@ -16,13 +16,13 @@ simplex_permutations(x::SVector{3},::Val{:AAA}) = [x[G_3B_AAA[i]] for i=1:length
 
 const G_3B_AAB_BA = [
 [ 1, 2, 3 ]
-,[ 2, 1, 3 ]
+,[ 1, 3, 2 ]
 ,]
 simplex_permutations(x::SVector{3},::Val{:AABba}) = [x[G_3B_AAB_BA[i]] for i=1:length(G_3B_AAB_BA)]
 
 const G_3B_AAB_BL = [
 [ 1, 2, 3 ]
-,[ 2, 1, 3 ]
+,[ 1, 3, 2 ]
 ,]
 simplex_permutations(x::SVector{3},::Val{:AAB}) = [x[G_3B_AAB_BL[i]] for i=1:length(G_3B_AAB_BL)]
 

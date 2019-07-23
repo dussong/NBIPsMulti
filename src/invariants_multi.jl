@@ -77,22 +77,22 @@ corners(::Val{:AAA}) = ( SVector(1,2), SVector(1,3), SVector(2,3) )
 
 # the 1.0 is a "secondary invariant"
 invariants(x::SVector{3, T},::Val{:AABba}) where {T} =
-      (@SVector T[ x[1] + x[2], x[1] * x[2], x[3] ]),
+      (@SVector T[ x[2] + x[3], x[2] * x[3], x[1] ]),
       (@SVector T[ 1.0 ])
 
 
 invariants_d(x::SVector{3, T},::Val{:AABba}) where {T} =
-      (@SVector [ (@SVector T[1.0, 1.0, 0.0]),
-                  (@SVector T[x[2], x[1], 0.0]),
-                  (@SVector T[0.0, 0.0, 1.0]) ]),
+      (@SVector [ (@SVector T[0.0, 1.0, 1.0]),
+                  (@SVector T[0.0, x[3], x[2]]),
+                  (@SVector T[1.0, 0.0, 0.0]) ]),
       (@SVector [ (@SVector T[0.0, 0.0, 0.0]) ])
 
 invariants_ed(x::SVector{3, T},::Val{:AABba}) where {T} =
-      (@SVector T[ x[1] + x[2], x[1] * x[2], x[3] ]),
+      (@SVector T[ x[2] + x[3], x[2] * x[3], x[1] ]),
       (@SVector T[ 1.0 ]),
-      (@SVector [ (@SVector T[1.0, 1.0, 0.0]),
-                  (@SVector T[x[2], x[1], 0.0]),
-                  (@SVector T[0.0, 0.0, 1.0]) ]),
+      (@SVector [ (@SVector T[0.0, 1.0, 1.0]),
+                  (@SVector T[0.0, x[3], x[2]]),
+                  (@SVector T[1.0, 0.0, 0.0]) ]),
       (@SVector [ (@SVector T[0.0, 0.0, 0.0]) ])
 
 
@@ -105,28 +105,26 @@ tdegrees(::Val{:AABba}) = (1, 2, 1), (0,)
 
 # the 1.0 is a "secondary invariant"
 invariants(x::SVector{3, T},::Val{:AAB}) where {T} =
-      (@SVector T[ x[1] + x[2], x[1] * x[2], x[3] ]),
+      (@SVector T[ x[2] + x[3], x[2] * x[3], x[1] ]),
       (@SVector T[ 1.0 ])
 
 
 invariants_d(x::SVector{3, T},::Val{:AAB}) where {T} =
-      (@SVector [ (@SVector T[1.0, 1.0, 0.0]),
-                  (@SVector T[x[2], x[1], 0.0]),
-                  (@SVector T[0.0, 0.0, 1.0]) ]),
+      (@SVector [ (@SVector T[0.0, 1.0, 1.0]),
+                  (@SVector T[0.0, x[3], x[2]]),
+                  (@SVector T[1.0, 0.0, 0.0]) ]),
       (@SVector [ (@SVector T[0.0, 0.0, 0.0]) ])
 
 invariants_ed(x::SVector{3, T},::Val{:AAB}) where {T} =
-      (@SVector T[ x[1] + x[2], x[1] * x[2], x[3] ]),
+      (@SVector T[ x[2] + x[3], x[2] * x[3], x[1] ]),
       (@SVector T[ 1.0 ]),
-      (@SVector [ (@SVector T[1.0, 1.0, 0.0]),
-                  (@SVector T[x[2], x[1], 0.0]),
-                  (@SVector T[0.0, 0.0, 1.0]) ]),
+      (@SVector [ (@SVector T[0.0, 1.0, 1.0]),
+                  (@SVector T[0.0, x[3], x[2]]),
+                  (@SVector T[1.0, 0.0, 0.0]) ]),
       (@SVector [ (@SVector T[0.0, 0.0, 0.0]) ])
 
 
 tdegrees(::Val{:AAB}) = (1, 2, 1), (0,)
-
-
 
 
    # Case :ABC (two different species), no real invariants since there is no symmetry
