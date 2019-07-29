@@ -12,6 +12,12 @@ D1 = MultiDesc(Ds)
 println(@test D1 == D)
 println(@test hash(BASIS(), D) == hash(BASIS(), D1))
 ##
+println("Check (De-)Dictionisation of `MultiDesc`")
+D = MultiDesc(ExpTransform(2.,2.5), CosCut(6., 9.),Val(:AA))
+Ds = Dict(D)
+D1 = MultiDesc(Ds)
+println(@test D1 == D)
+println(@test hash(BASIS(), D) == hash(BASIS(), D1))
 println("generate some basis functions")
 rcuts = [9.2, 6.2, 4.5]
 TRANSFORM = PolyTransform(3, 2.9)

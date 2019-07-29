@@ -189,7 +189,7 @@ Dict(D::MultiDesc) = Dict( "__id__"    =>  "MultiDesc",
                             "valN"    =>  get_val(D.valN)
                              )
 
-MultiDesc(D::Dict) = MultiDesc( AnalyticTransform(D["transform"]),
+MultiDesc(D::Dict) = MultiDesc( decode_dict(D["transform"]),
                                 decode_dict(D["cutoff"]),
                                 Val(Symbol(D["sp_type"])),
                                 Val(D["valN"])

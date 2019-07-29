@@ -46,6 +46,7 @@ V2_1 = IP.components[2]
 V2_2 = IP.components[3]
 V2_3 = IP.components[4]
 
+r0 = 3.
 V2rep_1 = RepulsiveCore(V2_1, 0.89*r0, -1.)
 V2rep_2 = RepulsiveCore(V2_2, 0.89*r0, -1.)
 V2rep_3 = RepulsiveCore(V2_3, 0.89*r0, -1.)
@@ -55,3 +56,6 @@ IP.components[2] = V2rep_1
 IP.components[3] = V2rep_2
 IP.components[4] = V2rep_3
 save_ip("pot_with_rep_core.json", IP, lsqinfo)
+
+db.configs[1].at
+energy(IP, db.configs[1].at)
