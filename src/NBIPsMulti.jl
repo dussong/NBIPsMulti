@@ -23,4 +23,6 @@ include("descriptors_multi.jl")
 include("environ_multi.jl")
 @reexport using NBIPsMulti.EnvIPsmulti
 
+include("repulsive_core.jl")
+
 end # module

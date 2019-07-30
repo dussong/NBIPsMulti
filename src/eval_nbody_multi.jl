@@ -241,6 +241,10 @@ energy(V::NBodyFunctionM, at::Atoms, Species::Vector{Int}) = sum_kbn(site_energi
 
 
 function energy(V::NBodyFunctionM, at::Atoms)
+   @show V
+   @show V.Sp
+   @show V.Sp_type
+   @show at
    return energy(V,at,V.Sp)
 end
 
