@@ -92,7 +92,7 @@ end
 #  File IO
 # ----------------------------------------------------
 
-Dict(V::RepulsiveCoreM) = Dict("__id__" => "NBodyIPs_RepulsiveCore",
+Dict(V::RepulsiveCoreM) = Dict("__id__" => "NBodyIPs_RepulsiveCoreM",
                               "Vout" => Dict(V.Vout),
                               "e0" => V.e0,
                               "ri" => V.ri)

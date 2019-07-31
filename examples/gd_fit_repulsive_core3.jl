@@ -100,6 +100,7 @@ IP_rep.components[2] = V2rep_1
 IP_rep.components[3] = V2rep_2
 IP_rep.components[4] = V2rep_3
 
+save_ip("pot_with_rep_core.json", IP_rep, lsqinfo)
 
 atX = SArray{Tuple{3},Float64,1,3}[[0.0, 0.0, 0.0], [0.6, 0.0, 0.0]]
 atZ = [6, 1]
@@ -110,3 +111,5 @@ energy(IP, at)
 energy(IP_rep, db.configs[1].at)
 energy(IP, db.configs[1].at)
 db.configs[1].D["E"][1]
+
+load_ip("pot_with_rep_core.json")
