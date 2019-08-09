@@ -20,6 +20,8 @@ const G_3B_AAB_BA = [
 ,]
 simplex_permutations(x::SVector{3},::Val{:AABba}) = [x[G_3B_AAB_BA[i]] for i=1:length(G_3B_AAB_BA)]
 
+simplex_permutations(x::SVector{3},::Val{:AAAba}) = [x[G_3B_AAB_BA[i]] for i=1:length(G_3B_AAB_BA)]
+
 const G_3B_AAB_BL = [
 [ 1, 2, 3 ]
 ,[ 1, 3, 2 ]
@@ -30,6 +32,7 @@ const G_3B_ABC = [
 [ 1, 2, 3 ]
 ,]
 simplex_permutations(x::SVector{3},::Val{:ABC}) = [x[G_3B_ABC[i]] for i=1:length(G_3B_ABC)]
+simplex_permutations(x::SVector{3},::Val{:ABCba}) = [x[G_3B_ABC[i]] for i=1:length(G_3B_ABC)]
 
 
 # 4-Body
@@ -53,6 +56,7 @@ const G_4B_AAAB_BA = [
 ,[ 3, 1, 2, 5, 6, 4 ]
 ,]
 simplex_permutations(x::SVector{6},::Val{:AAABba}) = [x[G_4B_AAAB_BA[i]] for i=1:3]
+simplex_permutations(x::SVector{6},::Val{:AAAAba}) = [x[G_4B_AAAB_BA[i]] for i=1:3]
 
 const G_NB_4B_AAAB_BL = [
 [ 1, 2, 3, 4, 5, 6 ]
@@ -85,3 +89,4 @@ const G_4B_ABCD = [
 [ 1, 2, 3, 4, 5, 6 ],
 ]
 simplex_permutations(x::SVector{6},::Val{:ABCD}) = [x[G_4B_ABCD[i]] for i=1:length(G_4B_ABCD)]
+simplex_permutations(x::SVector{6},::Val{:ABCDba}) = [x[G_4B_ABCD[i]] for i=1:length(G_4B_ABCD)]

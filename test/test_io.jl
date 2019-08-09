@@ -13,7 +13,7 @@ println(@test D1 == D)
 println(@test hash(BASIS(), D) == hash(BASIS(), D1))
 ##
 println("Check (De-)Dictionisation of `MultiDesc`")
-D = MultiDesc(ExpTransform(2.,2.5), CosCut(6., 9.),Val(:AA))
+D = MultiDesc(ExpTransform(2.,2.5), CosCut(6., 9.),Val(:AA),Val(2))
 Ds = Dict(D)
 D1 = MultiDesc(Ds)
 println(@test D1 == D)
@@ -44,6 +44,17 @@ B3AAA = nbpolys(D3AAA, 5, [1,1,1])
 B3AAB = nbpolys(D3AAB, 5, [1,1,2])
 B3ABC = nbpolys(D3ABC, 5, [1,2,3])
 
+D3AAAba = MultiDesc(transform,
+    cutoff,Val(:AAAba))
+D3AABba = MultiDesc(transform,
+    cutoff,Val(:AABba))
+D3ABCba = MultiDesc(transform,
+    cutoff,Val(:ABCba))
+B3AAAba = nbpolys(D3AAAba, 5, [1,1,1])
+B3AABba = nbpolys(D3AABba, 5, [1,1,2])
+B3ABCba = nbpolys(D3ABCba, 5, [1,2,3])
+
+
 # 4B
 D4AAAA = MultiDesc(transform,
     cutoff,Val(:AAAA))
@@ -61,9 +72,22 @@ B4AABB = nbpolys(D4AABB, 5, [1,1,2,2])
 B4AABC = nbpolys(D4AABC, 5, [1,1,2,3])
 B4ABCD = nbpolys(D4ABCD, 5, [1,2,3,4])
 
+
+D4AAAAba = MultiDesc(transform,
+    cutoff,Val(:AAAAba))
+D4AAABba = MultiDesc(transform,
+    cutoff,Val(:AAABba))
+D4ABCDba = MultiDesc(transform,
+    cutoff,Val(:ABCDba))
+B4AAAAba = nbpolys(D4AAAAba, 5, [1,1,1,1])
+B4AAABba = nbpolys(D4AAABba, 5, [1,1,1,2])
+B4ABCDba = nbpolys(D4ABCDba, 5, [1,2,3,4])
+
+
 B = [B2;
-     B3AAA; B3AAB; B3ABC
-     B4AAAA; B4AAAB; B4AABB; B4AABC; B4ABCD]
+     B3AAA; B3AAB; B3ABC; B3AAAba; B3AABba; B3ABCba;
+     B4AAAA; B4AAAB; B4AABB; B4AABC; B4ABCD;
+     B4AAAAba; B4AAABba; B4ABCDba]
 c = rand(length(B))
 IP = NBodyIP(B, c)
 println("Check (De-)Dictionisation of `NBodyIP`")
