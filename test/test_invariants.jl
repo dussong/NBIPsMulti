@@ -25,10 +25,10 @@ println("-------------------------------------------")
 println("3 and 4-Body ")
 println("-------------------------------------------")
 
-Sp_type = [Val(:AAA), Val(:AAB), Val(:ABC), Val(:AABba),
-           Val(:AAAA), Val(:AAABba), Val(:AAAB),
-           Val(:AABB), Val(:AABC), Val(:ABCD)]
-dim = [3,3,3,3,6,6,6,6,6,6]
+Sp_type = [Val(:AAA), Val(:AAAba), Val(:AAB), Val(:ABC), Val(:ABCba), Val(:AABba),
+           Val(:AAAA), Val(:AAAAba), Val(:AAABba), Val(:AAAB),
+           Val(:AABB), Val(:AABC), Val(:ABCD), Val(:ABCDba)]
+dim = [3,3,3,3,3,3,6,6,6,6,6,6,6,6]
 
 for (i,sp_type) in enumerate(Sp_type)
    println(sp_type)

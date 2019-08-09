@@ -84,6 +84,9 @@ function skip_simplex_species_order!(desc::MultiDesc,
    end
 end
 
+skip_simplex_species_order!(desc::MultiDesc,
+                           Spi,Spj,Species,J,::Val{:ABCba}) = false
+
 # 4-Body
 
 skip_simplex_species_order!(desc::MultiDesc,
@@ -173,6 +176,8 @@ function skip_simplex_species_order!(desc::MultiDesc,
    end
 end
 
+skip_simplex_species_order!(desc::MultiDesc,
+                           Spi,Spj,Species,J,::Val{:ABCDba}) = false
 
 skip_simplex_species_order!(desc::MultiDesc,
                             Spi,Spj,Species,J) =

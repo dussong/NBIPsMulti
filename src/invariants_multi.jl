@@ -179,6 +179,33 @@ tdegrees(::Val{:AAB}) = (1, 2, 1), (0,)
    tdegrees(::Val{:ABC}) = (1, 1, 1), (0,)
 
 
+   # Case :ABC (three different species), no real invariants since there is no symmetry
+
+   # the 1.0 is a "secondary invariant"
+   invariants(x::SVector{3, T},::Val{:ABCba}) where {T} =
+         (@SVector T[ x[1], x[2], x[3] ]),
+         (@SVector T[ 1.0 ])
+
+
+   invariants_d(x::SVector{3, T},::Val{:ABCba}) where {T} =
+         (@SVector [ (@SVector T[1.0, 0.0, 0.0]),
+                     (@SVector T[0.0, 1.0, 0.0]),
+                     (@SVector T[0.0, 0.0, 1.0]) ]),
+         (@SVector [ (@SVector T[0.0, 0.0, 0.0]) ])
+
+   invariants_ed(x::SVector{3, T},::Val{:ABCba}) where {T} =
+         (@SVector T[ x[1], x[2], x[3] ]),
+         (@SVector T[ 1.0 ]),
+         (@SVector [ (@SVector T[1.0, 0.0, 0.0]),
+                     (@SVector T[0.0, 1.0, 0.0]),
+                     (@SVector T[0.0, 0.0, 1.0]) ]),
+         (@SVector [ (@SVector T[0.0, 0.0, 0.0]) ])
+
+
+   tdegrees(::Val{:ABCba}) = (1, 1, 1), (0,)
+
+
+
 # ------------------------------------------------------------------------
 #             4-BODY Invariants
 # ------------------------------------------------------------------------
@@ -280,5 +307,40 @@ invariants_ed(x::SVector{6, T},::Val{:ABCD}) where {T} =
       (@SVector [ (@SVector T[0.0, 0.0, 0.0, 0.0, 0.0, 0.0]) ])
 
 tdegrees(::Val{:ABCD}) = (1, 1, 1, 1, 1, 1,), (0,)
+
+
+
+# Case :ABCDba (4 different atoms), only trivial invariants
+
+
+# the 1.0 is a "secondary invariant"
+invariants(x::SVector{6, T},::Val{:ABCDba}) where {T} =
+      (@SVector T[ x[1], x[2], x[3], x[4], x[5], x[6]]),
+      (@SVector T[ 1.0 ])
+
+
+invariants_d(x::SVector{6, T},::Val{:ABCDba}) where {T} =
+      (@SVector [ (@SVector T[1.0, 0.0, 0.0, 0.0, 0.0, 0.0]),
+                  (@SVector T[0.0, 1.0, 0.0, 0.0, 0.0, 0.0]),
+                  (@SVector T[0.0, 0.0, 1.0, 0.0, 0.0, 0.0]),
+                  (@SVector T[0.0, 0.0, 0.0, 1.0, 0.0, 0.0]),
+                  (@SVector T[0.0, 0.0, 0.0, 0.0, 1.0, 0.0]),
+                  (@SVector T[0.0, 0.0, 0.0, 0.0, 0.0, 1.0]),
+                   ]),
+      (@SVector [ (@SVector T[0.0, 0.0, 0.0, 0.0, 0.0, 0.0]) ])
+
+invariants_ed(x::SVector{6, T},::Val{:ABCDba}) where {T} =
+      (@SVector T[ x[1], x[2], x[3], x[4], x[5], x[6]]),
+      (@SVector T[ 1.0 ]),
+      (@SVector [ (@SVector T[1.0, 0.0, 0.0, 0.0, 0.0, 0.0]),
+                  (@SVector T[0.0, 1.0, 0.0, 0.0, 0.0, 0.0]),
+                  (@SVector T[0.0, 0.0, 1.0, 0.0, 0.0, 0.0]),
+                  (@SVector T[0.0, 0.0, 0.0, 1.0, 0.0, 0.0]),
+                  (@SVector T[0.0, 0.0, 0.0, 0.0, 1.0, 0.0]),
+                  (@SVector T[0.0, 0.0, 0.0, 0.0, 0.0, 1.0]),
+                   ]),
+      (@SVector [ (@SVector T[0.0, 0.0, 0.0, 0.0, 0.0, 0.0]) ])
+
+tdegrees(::Val{:ABCDba}) = (1, 1, 1, 1, 1, 1,), (0,)
 
 end
