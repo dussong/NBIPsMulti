@@ -19,12 +19,12 @@ at_positions = copy(positions(at)) |> mat
 
 r0 = 1.2*rnn(:Cu)
 
-valSp = [Val(:AAA),Val(:AABba),Val(:AAB),Val(:ABC)]
-Sp = [[29,29,29], [29,29,30], [29,29,30], [29,30,31]]
+valSp = [Val(:AAAba),Val(:AAA),Val(:AABba),Val(:AAB),Val(:ABC)]
+Sp = [[29,29,29], [29,29,29], [29,29,30], [29,29,30], [29,30,31]]
 
 
 
-for i in 1:4
+for i in 1:length(valSp)
    println("-------------------------------------------------")
    println(" Tests $(valSp[i]) ")
    println("-------------------------------------------------")

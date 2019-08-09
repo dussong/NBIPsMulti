@@ -71,6 +71,30 @@ tdegrees(::Val{:AAA}) = (1, 2, 3), (0,)
 corners(::Val{:AAA}) = ( SVector(1,2), SVector(1,3), SVector(2,3) )
 
 
+# Case :AAA (one species), using bond-angle invariants
+invariants(x::SVector{3, T},::Val{:AAAba}) where {T} =
+      (@SVector T[ x[2] + x[3], x[2] * x[3], x[1] ]),
+      (@SVector T[ 1.0 ])
+
+
+invariants_d(x::SVector{3, T},::Val{:AAAba}) where {T} =
+      (@SVector [ (@SVector T[0.0, 1.0, 1.0]),
+                  (@SVector T[0.0, x[3], x[2]]),
+                  (@SVector T[1.0, 0.0, 0.0]) ]),
+      (@SVector [ (@SVector T[0.0, 0.0, 0.0]) ])
+
+invariants_ed(x::SVector{3, T},::Val{:AAAba}) where {T} =
+      (@SVector T[ x[2] + x[3], x[2] * x[3], x[1] ]),
+      (@SVector T[ 1.0 ]),
+      (@SVector [ (@SVector T[0.0, 1.0, 1.0]),
+                  (@SVector T[0.0, x[3], x[2]]),
+                  (@SVector T[1.0, 0.0, 0.0]) ]),
+      (@SVector [ (@SVector T[0.0, 0.0, 0.0]) ])
+
+
+tdegrees(::Val{:AAAba}) = (1, 2, 1), (0,)
+
+
 # Case :AAB (two different species), using bond-angle invariants
 
 # x = (r1, r2, θ12) where 0 is the B species, 1 and 2 are A.
@@ -168,6 +192,18 @@ invariants_d(x::SVector{6, T},::Val{:AAAA}) where {T} =  NBodyIPs.BLInvariants.i
 invariants_ed(x::SVector{6, T},::Val{:AAAA}) where {T} = NBodyIPs.BLInvariants.invariants_ed(x)
 
 tdegrees(::Val{:AAAA}) = NBodyIPs.BLInvariants.tdegrees(Val(4))
+
+
+# Case :AAAA (3+1 atoms), using bond-angle invariants
+
+invariants(x::SVector{6, T},::Val{:AAAAba}) where {T} = NBodyIPs.BAInvariants.invariants(x)
+
+invariants_d(x::SVector{6, T},::Val{:AAAAba}) where {T} =  NBodyIPs.BAInvariants.invariants_d(x)
+
+invariants_ed(x::SVector{6, T},::Val{:AAAAba}) where {T} = NBodyIPs.BAInvariants.invariants_ed(x)
+
+tdegrees(::Val{:AAAAba}) = NBodyIPs.BAInvariants.tdegrees(Val(4))
+
 
 
 

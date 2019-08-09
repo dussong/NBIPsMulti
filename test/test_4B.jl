@@ -28,7 +28,7 @@ at_positions = copy(positions(at)) |> mat
 r0 = 1.2*rnn(:Cu)
 
 valSp = [
-         Val(:AAAA),
+         Val(:AAAA),Val(:AAAAba),
          Val(:AAABba),Val(:AAABba),
          Val(:AAAB),Val(:AAAB),
          Val(:AABB),
@@ -36,7 +36,7 @@ valSp = [
          Val(:ABCD)
          ]
 Sp = [
-      [29,29,29,29],
+      [29,29,29,29],[29,29,29,29],
       [29,29,29,30],[29,30,30,30],
       [29,29,29,30],[29,30,30,30],
       [29,29,30,30],

@@ -54,6 +54,10 @@ skip_simplex_species_order!(desc::MultiDesc,
                             Spi,Spj,Species,
                             J,::Val{:AAA}) = false
 
+skip_simplex_species_order!(desc::MultiDesc,
+                          Spi,Spj,Species,
+                          J,::Val{:AAAba}) = false
+
 function skip_simplex_species_order!(desc::MultiDesc,
                                      Spi,Spj,Species,J,::Val{:AAB})
    return Spj[J[1]] != Spj[J[2]]
@@ -85,6 +89,10 @@ end
 skip_simplex_species_order!(desc::MultiDesc,
                             Spi,Spj,Species,
                             J,::Val{:AAAA}) = false
+
+skip_simplex_species_order!(desc::MultiDesc,
+                          Spi,Spj,Species,
+                          J,::Val{:AAAAba}) = false
 
 function skip_simplex_species_order!(desc::MultiDesc,
                                    Spi,Spj,Species,J,::Val{:AAAB})
@@ -241,10 +249,10 @@ energy(V::NBodyFunctionM, at::Atoms, Species::Vector{Int}) = sum_kbn(site_energi
 
 
 function energy(V::NBodyFunctionM, at::Atoms)
-   @show V
-   @show V.Sp
-   @show V.Sp_type
-   @show at
+   # @show V
+   # @show V.Sp
+   # @show V.Sp_type
+   # @show at
    return energy(V,at,V.Sp)
 end
 
