@@ -71,6 +71,12 @@ MultiDesc(transform::String, cutoff, ::Val{:AAA}) =
                    Val(:AAA),
                    Val(3))
 
+MultiDesc(transform::String, cutoff, ::Val{:AAAba}) =
+    MultiDesc(AnalyticTransform(transform),
+              fcut_analyse(cutoff),
+              Val(:AAAba),
+              Val(3))
+
 MultiDesc(transform::String, cutoff, ::Val{:AAB}) =
          MultiDesc(AnalyticTransform(transform), fcut_analyse(cutoff),
                    Val(:AAB), Val(3))
@@ -83,6 +89,10 @@ MultiDesc(transform::String, cutoff, ::Val{:ABC}) =
          MultiDesc(AnalyticTransform(transform), fcut_analyse(cutoff),
                    Val(:ABC), Val(3))
 
+MultiDesc(transform::String, cutoff, ::Val{:ABCba}) =
+        MultiDesc(AnalyticTransform(transform), fcut_analyse(cutoff),
+                  Val(:ABCba), Val(3))
+
 # 4-Body
 
 MultiDesc(transform::String, cutoff, ::Val{:AAAA}) =
@@ -91,6 +101,11 @@ MultiDesc(transform::String, cutoff, ::Val{:AAAA}) =
                     Val(:AAAA),
                     Val(4))
 
+MultiDesc(transform::String, cutoff, ::Val{:AAAAba}) =
+          MultiDesc(AnalyticTransform(transform),
+                    fcut_analyse(cutoff),
+                    Val(:AAAAba),
+                    Val(4))
 
 MultiDesc(transform::String, cutoff, ::Val{:AAAB}) =
           MultiDesc(AnalyticTransform(transform),
@@ -123,6 +138,12 @@ MultiDesc(transform::String, cutoff, ::Val{:ABCD}) =
                     fcut_analyse(cutoff),
                     Val(:ABCD),
                     Val(4))
+
+MultiDesc(transform::String, cutoff, ::Val{:ABCDba}) =
+      MultiDesc(AnalyticTransform(transform),
+                fcut_analyse(cutoff),
+                Val(:ABCDba),
+                Val(4))
 
 # ---------------------------------------
 
