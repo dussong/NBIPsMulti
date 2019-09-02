@@ -256,7 +256,7 @@ tdegrees(::Val{:AAAB}) = (1, 1, 2, 2, 3, 3,), (0, 2, 3, 3,)
 
 
 
-# Case AABB
+# Case AABB with bond-lengths
 
 include("NB_4B_AABB_invariants.jl")
 @inline invariants(x::SVector{6},::Val{:AABB}) = NB_4B_AABB.invariants_gen(x)
@@ -264,6 +264,18 @@ include("NB_4B_AABB_invariants.jl")
 @inline invariants_ed(x::SVector{6},::Val{:AABB}) = NB_4B_AABB.invariants_ed_gen(x)
 
 tdegrees(::Val{:AABB}) = (1, 1, 1, 2, 2, 2,), (0, 3,)
+
+# Case AABB with bond-angles
+
+include("NB_4B_AABBba_invariants.jl")
+@inline invariants(x::SVector{6},::Val{:AABBba}) = NB_4B_AABBba.invariants_gen(x)
+@inline invariants_d(x::SVector{6},::Val{:AABBba}) = NB_4B_AABBba.invariants_d_gen(x)
+@inline invariants_ed(x::SVector{6},::Val{:AABBba}) = NB_4B_AABBba.invariants_ed_gen(x)
+
+tdegrees(::Val{:AABBba}) = (1, 1, 1, 2, 2, 2,), (0, 3,)
+
+
+
 
 # Case AABC
 
@@ -273,6 +285,39 @@ include("NB_4B_AABC_invariants.jl")
 @inline invariants_ed(x::SVector{6},::Val{:AABC}) = NB_4B_AABC.invariants_ed_gen(x)
 
 tdegrees(::Val{:AABC}) = (1, 1, 1, 1, 2, 2,), (0, 2,)
+
+# Case AABC with bond-angles, only trivial invariants
+
+# the 1.0 is a "secondary invariant"
+invariants(x::SVector{6, T},::Val{:AABCba}) where {T} =
+      (@SVector T[ x[1], x[2], x[3], x[4], x[5], x[6]]),
+      (@SVector T[ 1.0 ])
+
+
+invariants_d(x::SVector{6, T},::Val{:AABCba}) where {T} =
+      (@SVector [ (@SVector T[1.0, 0.0, 0.0, 0.0, 0.0, 0.0]),
+                  (@SVector T[0.0, 1.0, 0.0, 0.0, 0.0, 0.0]),
+                  (@SVector T[0.0, 0.0, 1.0, 0.0, 0.0, 0.0]),
+                  (@SVector T[0.0, 0.0, 0.0, 1.0, 0.0, 0.0]),
+                  (@SVector T[0.0, 0.0, 0.0, 0.0, 1.0, 0.0]),
+                  (@SVector T[0.0, 0.0, 0.0, 0.0, 0.0, 1.0]),
+                   ]),
+      (@SVector [ (@SVector T[0.0, 0.0, 0.0, 0.0, 0.0, 0.0]) ])
+
+invariants_ed(x::SVector{6, T},::Val{:AABCba}) where {T} =
+      (@SVector T[ x[1], x[2], x[3], x[4], x[5], x[6]]),
+      (@SVector T[ 1.0 ]),
+      (@SVector [ (@SVector T[1.0, 0.0, 0.0, 0.0, 0.0, 0.0]),
+                  (@SVector T[0.0, 1.0, 0.0, 0.0, 0.0, 0.0]),
+                  (@SVector T[0.0, 0.0, 1.0, 0.0, 0.0, 0.0]),
+                  (@SVector T[0.0, 0.0, 0.0, 1.0, 0.0, 0.0]),
+                  (@SVector T[0.0, 0.0, 0.0, 0.0, 1.0, 0.0]),
+                  (@SVector T[0.0, 0.0, 0.0, 0.0, 0.0, 1.0]),
+                   ]),
+      (@SVector [ (@SVector T[0.0, 0.0, 0.0, 0.0, 0.0, 0.0]) ])
+
+tdegrees(::Val{:AABCba}) = (1, 1, 1, 1, 1, 1,), (0,)
+
 
 # Case :ABCD (4 different atoms), only trivial invariants
 

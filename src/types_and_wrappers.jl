@@ -491,7 +491,25 @@ function check_species(desc::MultiDesc, Sp, ::Val{:AABB})
    end
 end
 
+function check_species(desc::MultiDesc, Sp, ::Val{:AABBba})
+   if (length(Sp) == 4)&&(length(unique(Sp)) == 2)
+      if (Sp[1] == Sp[2])&&(Sp[3] == Sp[4])&&(Sp[2] !== Sp[3])
+         return true
+      elseif (Sp[1] == Sp[3])&&(Sp[2] == Sp[4])&&(Sp[1] !== Sp[2])
+         return true
+      elseif (Sp[1] == Sp[4])&&(Sp[2] == Sp[3])&&(Sp[1] !== Sp[2])
+         return true
+      end
+   else
+      return false
+   end
+end
+
 function check_species(desc::MultiDesc, Sp, ::Val{:AABC})
+   return (length(Sp) == 4)&&(length(unique(Sp)) == 3)
+end
+
+function check_species(desc::MultiDesc, Sp, ::Val{:AABCba})
    return (length(Sp) == 4)&&(length(unique(Sp)) == 3)
 end
 

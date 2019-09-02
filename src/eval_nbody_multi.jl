@@ -132,6 +132,28 @@ function skip_simplex_species_order!(desc::MultiDesc,
 end
 
 function skip_simplex_species_order!(desc::MultiDesc,
+                                   Spi,Spj,Species,J,::Val{:AABBba})
+   if Spi == Species[1]
+      # ind = sortperm([Spj[J[k]] for k=1:3])
+      # J[1],J[2],J[3] = J[ind[1]],J[ind[2]],J[ind[3]]
+      # return false
+      if (Spj[J[1]] == Species[2])
+         return false
+      elseif (Spj[J[2]] == Species[2])
+         J = [J[2],J[1],J[3]]
+         # J[2], J[1] = J[1], J[2]
+         return false
+      elseif (Spj[J[3]] == Species[2])
+         J = [J[3], J[2], J[1]]
+         # J[3], J[1] = J[1], J[3]
+         return false
+      end
+   else
+      return true
+   end
+end
+
+function skip_simplex_species_order!(desc::MultiDesc,
                                    Spi,Spj,Species,J,::Val{:AABC})
    if Spi == Species[1]
       ind = sortperm([Spj[J[k]] for k=1:3])
@@ -141,6 +163,18 @@ function skip_simplex_species_order!(desc::MultiDesc,
       return true
    end
 end
+
+function skip_simplex_species_order!(desc::MultiDesc,
+                                   Spi,Spj,Species,J,::Val{:AABCba})
+   if Spi == Species[1]
+      ind = sortperm([Spj[J[k]] for k=1:3])
+      J = [J[ind[1]],J[ind[2]],J[ind[3]]]
+      return false
+   else
+      return true
+   end
+end
+
 
 
 function skip_simplex_species_order!(desc::MultiDesc,
