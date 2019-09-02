@@ -77,12 +77,24 @@ const G_NB_4B_AABB = [
 simplex_permutations(x::SVector{6},::Val{:AABB}) = [x[G_NB_4B_AABB[i]] for i=1:4]
 
 
+const G_NB_4B_AABBba = [
+[ 1, 2, 3, 4, 5, 6 ]
+,[ 1, 3, 2, 5, 4, 6 ]
+,]
+simplex_permutations(x::SVector{6}, ::Val{:AABBba}) = [x[G_NB_4B_AABBba[i]] for i=1:2]
+
+
 
 const G_NB_4B_AABC = [
 [ 1, 2, 3, 4, 5, 6 ]
 ,[ 1, 4, 5, 2, 3, 6 ]
 ,]
 simplex_permutations(x::SVector{6},::Val{:AABC}) = [x[G_NB_4B_AABC[i]] for i=1:2]
+
+const G_4B_AABCba = [
+[ 1, 2, 3, 4, 5, 6 ],
+]
+simplex_permutations(x::SVector{6},::Val{:AABCba}) = [x[G_4B_AABCba[i]] for i=1:length(G_4B_AABCba)]
 
 
 const G_4B_ABCD = [

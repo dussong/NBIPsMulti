@@ -43,7 +43,7 @@ const P6 = Val((P6_1,))
 const IS1 = Val((IS1_1,IS1_2,))
 
 
-function invariants(x1::SVector{6, T}) where {T}
+function invariants_gen(x1::SVector{6, T}) where {T}
    x2 = x1.*x1
    #------------------------------------------------
    # Primaries
@@ -85,7 +85,7 @@ return (@SVector [P1,P2,P3,P4,P5,P6,]), (@SVector [SEC1,SEC2,])
 
 
 
-function invariants_d(x1::SVector{6, T}) where {T}
+function invariants_d_gen(x1::SVector{6, T}) where {T}
    x2 = x1.*x1
 
    dx1 = @SVector ones(6)
@@ -135,7 +135,7 @@ return (dP1,dP2,dP3,dP4,dP5,dP6,), (dSEC1,dSEC2,)
 
 
 
-function invariants_ed(x1::SVector{6, T}) where {T}
+function invariants_ed_gen(x1::SVector{6, T}) where {T}
    x2 = x1.*x1
 
    dx1 = @SVector ones(6)
