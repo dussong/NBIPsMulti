@@ -256,62 +256,6 @@ NBPolyM(D::Dict) = NBPolyM([ tuple(ti...) for ti in D["t"] ],
 
 Base.convert(::Val{:NBPolyM}, D::Dict) = NBPolyM(D)
 
-#
-# # ==================================================================
-# #    StNBPoly
-# # ==================================================================
-#
-# @pot struct StNBPoly{N, TD, TP} <: NBodyFunction{N, TD}
-#    D::TD       # Descriptor
-#    P::TP       # a static polynomial
-#    valN::Val{N}
-# end
-#
-# """
-# `struct StNBPoly`  (N-Body Bond-length Polynomial)
-#
-# fast evaluation of the outer polynomial using `StaticPolynomials`
-# """
-# StNBPoly
-#
-# descriptor(V::StNBPoly) = V.D
-#
-# function StNBPoly(V::NBPoly{N}) where {N}
-#    nI1, nI2 = ninvariants(V.D, N)
-#    nI = nI1 + nI2
-#    nmonomials = length(V.c)
-#    # generate the exponents for the StaticPolynomial
-#    exps = zeros(Int, nI, nmonomials)
-#    for (i, α) in enumerate(V.t)  # i = 1:nmonomials
-#       for (j, a) in enumerate(α[1:end-1])   #  ∏ I1[j]^α[j]
-#          exps[j, i] = a    # I1[j]^α[j]
-#       end
-#       exps[nI1+1+α[end], i] = 1   # I2[α[end]] * (...)
-#    end
-#    # generate the static polynomial
-#    return StNBPoly(V.D, StaticPolynomials.Polynomial(V.c, exps), V.valN)
-# end
-#
-# cutoff(V::StNBPoly) = cutoff(V.D)
-#
-# fast(Vn::StNBPoly)  = Vn
-# fast(Vn::NBPoly) =  StNBPoly(Vn)
-#
-# evaluate_I(V::StNBPoly, II) =
-#       StaticPolynomials.evaluate(V.P, vcat(II...))
-#
-# function evaluate_I_ed(V::StNBPoly, II)
-#    V, dV_dI = StaticPolynomials.evaluate_and_gradient(V.P, vcat(II[1], II[2]))
-#    if length(dV_dI) != length(II[3]) + length(II[4])
-#       @show size.(II)
-#       @show size(dV_dI)
-#       @show size(vcat(II[1], II[2]))
-#    end
-#    return V, dot(vcat(II[3], II[4]), dV_dI)  # (dI' * dV_dI)
-# end
-#
-
-
 
 # ---------------------------------------------------------------------
 #  Construction of basis functions

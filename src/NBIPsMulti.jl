@@ -25,4 +25,6 @@ include("environ_multi.jl")
 
 include("repulsive_core.jl")
 
+include("fast.jl")
+
 end # module
