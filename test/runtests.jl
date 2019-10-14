@@ -13,4 +13,6 @@ using JuLIP, NBodyIPs, Test, StaticArrays
    @testset "4-body-env" begin include("test_4B_env.jl") end
 
    @testset "I/O" begin include("test_io.jl") end
+
+   @testset "Fast" begin include("test_fast.jl") end
 end

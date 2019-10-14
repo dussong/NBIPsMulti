@@ -4,7 +4,7 @@ using Test
 using LinearAlgebra: norm
 using Printf
 using BenchmarkTools
-using Profile, ProfileView
+
 
 using NBodyIPs: tdegrees, invariants, invariants_d, invariants_ed
 
@@ -98,6 +98,8 @@ IPM = NBodyIP(B, c)
 IPMf = fast(IPM)
 
 
+@time E = energy(IPM, at)
+@time Efast = energy(IPMf, at)
 
 @time E = energy(IPM, at)
 @time Efast = energy(IPMf, at)
@@ -107,29 +109,7 @@ IPMf = fast(IPM)
 @time dE = -forces(IPM, at) |> mat
 @time dEfast = -forces(IPMf, at) |> mat
 
-for i in 8:9
-    # 1:length(IPMf.components)
-    @show i
-    @show IPMf.components[i].P
-    forces(IPMf.components[i],at)
-end
+@time dE = -forces(IPM, at) |> mat
+@time dEfast = -forces(IPMf, at) |> mat
 
-
-for i in 1:length(IPMf.components)
-    @show i
-    @show sum(length.(tdegrees(IPMf.components[i].Sp_type)))
-    @show AAA = length(IPMf.components[i].P.variables)
-    @show tdegrees(IPMf.components[i].Sp_type)
-    # AAA.variables
-    # AAA.coefficients
-    # AAA.perm
-
-end
-using StaticPolynomials
-using StaticArrays
-
-
-
-StaticPolynomials.evaluate_and_gradient(IPMf.components[9].P, SVector(1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.))
-
-@test(norm(dE - dEfast, Inf) < 1e-10)
+@test(norm(dE - dEfast, Inf) < 1e-9)
