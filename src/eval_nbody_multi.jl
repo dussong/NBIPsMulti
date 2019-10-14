@@ -27,20 +27,22 @@ using NeighbourLists: nbodies,
 # skip the simplex if not the right species
 function skip_simplex_species!(Spi,Spj,Species,J,tmp)
    tmp[1] = Spi
+   @assert(length(tmp) == length(J)+1)
    for i=1:length(J)
       tmp[i+1] = Spj[J[i]]
    end
-   return sort(tmp[1:length(J)+1]) != sort(Species)
+   return sort(tmp) != Species
 end
 
 # skip the simplex if not the right species
 function skip_simplex_species_many!(Spi,Spj,Species,J,tmp)
    tmp[1] = Spi
+   @assert(length(tmp) == length(J)+1)
    for i=1:length(J)
       tmp[i+1] = Spj[J[i]]
    end
-   tmp[1:length(J)+1] = sort(tmp[1:length(J)+1])
-   return [tmp[1:length(J)+1] == sort(Species[k]) for k=1:length(Species)]
+   sort!(tmp)
+   return [tmp == Species[k] for k=1:length(Species)]
 end
 
 
@@ -274,12 +276,13 @@ end
 
 
 function site_energies(V::NBodyFunctionM{N}, at::Atoms{T},Species::Vector{Int}) where {N, T}
+   Species = sort!(Species)
    Es = zeros(T, length(at))
    Z = atomic_numbers(at)
    for (i, j, r, R) in sites(at, cutoff(V))
       Spi = Z[i]
       Spj = Z[j]
-      tmp = [Spi; Spj]
+      tmp = zeros(Int,N)
       Es[i] = eval_site_nbody!(Val(N), R, cutoff(V),
                                ((out, R, J, temp,Spi,Spj,Species) -> out + evaluate(V, descriptor(V), R, J,Spi,Spj,Species,tmp)), zero(T), nothing, Spi,Spj,Species)
    end
@@ -300,6 +303,7 @@ end
 
 
 function forces(V::NBodyFunctionM{N}, at::Atoms{T},Species::Vector{Int}) where {N, T}
+   Species = sort!(Species)
    nlist = neighbourlist(at, cutoff(V))
    maxneigs = max_neigs(nlist)
    F = zeros(JVec{T}, length(at))
@@ -308,7 +312,7 @@ function forces(V::NBodyFunctionM{N}, at::Atoms{T},Species::Vector{Int}) where {
    for (i, j, r, R) in sites(nlist)
       Spi = Z[i]
       Spj = Z[j]
-      tmp = [Spi; Spj]
+      tmp = zeros(Int,N)
       fill!(dVsite, zero(JVec{T}))
       eval_site_nbody!(Val(N), R, cutoff(V),
                                ((out, R, J, temp,Spi,Spj,Species) ->  evaluate_d!(out, V, descriptor(V), R, J,Spi,Spj,Species,tmp)), dVsite, nothing, Spi,Spj,Species)
@@ -345,11 +349,11 @@ function energy(B::AbstractVector{TB}, at::Atoms{T}
    nlist = neighbourlist(at, rcut)
    E = zeros(T, length(B))
    Z = atomic_numbers(at)
-   Species = [B[i].Sp for i=1:length(B)]
+   Species = [sort(B[i].Sp) for i=1:length(B)]
    for (i, j, r, R) in sites(nlist)
       Spi = Z[i]
       Spj = Z[j]
-      tmp = [Spi; Spj]
+      tmp = zeros(Int,N)
       # evaluate all the site energies at the same time
       # for each simplex, write the nB energies into temp
       # then add them to E, which is just passed through all the
@@ -374,13 +378,13 @@ function forces(B::AbstractVector{TB}, at::Atoms{T}
    # site gradient
    dVsite = [ zeros(JVec{T}, maxneigs)   for n = 1:nB ]
 
-   Species = [B[i].Sp for i=1:length(B)]
+   Species = [sort(B[i].Sp) for i=1:length(B)]
    Z = atomic_numbers(at)
 
    for (i, j, r, R) in sites(nlist)
       Spi = Z[i]
       Spj = Z[j]
-      tmp = [Spi; Spj]
+      tmp = zeros(Int,N)
       # clear dVsite
       for n = 1:nB; fill!(dVsite[n], zero(JVec{T})); end
       # fill dVsite
@@ -408,13 +412,13 @@ function virial(B::AbstractVector{TB}, at::Atoms{T}
    # site gradient
    dVsite = [ zeros(JVec{T}, maxneigs)   for n = 1:nB ]
 
-   Species = [B[i].Sp for i=1:length(B)]
+   Species = [sort(B[i].Sp) for i=1:length(B)]
    Z = atomic_numbers(at)
 
    for (i, j, r, R) in sites(nlist)
       Spi = Z[i]
       Spj = Z[j]
-      tmp = [Spi; Spj]
+      tmp = zeros(Int,N)
       # clear dVsite
       for n = 1:nB; dVsite[n] .*= 0.0; end
       # fill dVsite
