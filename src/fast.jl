@@ -58,12 +58,12 @@ evaluate_I(V::StNBPolyM, II) =
       StaticPolynomials.evaluate(V.P, vcat(II...))
 
 function evaluate_I_ed(V::StNBPolyM, II)
-   V, dV_dI = StaticPolynomials.evaluate_and_gradient(V.P, vcat(II[1], II[2]))
-
+   V1, dV_dI = StaticPolynomials.evaluate_and_gradient(V.P, vcat(II[1], II[2]))
    # if length(dV_dI) != length(II[3]) + length(II[4])
    #    @show size.(II)
    #    @show size(dV_dI)
    #    @show size(vcat(II[1], II[2]))
+   #    @show size(vcat(II[3], II[4]))
    # end
 
    # TODO: check a few variants how to compute dV
@@ -74,5 +74,5 @@ function evaluate_I_ed(V::StNBPolyM, II)
       dV += II34[i] * dV_dI[i]
    end
 
-   return V, dV # sum(i * dV_di for (i, dVdi) in zip( .* dV_dI)  # (dI' * dV_dI)
+   return V1, dV # sum(i * dV_di for (i, dVdi) in zip( .* dV_dI)  # (dI' * dV_dI)
 end

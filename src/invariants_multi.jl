@@ -252,7 +252,7 @@ include("NB_4B_AAAB_BL_invariants.jl")
 @inline invariants_d(x::SVector{6},::Val{:AAAB}) = NB_4B_AAAB_BL.invariants_d_gen(x)
 @inline invariants_ed(x::SVector{6},::Val{:AAAB}) = NB_4B_AAAB_BL.invariants_ed_gen(x)
 
-tdegrees(::Val{:AAAB}) = (1, 1, 2, 2, 3, 3,), (0, 2, 3, 3,)
+tdegrees(::Val{:AAAB}) = (1, 1, 2, 2, 3, 3,), (0, 2, 3, 3, 4, 6,)
 
 
 
