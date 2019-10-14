@@ -4,10 +4,10 @@ function evaluate(V::NBodyFunction{N},
                   desc::NBSiteDescriptor,
                   Rs::AbstractVector{JVec{T}},
                   J,
-                  Spi, Spj, Species) where {N, T}
+                  Spi, Spj, Species, tmp) where {N, T}
                   # ,Spi::Integer,Spj::Vector{Integer},Species::Vector{Integer}
    # check species
-   skip_simplex_species(Spi,Spj,Species,J) && return zero(T)
+   skip_simplex_species!(Spi,Spj,Species,J,tmp) && return zero(T)
    skip_simplex_species_order!(desc,Spi,Spj,Species,J) && return zero(T)
    return evaluate(V,desc,Rs,0,J)
    # get the physical descriptor: bond-lengths (+ bond-angles)
@@ -35,10 +35,10 @@ function evaluate_d!(dVsite,
                      desc::NBSiteDescriptor,
                      Rs::AbstractVector{JVec{T}},
                      J,
-                     Spi, Spj, Species) where {N,T}
+                     Spi, Spj, Species, tmp) where {N,T}
                      # Spi::Integer,Spj::Vector{Integer},Species::Vector{Integer}
    # check species
-   skip_simplex_species(Spi,Spj,Species,J) && return dVsite
+   skip_simplex_species!(Spi,Spj,Species,J,tmp) && return dVsite
    skip_simplex_species_order!(desc,Spi,Spj,Species,J) && return dVsite
    evaluate_d!(dVsite, V, desc, Rs,0,J)
 end
@@ -47,8 +47,8 @@ end
 function evaluate_many!(Es,
                         B::AbstractVector{TB},
                         desc::NBSiteDescriptor,
-                        Rs, J, Spi,Spj,Species)  where {TB <: NBodyFunctionM{N}} where {N}
-   ind = findall(skip_simplex_species_many(Spi,Spj,Species,J))
+                        Rs, J, Spi,Spj,Species,tmp)  where {TB <: NBodyFunctionM{N}} where {N}
+   ind = findall(skip_simplex_species_many!(Spi,Spj,Species,J,tmp))
    # Es[ind] = evaluate_many!(Es[ind],B[ind],desc,Rs,J)
    for i in ind
       if !(skip_simplex_species_order!(desc,Spi,Spj,Species[i],J))
@@ -58,8 +58,8 @@ function evaluate_many!(Es,
    return Es
 end
 
-evaluate_many!(out, B, Rs, J, Spi, Spj, Species) =
-      evaluate_many!(out, B, descriptor(B[1]), Rs, J, Spi, Spj, Species)
+evaluate_many!(out, B, Rs, J, Spi, Spj, Species,tmp) =
+      evaluate_many!(out, B, descriptor(B[1]), Rs, J, Spi, Spj, Species, tmp)
 
 
 
@@ -67,8 +67,8 @@ function evaluate_many_d!(dVsite::AbstractVector,
                           B::AbstractVector{TB},
                           desc::NBSiteDescriptor,
                           Rs,
-                          J, Spi,Spj,Species)  where {TB <: NBodyFunctionM{N}} where {N}
-   ind = findall(skip_simplex_species_many(Spi,Spj,Species,J))
+                          J, Spi,Spj,Species, tmp)  where {TB <: NBodyFunctionM{N}} where {N}
+   ind = findall(skip_simplex_species_many!(Spi,Spj,Species,J,tmp))
    # dVsite[ind] = evaluate_many_d!(dVsite[ind],B[ind],desc,Rs,J)
    for i in ind
       if !(skip_simplex_species_order!(desc,Spi,Spj,Species[i],J))
@@ -78,8 +78,8 @@ function evaluate_many_d!(dVsite::AbstractVector,
    return dVsite
 end
 
-evaluate_many_d!(out, B, Rs, J, Spi, Spj, Species) =
-      evaluate_many_d!(out, B, descriptor(B[1]), Rs, J, Spi,Spj,Species)
+evaluate_many_d!(out, B, Rs, J, Spi, Spj, Species, tmp) =
+      evaluate_many_d!(out, B, descriptor(B[1]), Rs, J, Spi,Spj,Species, tmp)
 
 
 include("descriptors_multi_3B_4B.jl")

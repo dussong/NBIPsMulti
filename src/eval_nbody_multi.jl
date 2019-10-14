@@ -25,21 +25,22 @@ using NeighbourLists: nbodies,
 
 
 # skip the simplex if not the right species
-function skip_simplex_species(Spi,Spj,Species,J)
-   Sp = [Spi]
+function skip_simplex_species!(Spi,Spj,Species,J,tmp)
+   tmp[1] = Spi
    for i=1:length(J)
-      push!(Sp,Spj[J[i]])
+      tmp[i+1] = Spj[J[i]]
    end
-   return sort(Sp) != sort(Species)
+   return sort(tmp[1:length(J)+1]) != sort(Species)
 end
 
 # skip the simplex if not the right species
-function skip_simplex_species_many(Spi,Spj,Species,J)
-   Sp = [Spi]
+function skip_simplex_species_many!(Spi,Spj,Species,J,tmp)
+   tmp[1] = Spi
    for i=1:length(J)
-      push!(Sp,Spj[J[i]])
+      tmp[i+1] = Spj[J[i]]
    end
-   return [sort(Sp) == sort(Species[k]) for k=1:length(Species)]
+   tmp[1:length(J)+1] = sort(tmp[1:length(J)+1])
+   return [tmp[1:length(J)+1] == sort(Species[k]) for k=1:length(Species)]
 end
 
 
@@ -278,8 +279,9 @@ function site_energies(V::NBodyFunctionM{N}, at::Atoms{T},Species::Vector{Int}) 
    for (i, j, r, R) in sites(at, cutoff(V))
       Spi = Z[i]
       Spj = Z[j]
+      tmp = [Spi; Spj]
       Es[i] = eval_site_nbody!(Val(N), R, cutoff(V),
-                               ((out, R, J, temp,Spi,Spj,Species) -> out + evaluate(V, descriptor(V), R, J,Spi,Spj,Species)), zero(T), nothing, Spi,Spj,Species)
+                               ((out, R, J, temp,Spi,Spj,Species) -> out + evaluate(V, descriptor(V), R, J,Spi,Spj,Species,tmp)), zero(T), nothing, Spi,Spj,Species)
    end
    return Es
 end
@@ -306,9 +308,10 @@ function forces(V::NBodyFunctionM{N}, at::Atoms{T},Species::Vector{Int}) where {
    for (i, j, r, R) in sites(nlist)
       Spi = Z[i]
       Spj = Z[j]
+      tmp = [Spi; Spj]
       fill!(dVsite, zero(JVec{T}))
       eval_site_nbody!(Val(N), R, cutoff(V),
-                               ((out, R, J, temp,Spi,Spj,Species) ->  evaluate_d!(out, V, descriptor(V), R, J,Spi,Spj,Species)), dVsite, nothing, Spi,Spj,Species)
+                               ((out, R, J, temp,Spi,Spj,Species) ->  evaluate_d!(out, V, descriptor(V), R, J,Spi,Spj,Species,tmp)), dVsite, nothing, Spi,Spj,Species)
       # write site energy gradient into forces
       for n = 1:length(j)
          F[j[n]] -= dVsite[n]
@@ -346,12 +349,13 @@ function energy(B::AbstractVector{TB}, at::Atoms{T}
    for (i, j, r, R) in sites(nlist)
       Spi = Z[i]
       Spj = Z[j]
+      tmp = [Spi; Spj]
       # evaluate all the site energies at the same time
       # for each simplex, write the nB energies into temp
       # then add them to E, which is just passed through all the
       # various loops, so no need to update it here again
       eval_site_nbody!(Val(N), R, rcut,
-                       (out, R, J, temp,Spi,Spj,Species) -> evaluate_many!(out, B, R, J, Spi, Spj,Species),
+                       (out, R, J, temp,Spi,Spj,Species) -> evaluate_many!(out, B, R, J, Spi, Spj,Species, tmp),
                        E, nothing, Spi,Spj,Species)
    end
    return E
@@ -376,11 +380,12 @@ function forces(B::AbstractVector{TB}, at::Atoms{T}
    for (i, j, r, R) in sites(nlist)
       Spi = Z[i]
       Spj = Z[j]
+      tmp = [Spi; Spj]
       # clear dVsite
       for n = 1:nB; fill!(dVsite[n], zero(JVec{T})); end
       # fill dVsite
       eval_site_nbody!(Val(N), R, rcut,
-                       (out, R, J, temp, Spi, Spj, Species) -> evaluate_many_d!(out, B, R, J, Spi, Spj, Species),
+                       (out, R, J, temp, Spi, Spj, Species) -> evaluate_many_d!(out, B, R, J, Spi, Spj, Species, tmp),
                        dVsite, nothing, Spi,Spj,Species)
       # write it into the force vectors
       for ib = 1:nB, n = 1:length(j)
@@ -409,11 +414,12 @@ function virial(B::AbstractVector{TB}, at::Atoms{T}
    for (i, j, r, R) in sites(nlist)
       Spi = Z[i]
       Spj = Z[j]
+      tmp = [Spi; Spj]
       # clear dVsite
       for n = 1:nB; dVsite[n] .*= 0.0; end
       # fill dVsite
       eval_site_nbody!(Val(N), R, rcut,
-                       (out, R, J, temp, Spi, Spj, Species) -> evaluate_many_d!(out, B, R, J, Spi, Spj, Species),
+                       (out, R, J, temp, Spi, Spj, Species) -> evaluate_many_d!(out, B, R, J, Spi, Spj, Species, tmp),
                        dVsite, nothing,Spi,Spj,Species)
       # update the virials
       for iB = 1:nB
