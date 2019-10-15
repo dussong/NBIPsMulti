@@ -61,8 +61,8 @@ function site_ns(V::EnvIPM, at)
    for (i, j, r, R) in pairs(at,cutoff(Vn(V)))
       zi = at.Z[i]
       zj = at.Z[j]
-      
-      # Must be within weighted cutoff 
+
+      # Must be within weighted cutoff
       if r < ( cutoff(Vn(V)) / w[(zi,zj)] )
           E[i] += 0.5 * evaluate(Vn(V),r * w[(zi,zj)])
       end
@@ -84,7 +84,7 @@ function site_ns_ed(V::EnvIPM, at)
          zi = at.Z[i]
          zj = at.Z[j]
 
-      # Must be within weighted cutoff 
+      # Must be within weighted cutoff
       if r < ( cutoff(Vn(V)) / w[(zi,zj)] )
           E[i] += 0.5 * evaluate(Vn(V),r * w[(zi,zj)])
       end
@@ -137,10 +137,11 @@ function forces(V::EnvIPM{N}, at::Atoms{T},Species::Vector{Int}) where {N, T}
    for (i, j, r, R) in sites(nlist)
       Spi = Z[i]
       Spj = Z[j]
+      tmp = zeros(Int,N)
       # compute the site energy gradients
       fill!(dVsite, zero(JVec{T}))
       eval_site_nbody!(Val(N), R, cutoff(V),
-                               ((out, R, J, temp,Spi,Spj,Species) ->  evaluate_d!(out, Vr(V), descriptor(V), R, J,Spi,Spj,Species)), dVsite, nothing, Spi,Spj,Species)
+                               ((out, R, J, temp,Spi,Spj,Species) ->  evaluate_d!(out, Vr(V), descriptor(V), R, J,Spi,Spj,Species,tmp)), dVsite, nothing, Spi,Spj,Species)
                                # dVsite == out, nothing == temp
       # compute the neighbour count gradients
       site_n_d!(dVn, V, r, R, Ns[i], dNs[i], Spi, Spj)
@@ -221,13 +222,14 @@ function energy(B::Vector{TB}, at::Atoms{T}
    for (i, j, r, R) in sites(nlist)
       Spi = Z[i]
       Spj = Z[j]
+      tmp = zeros(Int,N)
       # evaluate all the site energies at the same time
       # for each simples, write the nB energies into temp
       # then add them to E, which is just passed through all the
       # various loops, so no need to update it here again
       fill!(Etemp, zero(T))
       eval_site_nbody!(Val(N), R, rcut,
-                       (out, R, J, temp,Spi,Spj,Species) -> evaluate_many!(out, Br, R, J, Spi, Spj,Species),
+                       (out, R, J, temp,Spi,Spj,Species) -> evaluate_many!(out, Br, R, J, Spi, Spj,Species,tmp),
                        Etemp, nothing, Spi,Spj,Species)
       # eval_site_nbody!(Val(N), i, j, R, rcut, false,
       #                  (out, R, ii, J, temp) -> evaluate_many!(out, Br, R, ii, J),
@@ -275,15 +277,16 @@ function forces(B::AbstractVector{TB}, at::Atoms{T}
    for (i, j, r, R) in sites(nlist)
       Spi = Z[i]
       Spj = Z[j]
+      tmp = zeros(Int,N)
       # clear dVsite and Etemp
       for n = 1:nB; fill!(dVsite[n], zero(JVec{T})); end
       fill!(Etemp, zero(T))
       # fill site energy and dVsite
       eval_site_nbody!(Val(N), R, rcut,
-                      (out, R, J, temp,Spi,Spj,Species) -> evaluate_many!(out, Br, R, J, Spi, Spj,Species),
+                      (out, R, J, temp,Spi,Spj,Species) -> evaluate_many!(out, Br, R, J, Spi, Spj,Species,tmp),
                       Etemp, nothing, Spi,Spj,Species)
       eval_site_nbody!(Val(N), R, rcut,
-                      (out, R, J, temp, Spi, Spj, Species) -> evaluate_many_d!(out, Br, R, J, Spi, Spj, Species),
+                      (out, R, J, temp, Spi, Spj, Species) -> evaluate_many_d!(out, Br, R, J, Spi, Spj, Species,tmp),
                       dVsite, nothing, Spi,Spj,Species)
 
       # write it into the force vectors

@@ -3,7 +3,6 @@ using JuLIP, NBodyIPs, NBIPsMulti, StaticArrays
 using Test
 using LinearAlgebra: norm
 using Printf
-using BenchmarkTools
 
 
 using NBodyIPs: tdegrees, invariants, invariants_d, invariants_ed
@@ -98,18 +97,19 @@ IPM = NBodyIP(B, c)
 IPMf = fast(IPM)
 
 
-@time E = energy(IPM, at)
-@time Efast = energy(IPMf, at)
+# @time E = energy(IPM, at)
+# @time Efast = energy(IPMf, at)
 
-@time E = energy(IPM, at)
-@time Efast = energy(IPMf, at)
+E = energy(IPM, at)
+Efast = energy(IPMf, at)
+Efast = energy(IPMf, at)
 
-@test(abs.(Efast-E) < 1e-10)
+@test(abs.(Efast-E) < 1e-8)
 
-@time dE = -forces(IPM, at) |> mat
-@time dEfast = -forces(IPMf, at) |> mat
+# @time dE = -forces(IPM, at) |> mat
+# @time dEfast = -forces(IPMf, at) |> mat
 
-@time dE = -forces(IPM, at) |> mat
-@time dEfast = -forces(IPMf, at) |> mat
+dE = -forces(IPM, at) |> mat
+dEfast = -forces(IPMf, at) |> mat
 
-@test(norm(dE - dEfast, Inf) < 1e-9)
+@test(norm(dE - dEfast, Inf) < 1e-8)

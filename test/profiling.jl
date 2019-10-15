@@ -1,4 +1,4 @@
-# using Profile, ProfileView
+using Profile, ProfileView
 using NBodyIPs, NBIPsMulti
 # using NBodyIPs: tdegrees
 using JuLIP
@@ -124,7 +124,7 @@ IPf = fast(IPM)
 #
 Profile.clear()
 Profile.init(delay = 1e-8)
-@profile E = energy(IPM,at)
+@profile E = forces(IPM,at)
 # @code_warntype energy(IPM,at)
 # @
 # # @profile dEfast = -forces(IPM, at) |> mat
