@@ -40,68 +40,78 @@ cutoff = "(:cos, $(rcut-1.5), $(rcut))"
 
 # 2B
 D2 = MultiDesc(transform,cutoff,Val(:AA))
-B2 = nbpolys(D2, 5, [29,30])
+B2 = nbpolys(D2, 5, [29,29])
 
 # # 3B
-D3AAA = MultiDesc(transform,
-    cutoff,Val(:AAA))
-D3AAB = MultiDesc(transform,
-    cutoff,Val(:AAB))
-D3ABC = MultiDesc(transform,
-    cutoff,Val(:ABC))
-B3AAA = nbpolys(D3AAA, 5, [29,29,29])
-B3AAB = nbpolys(D3AAB, 5, [29,29,30])
-B3ABC = nbpolys(D3ABC, 5, [29,30,31])
-
-D3AAAba = MultiDesc(transform,
-    cutoff,Val(:AAAba))
-D3AABba = MultiDesc(transform,
-    cutoff,Val(:AABba))
-D3ABCba = MultiDesc(transform,
-    cutoff,Val(:ABCba))
-B3AAAba = nbpolys(D3AAAba, 5, [29,29,29])
-B3AABba = nbpolys(D3AABba, 5, [29,29,30])
-B3ABCba = nbpolys(D3ABCba, 5, [29,30,31])
-
-
-# # 4B
-D4AAAA = MultiDesc(transform,
-    cutoff,Val(:AAAA))
-D4AAAB = MultiDesc(transform,
-    cutoff,Val(:AAAB))
-D4AABB = MultiDesc(transform,
-    cutoff,Val(:AABB))
-D4AABC = MultiDesc(transform,
-    cutoff,Val(:AABC))
-D4ABCD = MultiDesc(transform,
-    cutoff,Val(:ABCD))
-B4AAAA = nbpolys(D4AAAA, 5, [29,29,29,29])
-B4AAAB = nbpolys(D4AAAB, 5, [29,29,29,30])
-B4AABB = nbpolys(D4AABB, 5, [29,29,30,30])
-B4AABC = nbpolys(D4AABC, 5, [29,29,30,31])
-B4ABCD = nbpolys(D4ABCD, 5, [29,30,31,32])
-
-
-D4AAAAba = MultiDesc(transform,
-    cutoff,Val(:AAAAba))
-D4AAABba = MultiDesc(transform,
-    cutoff,Val(:AAABba))
-D4ABCDba = MultiDesc(transform,
-    cutoff,Val(:ABCDba))
-B4AAAAba = nbpolys(D4AAAAba, 5, [29,29,29,29])
-B4AAABba = nbpolys(D4AAABba, 5, [29,29,29,30])
-B4ABCDba = nbpolys(D4ABCDba, 5, [29,30,31,32])
+# D3AAA = MultiDesc(transform,
+#     cutoff,Val(:AAA))
+# D3AAB = MultiDesc(transform,
+#     cutoff,Val(:AAB))
+# D3ABC = MultiDesc(transform,
+#     cutoff,Val(:ABC))
+# B3AAA = nbpolys(D3AAA, 5, [29,29,29])
+# B3AAB = nbpolys(D3AAB, 5, [29,29,30])
+# B3ABC = nbpolys(D3ABC, 5, [29,30,31])
+#
+# D3AAAba = MultiDesc(transform,
+#     cutoff,Val(:AAAba))
+# D3AABba = MultiDesc(transform,
+#     cutoff,Val(:AABba))
+# D3ABCba = MultiDesc(transform,
+#     cutoff,Val(:ABCba))
+# B3AAAba = nbpolys(D3AAAba, 5, [29,29,29])
+# B3AABba = nbpolys(D3AABba, 5, [29,29,30])
+# B3ABCba = nbpolys(D3ABCba, 5, [29,30,31])
+#
+#
+# # # 4B
+# D4AAAA = MultiDesc(transform,
+#     cutoff,Val(:AAAA))
+# D4AAAB = MultiDesc(transform,
+#     cutoff,Val(:AAAB))
+# D4AABB = MultiDesc(transform,
+#     cutoff,Val(:AABB))
+# D4AABC = MultiDesc(transform,
+#     cutoff,Val(:AABC))
+# D4ABCD = MultiDesc(transform,
+#     cutoff,Val(:ABCD))
+# B4AAAA = nbpolys(D4AAAA, 5, [29,29,29,29])
+# B4AAAB = nbpolys(D4AAAB, 5, [29,29,29,30])
+# B4AABB = nbpolys(D4AABB, 5, [29,29,30,30])
+# B4AABC = nbpolys(D4AABC, 5, [29,29,30,31])
+# B4ABCD = nbpolys(D4ABCD, 5, [29,30,31,32])
+#
+#
+# D4AAAAba = MultiDesc(transform,
+#     cutoff,Val(:AAAAba))
+# D4AAABba = MultiDesc(transform,
+#     cutoff,Val(:AAABba))
+# D4ABCDba = MultiDesc(transform,
+#     cutoff,Val(:ABCDba))
+# B4AAAAba = nbpolys(D4AAAAba, 5, [29,29,29,29])
+# B4AAABba = nbpolys(D4AAABba, 5, [29,29,29,30])
+# B4ABCDba = nbpolys(D4ABCDba, 5, [29,30,31,32])
 
 
 B = [B2;
-     B3AAA;
-     B3AAB; B3ABC; B3AAAba; B3AABba; B3ABCba;
-     B4AAAA;
-     B4AAAB; B4AABB; B4AABC; B4ABCD;
-     B4AAAAba; B4AAABba; B4ABCDba
+     # B3AAA;
+     # B3AAB; B3ABC; B3AAAba; B3AABba; B3ABCba;
+     # B4AAAA;
+     # B4AAAB; B4AABB; B4AABC; B4ABCD;
+     # B4AAAAba; B4AAABba; B4ABCDba
      ]
 c = rand(length(B))
 IPM = NBodyIP(B, c)
+
+at = rattle!(bulk(:Cu, cubic=true) * 2, 0.01)
+function testip(IP,at)
+    for i in 1:100
+        E = energy(IP, at)
+    end
+end
+
+@time testip(IPM,at)
+@time testip(fast(IPM),at)
 
 @time energy(IPM,at)
 @time energy(IPM,at)
@@ -109,6 +119,15 @@ IPM = NBodyIP(B, c)
 IPf = fast(IPM)
 @time energy(IPf,at)
 @time energy(IPf,at)
+
+22
+
+function test_e(IP)
+    return energy(IP,at)
+end
+
+@time test_e(IPM)
+@time test_e(IPf)
 
 22
 
@@ -122,14 +141,22 @@ IPf = fast(IPM)
 #
 # @time skip_simplex_species(3,[4,5],[3,4],SVector(1,2))
 #
-Profile.clear()
-Profile.init(delay = 1e-8)
-@profile E = forces(IPM,at)
+# @code_warntype forces(IPM,at)
+# @code_warntype forces(IPf,at)
 # @code_warntype energy(IPM,at)
-# @
-# # @profile dEfast = -forces(IPM, at) |> mat
-ProfileView.view()
+# @code_warntype energy(IPf,at)
+
+# Profile.clear()
+# Profile.init(delay = 1e-4)
+# @profile E = forces(IPM,at)
+# # @code_warntype forces(IPM,at)
+# # @code_warntype energy(IPM,at)
+# # @
+# # # @profile dEfast = -forces(IPM, at) |> mat
+# ProfileView.view()
 #
+# Profile.print()
+# #
 # a = [1]
 #
 # push!(a,2)

@@ -31,7 +31,8 @@ function skip_simplex_species!(Spi,Spj,Species,J,tmp)
    for i=1:length(J)
       tmp[i+1] = Spj[J[i]]
    end
-   return sort(tmp) != Species
+   sort!(tmp, alg=InsertionSort)
+   return tmp != Species
 end
 
 # skip the simplex if not the right species
@@ -276,13 +277,14 @@ end
 
 
 function site_energies(V::NBodyFunctionM{N}, at::Atoms{T},Species::Vector{Int}) where {N, T}
-   Species = sort!(Species)
+   sort!(Species)
    Es = zeros(T, length(at))
    Z = atomic_numbers(at)
+   tmp = zeros(Int,N)
+   Spi = 0
    for (i, j, r, R) in sites(at, cutoff(V))
       Spi = Z[i]
       Spj = Z[j]
-      tmp = zeros(Int,N)
       Es[i] = eval_site_nbody!(Val(N), R, cutoff(V),
                                ((out, R, J, temp,Spi,Spj,Species) -> out + evaluate(V, descriptor(V), R, J,Spi,Spj,Species,tmp)), zero(T), nothing, Spi,Spj,Species)
    end
@@ -303,16 +305,17 @@ end
 
 
 function forces(V::NBodyFunctionM{N}, at::Atoms{T},Species::Vector{Int}) where {N, T}
-   Species = sort!(Species)
+   sort!(Species)
    nlist = neighbourlist(at, cutoff(V))
    maxneigs = max_neigs(nlist)
    F = zeros(JVec{T}, length(at))
    dVsite = zeros(JVec{T}, maxneigs)
    Z = atomic_numbers(at)
+   tmp = zeros(Int,N)
+   Spi = 0
    for (i, j, r, R) in sites(nlist)
       Spi = Z[i]
       Spj = Z[j]
-      tmp = zeros(Int,N)
       fill!(dVsite, zero(JVec{T}))
       eval_site_nbody!(Val(N), R, cutoff(V),
                                ((out, R, J, temp,Spi,Spj,Species) ->  evaluate_d!(out, V, descriptor(V), R, J,Spi,Spj,Species,tmp)), dVsite, nothing, Spi,Spj,Species)
@@ -350,10 +353,10 @@ function energy(B::AbstractVector{TB}, at::Atoms{T}
    E = zeros(T, length(B))
    Z = atomic_numbers(at)
    Species = [sort(B[i].Sp) for i=1:length(B)]
+   tmp = zeros(Int,N)
    for (i, j, r, R) in sites(nlist)
       Spi = Z[i]
       Spj = Z[j]
-      tmp = zeros(Int,N)
       # evaluate all the site energies at the same time
       # for each simplex, write the nB energies into temp
       # then add them to E, which is just passed through all the
@@ -380,11 +383,11 @@ function forces(B::AbstractVector{TB}, at::Atoms{T}
 
    Species = [sort(B[i].Sp) for i=1:length(B)]
    Z = atomic_numbers(at)
+   tmp = zeros(Int,N)
 
    for (i, j, r, R) in sites(nlist)
       Spi = Z[i]
       Spj = Z[j]
-      tmp = zeros(Int,N)
       # clear dVsite
       for n = 1:nB; fill!(dVsite[n], zero(JVec{T})); end
       # fill dVsite
@@ -414,11 +417,11 @@ function virial(B::AbstractVector{TB}, at::Atoms{T}
 
    Species = [sort(B[i].Sp) for i=1:length(B)]
    Z = atomic_numbers(at)
+   tmp = zeros(Int,N)
 
    for (i, j, r, R) in sites(nlist)
       Spi = Z[i]
       Spj = Z[j]
-      tmp = zeros(Int,N)
       # clear dVsite
       for n = 1:nB; dVsite[n] .*= 0.0; end
       # fill dVsite
