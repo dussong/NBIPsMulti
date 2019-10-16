@@ -3,6 +3,7 @@ using JuLIP: AbstractCalculator
 using JuLIP.Potentials: @pot
 using StaticArrays
 using KahanSummation
+using StaticArrays
 
 using NBodyIPs: NBodyFunction, bapolys, eval_site_nbody!, evaluate, eval_site_nbody!, evaluate_d!, NBSiteDescriptor, _get_loop_ex, _get_Jvec_ex, descriptor, ricoords, skip_simplex, fcut, invariants, evaluate_I, fcut_d, invariants_ed, evaluate_I_ed, gradri2gradR!, evaluate_many!
 
@@ -282,9 +283,14 @@ function site_energies(V::NBodyFunctionM{N}, at::Atoms{T},Species::Vector{Int}) 
    Z = atomic_numbers(at)
    tmp = zeros(Int,N)
    Spi = 0
+   nlist = neighbourlist(at, cutoff(V))
+   maxneigs = max_neigs(nlist)
+   Spj = zeros(Int,maxneigs)
    for (i, j, r, R) in sites(at, cutoff(V))
       Spi = Z[i]
-      Spj = Z[j]
+      for n=1:length(j)
+         Spj[n] = Z[j[n]]
+      end
       Es[i] = eval_site_nbody!(Val(N), R, cutoff(V),
                                ((out, R, J, temp,Spi,Spj,Species) -> out + evaluate(V, descriptor(V), R, J,Spi,Spj,Species,tmp)), zero(T), nothing, Spi,Spj,Species)
    end
@@ -313,9 +319,12 @@ function forces(V::NBodyFunctionM{N}, at::Atoms{T},Species::Vector{Int}) where {
    Z = atomic_numbers(at)
    tmp = zeros(Int,N)
    Spi = 0
+   Spj = zeros(Int,maxneigs)
    for (i, j, r, R) in sites(nlist)
       Spi = Z[i]
-      Spj = Z[j]
+      for n = 1:length(j)
+         Spj[n] = Z[j[n]]
+      end
       fill!(dVsite, zero(JVec{T}))
       eval_site_nbody!(Val(N), R, cutoff(V),
                                ((out, R, J, temp,Spi,Spj,Species) ->  evaluate_d!(out, V, descriptor(V), R, J,Spi,Spj,Species,tmp)), dVsite, nothing, Spi,Spj,Species)
