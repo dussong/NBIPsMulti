@@ -3,7 +3,6 @@ using JuLIP: AbstractCalculator
 using JuLIP.Potentials: @pot
 using StaticArrays
 using KahanSummation
-using StaticArrays
 
 using NBodyIPs: NBodyFunction, bapolys, eval_site_nbody!, evaluate, eval_site_nbody!, evaluate_d!, NBSiteDescriptor, _get_loop_ex, _get_Jvec_ex, descriptor, ricoords, skip_simplex, fcut, invariants, evaluate_I, fcut_d, invariants_ed, evaluate_I_ed, gradri2gradR!, evaluate_many!
 
