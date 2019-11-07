@@ -275,23 +275,26 @@ skip_simplex_species_order!(desc::MultiDesc,
 end
 
 
-
-function site_energies(V::NBodyFunctionM{N}, at::Atoms{T},Species::Vector{Int}) where {N, T}
+function site_energies(V::NBodyFunctionM{N},at::Atoms{T}, Species::Vector{Int},
+   nlist = neighbourlist(at, cutoff(V))) where {N, T}
    sort!(Species)
    Es = zeros(T, length(at))
    Z = atomic_numbers(at)
    tmp = zeros(Int,N)
    Spi = 0
-   nlist = neighbourlist(at, cutoff(V))
    maxneigs = max_neigs(nlist)
    Spj = zeros(Int,maxneigs)
    for (i, j, r, R) in sites(at, cutoff(V))
       Spi = Z[i]
-      for n=1:length(j)
-         Spj[n] = Z[j[n]]
-      end
-      Es[i] = eval_site_nbody!(Val(N), R, cutoff(V),
-                               ((out, R, J, temp,Spi,Spj,Species) -> out + evaluate(V, descriptor(V), R, J,Spi,Spj,Species,tmp)), zero(T), nothing, Spi,Spj,Species)
+      # if (Spi in Species)
+         for n=1:length(j)
+            Spj[n] = Z[j[n]]
+         end
+         Es[i] = eval_site_nbody!(Val(N), R, cutoff(V),
+                                  ((out, R, J, temp,Spi,Spj,Species) -> out + evaluate(V, descriptor(V), R, J,Spi,Spj,Species,tmp)), zero(T), nothing, Spi,Spj,Species)
+      # else
+      #    Es[i] = 0.
+      # end
    end
    return Es
 end
