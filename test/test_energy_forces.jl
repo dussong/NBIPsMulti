@@ -20,9 +20,9 @@ BL2 = MultiDesc("exp( - 2 * (r/$r0-1))",
                     "(:cos, $(r0-1.5), $(r0))",Val(:AA),Val(2))
 
 basis = [
-     nbpolys(BL2, 14, [29,29], Val(:AA));
-     nbpolys(BL2, 14, [29,30], Val(:AA));
-     nbpolys(BL2, 14, [30,30], Val(:AA));
+     nbpolys(BL2, 4, [29,29], Val(:AA));
+     nbpolys(BL2, 4, [29,30], Val(:AA));
+     nbpolys(BL2, 4, [30,30], Val(:AA));
   ]
 
 basis[1].Sp

@@ -30,7 +30,7 @@ for i in 1:2
    BL3 = MultiDesc("exp( - 2 * (r/$r0-1))",
                     "(:cos, $(r0-1.5), $(r0))",valSp[i])
 
-   basis = [ nbpolys(BL3, 5, Sp[i]); ]
+   basis = [ nbpolys(BL3, 4, Sp[i]); ]
 
    basis[1].Sp
    energy(basis[1],at,basis[1].Sp)
