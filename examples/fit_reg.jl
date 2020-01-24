@@ -10,7 +10,6 @@ E0 = Butane.get_E0()
 @info("Load database...")
 dbpath = homedir() * "/.julia/dev/NBIPsMulti/data/Butane_4B_env3"
 
-
 db = LsqDB(dbpath)
 db
 # summary(db)

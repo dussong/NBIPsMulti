@@ -1,9 +1,0 @@
-julia 0.7
-Reexport
-NBodyIPs
-ForwardDiff
-Combinatorics
-StaticArrays
-JuLIP
-NeighbourLists
-KahanSummation

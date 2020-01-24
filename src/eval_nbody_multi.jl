@@ -275,13 +275,14 @@ skip_simplex_species_order!(desc::MultiDesc,
 end
 
 
-function site_energies(V::NBodyFunctionM{N},at::Atoms{T}, Species::Vector{Int},
-   nlist = neighbourlist(at, cutoff(V))) where {N, T}
+function site_energies(V::NBodyFunctionM{N},at::Atoms{T}, Species::Vector{Int}) where {N, T}
+   # ,nlist = neighbourlist(at, cutoff(V))
    sort!(Species)
    Es = zeros(T, length(at))
    Z = atomic_numbers(at)
    tmp = zeros(Int,N)
    Spi = 0
+   nlist = neighbourlist(at, cutoff(V))
    maxneigs = max_neigs(nlist)
    Spj = zeros(Int,maxneigs)
    for (i, j, r, R) in sites(at, cutoff(V))
@@ -300,6 +301,7 @@ function site_energies(V::NBodyFunctionM{N},at::Atoms{T}, Species::Vector{Int},
 end
 
 energy(V::NBodyFunctionM, at::Atoms, Species::Vector{Int}) = sum_kbn(site_energies(V, at, Species))
+# ,nlist = neighbourlist(at, cutoff(V))
 
 
 function energy(V::NBodyFunctionM, at::Atoms)

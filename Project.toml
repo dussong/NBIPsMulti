@@ -1,0 +1,26 @@
+name = "NBIPsMulti"
+uuid = "c89b3e43-2816-5ab2-9493-d1cd4c9807f6"
+authors = ["Genevieve <g.dusson@warwick.ac.uk>"]
+version = "0.1.0"
+
+[deps]
+ASE = "51974c44-a7ed-5088-b8be-3e78c8ba416c"
+Combinatorics = "861a8166-3701-5b0c-9a16-15d98fcdc6aa"
+ForwardDiff = "f6369f11-7733-5829-9624-2563aa707210"
+IPFitting = "3002bd4c-79e4-52ce-b924-91256dde4e52"
+JuLIP = "945c410c-986d-556a-acb1-167a618e0462"
+KahanSummation = "8e2b3108-d4c1-50be-a7a2-16352aec75c3"
+LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
+NBodyIPs = "091ff95d-640b-5850-a1f5-612e1cfea893"
+NeighbourLists = "2fcf5ba9-9ed4-57cf-b73f-ff513e316b9c"
+Printf = "de0858da-6303-5e67-8744-51eddeeeb8d7"
+Reexport = "189a3867-3050-52da-a836-e630ba90ab69"
+StaticArrays = "90137ffa-7385-5640-81b9-e52037218182"
+StaticPolynomials = "62e018b1-6e46-5407-a5a7-97d4fbcae734"
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[compat]
+IPFitting = "0.0.6"
+JuLIP = "0.7.3"
+NeighbourLists = "0.4.1"
+julia = "1"
