@@ -1,13 +1,28 @@
 # NBIPsMulti
 
-##Description
+## Description
 
-This package extends the packages `cortner/NBodyIPs` and `cortner/IPFitting` to multicomponent systems. 
+This Julia package extends the packages `cortner/NBodyIPs` and `cortner/IPFitting` to multicomponent systems. It generate Interatomic Potentials based on symmetry-adapted polynomials.
 
+Disclaimer: this is a *prototype* code.
 
-##Example files
+## Installation notes
 
-Several examples are provided in the example folder, covering the different steps described below.
+To install the package, first clone the repository:
+```
+] add https://github.com/dussong/NBIPsMulti.git
+```
+You may need to install additional packages.
+
+To run the examples provided in the example folder, you need to activate the environment relative to the package. For this, go in the directory of the package and run
+```
+] activate .
+```
+Alternatively, you can run
+```
+] activate dir/NBodyIPsMulti
+```
+where `dir` is the directory where the package is cloned.
 
 
 ## Basic Usage
@@ -91,6 +106,9 @@ particular mention `fast`)
 
 
 ### More comments
+
+- talk about the regularisation
+- repulsive core.
 
 there are two functions `filter_basis` and `filter_configs` that can be
 used to choose a subset of the data and a subset of the basis. For example,
