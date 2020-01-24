@@ -52,44 +52,26 @@ BL3_AAA = MultiDesc("exp( - 2.5 * (r/$r0-1))", "(:cos2s, $(0.7*r0), $(0.88*r0), 
 The species type `:AAA` means that the three particles are the same. The possible species types are
 * `:AA` (two-body)
 * `:AAA, :AAB, :ABC` (three-body)
-* `:AAAA, :AAAB, :AABC, :AABB, ABCD` (four-body)
-We can then generate basis functions using `nbpolys`, e.g.,
+* `:AAAA, :AAAB, :AABC, :AABB, :ABCD` (four-body)
+We can then generate basis functions using `nbpolys`, providing the descriptor, polynomial degree and atomic number of the species involved (they have to match the descriptor species type), e.g.,
 ```julia
 #            descriptor, degree, atomic number of the species
 B3 = nbpolys(BL3_AAA, 14, [6,6,6])
 ```
 In practice, one would normally specify different cut-offs and space transforms
 for different body-orders. Suppose these give descriptors `D2, D3aaa, D3aab`, with species types `:AA`, `:AAA` and `:AAB` then
-a 4-body basis can be constructed providing the descriptor, polynomial degree and atomic number of the species involved (they have to match the descriptor species type)
+a 4-body basis can be constructed with
 ```julia
 B = [ nbpolys(D2, 14, [1,1]); nbpolys(D3aaa, 7, [1,1,1]); nbpolys(D3, 8, [1,1,6]) ]
 ```
 
-For more details and more complex basis sets, see below.
-
-
 ### Step 3: Precompute a Lsq system
 
-Once the dft dataset and the basis functions have been specified, the
-least-squares system matrix can be assembled. This can be very time-consuming
-for high body-orders, large basis sets and large data sets. Therefore this
-matrix is stored in a block format that allows us to later re-use it in a variety
-of different ways. This is done via
+As in `IPFitting.jl` the assembly of the least-square system is done via
 ```julia
 db = LsqDB(fname, configs, basis)
 ```
-* The db is stored in two files: `fname_info.jld2` and `fname_kron.h5`. In
-particular, `fname` is the path + name of the db, but without ending. E.g,
-`"~/scratch/nbodyips/W5Bdeg12env"`.
-* `configs` is a `Vector{Dat}`
-* `basis` is a `Vector{<: AbstractCalculator}`
-* The command `db = LsqDB(fname, configs, basis)` evaluates the basis functions,
-e.g.,  `energy(basis[i], configs[j].at)` for all `i, j`, and stores these values
-which make up the lsq matrix.
-
-To reload a pre-computed lsq system, use `LsqDB(fname)`. To compute a lsq
-system without storing it on disk, use `LsqDB("", configs, basis)`, i.e.,
-pass an empty string as the filename.
+see `IPFitting.jl` for more documentation.
 
 ### Step 4: Lsq fit, Analyse the fitting errors
 
@@ -101,40 +83,10 @@ for details.
 ### Step 5: Usage
 
 The output `IP` of `lsqfit` is a `JuLIP.AbstractCalculator` which supports
-`energy, forces, virial, site_energies`. (todo: write more here, in
-particular mention `fast`)
-
+`energy, forces, virial, site_energies`.
 
 ### More comments
 
-- talk about the regularisation
-- repulsive core.
-
-there are two functions `filter_basis` and `filter_configs` that can be
-used to choose a subset of the data and a subset of the basis. For example,
-to take only 2B:
-```
-Ib2 = filter_basis(db, b -> (bodyorder(b) < 2))
-```
-See inline documentation for more details.
-
-
-## Analysis
-
-### Add fit information to a list of configurations
-
-Suppose `configs::Vector{Dat}` is a list of configurations, then we can
-add fitting error information by calling
-```
-add_fits!(myIP, configs, fitkey="myIP")
-```
-This will evaluate all observations stored in configs with the new IP and store
-them in `configs[n].info[fitkey]["okey"]`. These observation values can then
-be used to compute RMSE, produce scatter plots, etc.
-
-This calculation can take a while. If `myIP` has just been fitted using `lsqfit`
-then there is a quicker way to generate the fitting errors, but this is not
-yet implemented. TODO: implement this!
-
-
-## Hooks
+There are some more capabilities, namely:
+* Regularization for the resolution of the least-squares system. This is illustrated in the example `fit_with_regularisation.jl`
+* Addition of a repulsive core for small interatomic distances. This is presented in the example `fit_repulsive_core.jl`
