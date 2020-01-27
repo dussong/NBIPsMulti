@@ -10,15 +10,15 @@ This is a *prototype* code.
 
 To install the package, first clone the repository:
 ```julia
-] add "https://github.com/dussong/NBIPsMulti.git"
+] add https://github.com/dussong/NBIPsMulti.git
 ```
 You may need to install additional packages.
 
-To run the examples provided in the example folder, you need to activate the environment relative to the package. For this, go in the directory of the package and run
+To run the examples provided in the example folder, one first needs to activate the environment relative to the package. For this, go to the directory of the package and run
 ```julia
 ] activate .
 ```
-Alternatively, you can run
+Alternatively, one can run
 ```julia
 ] activate dir/NBodyIPsMulti
 ```
@@ -41,7 +41,7 @@ A basis is defined by
 * species type (main difference from the single species case)
 * polynomial degree
 
-For example, using bond-lengths PIPs with Morse coordinates `"exp( - 2.5 * (r/$r0-1))"` and a two-sided cosine cut-off `"(:cos2s, $(0.7*r0), $(0.88*r0), $(1.8*r0), $(rcut3))"`, we can define a descriptor
+For example, using bond-lengths PIPs with Morse coordinates `"exp( - 2.5 * (r/$r0-1))"` and a two-sided cosine cut-off `"(:cos2s, $(0.7*r0), $(0.88*r0), $(1.8*r0), $(rcut3))"`, one can define a descriptor
 ```julia
 r0 = 3*round(rnn(:C),digits=2)
 rcut2 = 2.8 * r0
@@ -53,7 +53,7 @@ The species type `:AAA` means that the three particles are the same. The possibl
 * `:AA` (two-body)
 * `:AAA, :AAB, :ABC` (three-body)
 * `:AAAA, :AAAB, :AABC, :AABB, :ABCD` (four-body)
-We can then generate basis functions using `nbpolys`, providing the descriptor, polynomial degree and atomic number of the species involved (they have to match the descriptor species type), e.g.,
+One can then generate basis functions using `nbpolys`, providing the descriptor, polynomial degree and atomic number of the species involved (they have to match the descriptor species type), e.g.,
 ```julia
 #            descriptor, degree, atomic number of the species
 B3 = nbpolys(BL3_AAA, 14, [6,6,6])
@@ -83,7 +83,7 @@ for details.
 ### Step 5: Usage
 
 The output `IP` of `lsqfit` is a `JuLIP.AbstractCalculator` which supports
-`energy, forces, virial, site_energies`.
+`energy, forces, site_energies`.
 
 ### More comments
 
