@@ -10,7 +10,7 @@ This is a *prototype* code.
 
 To install the package, first clone the repository:
 ```julia
-] add https://github.com/dussong/NBIPsMulti.git
+] add "https://github.com/dussong/NBIPsMulti.git"
 ```
 You may need to install additional packages.
 
