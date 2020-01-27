@@ -12,7 +12,7 @@ To install the package, first clone the repository:
 ```julia
 ] add https://github.com/dussong/NBIPsMulti.git
 ```
-You may need to install additional packages.
+You may need to install additional packages. In particular, the package manager `https://github.com/JuliaMolSim/MolSim` may be useful.
 
 To run the examples provided in the example folder, one first needs to activate the environment relative to the package. For this, run in the directory of the package
 ```julia
