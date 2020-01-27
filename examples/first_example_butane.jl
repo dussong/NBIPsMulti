@@ -92,3 +92,6 @@ save_ip(homedir() * "/.julia/dev/NBIPsMulti/data/Butane_4B_IP.json", IP, lsqinfo
 
 # Load the potential directly
 load_ip(homedir() * "/.julia/dev/NBIPsMulti/data/Butane_4B_IP.json")
+
+# For faster evaluation
+fast(IP)

@@ -108,13 +108,3 @@ end
 convert(::Val{:NBodyIPs_RepulsiveCoreM}, D::Dict) = RepulsiveCoreM(D)
 
 end
-
-# EXAMPLE CODE => TURN THiS INTO A TEST!
-# ## try out the repulsive potential
-# Vfit = IPall.components[2]
-# Vrep = NBodyIPs.Repulsion.RepulsiveCore(Vfit, 2.1)
-#
-# rp = range(0.3*r0, 9.0, length=500)
-# plot(rp, Vfit.(rp), lw=2, label ="fit")
-# plot!(rp, Vrep.Vin.(rp), lw=2, label ="inner", ylims = [-2.0, 10.0] )
-# plot!(rp, Vrep.(rp), label = "combined")
