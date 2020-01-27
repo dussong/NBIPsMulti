@@ -2,7 +2,7 @@
 
 ## Description
 
-This Julia package extends the packages `cortner/NBodyIPs` and `cortner/IPFitting` to multicomponent systems. It generate Interatomic Potentials based on symmetry-adapted polynomials.
+This Julia package extends the packages `cortner/NBodyIPs.jl` and `cortner/IPFitting.jl` to multicomponent systems. It generate Interatomic Potentials based on symmetry-adapted polynomials.
 
 This is a *prototype* code.
 

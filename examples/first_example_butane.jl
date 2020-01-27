@@ -37,6 +37,7 @@ BL4_AABB = MultiDesc("exp( - 2.5 * (r/$r0-1))", "(:cos2s, $(0.7*r0), $(0.88*r0),
 
 ##
 @info("Generate a 4B basis ...")
+#1 is for Hydrogen, 6 is for Carbon
 basis = [
       nbpolys(BL2, 14, [6,6]);
       nbpolys(BL2, 14, [1,1]);
@@ -70,15 +71,15 @@ end
 obsweights = Dict("E" => 1.0, "F" => 1.0)
 configweights = Dict("test"  => 1.0)
 
+# Reference energy
 E0 = Butane.get_E0() #reference energy
 IP, lsqinfo = lsqfit( db;
-                       E0 = E0,
                        obsweights=obsweights,
                        configweights=configweights,
                        Ibasis = collect(1:45), #selecting particular basis functions
                        combineIP = NBodyIP,
                        # solver = (:rrqr, 1e-12),
-                       # Vref = OneBody(E0) #reference potential
+                       Vref = OneBody(E0) #reference potential
                        )
 
 
