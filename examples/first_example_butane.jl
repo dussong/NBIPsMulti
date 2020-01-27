@@ -88,10 +88,10 @@ rmse_table(rmse(errs)...)
 
 
 # Save potential
-save_ip(homedir() * "/.julia/dev/NBIPsMulti/data/Butane_4B_IP.json", IP, lsqinfo) #save potential
+save_ip(homedir() * "/.julia/dev/NBIPsMulti/data/Butane_4B_IP.json", IP, lsqinfo); #save potential
 
 # Load the potential directly
 load_ip(homedir() * "/.julia/dev/NBIPsMulti/data/Butane_4B_IP.json")
 
 # For faster evaluation
-fast(IP)
+fast(IP);

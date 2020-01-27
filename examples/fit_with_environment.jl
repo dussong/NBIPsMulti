@@ -14,7 +14,11 @@ data = Butane.load_xyz()
 dbpath = homedir() * "/.julia/dev/NBIPsMulti/data/Butane_4B"
 
 @info("Generate descriptors...")
-
+r0 = 3*round(rnn(:C),digits=2) #cutoff parameter
+rcut0 = 1.5 * r0
+rcut2 = 2.8 * r0
+rcut3 = 2.3 * r0
+rcut4 = 1.9 * r0
 BL2 = MultiDesc(ExpTransform(2, r0), CosCut(rcut2-1.5,rcut2),Val(:AA))
 BL3_AAA = MultiDesc(ExpTransform(2.5,r0), CosCut(rcut3-1.5,rcut3),Val(:AAA))
 
@@ -81,6 +85,7 @@ end
 #configuration weights
 configweights = Dict("test"  => 1.0)
 
+E0 = Butane.get_E0() #reference energy
 
 IPenv, lsqinfoenv = lsqfit( dbenv;
                     # E0 = 1.,
@@ -91,7 +96,7 @@ IPenv, lsqinfoenv = lsqfit( dbenv;
                     combineIP = NBodyIP,
                     regularisers = regenv,
                     # Ibasis = Ibasis
-                    Vref = oneB
+                    Vref = OneBody(E0)
                     )
 
 errsenv = lsqinfoenv["errors"]

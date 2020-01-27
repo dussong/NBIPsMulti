@@ -1,56 +1,92 @@
 @info("Load libraries...")
 
-using NBodyIPs, IPFitting, JuLIP, NBIPsMulti
+using NBodyIPs
+using IPFitting
+using JuLIP
+using NBIPsMulti
+## 2B repulsion
+using NBIPsMulti.RepulsionM: RepulsiveCoreM
 
-# Load data
 include(homedir() * "/.julia/dev/NBIPsMulti/src/Butane.jl")
-E0 = Butane.get_E0()
 
 @info("Load database...")
 dbpath = homedir() * "/.julia/dev/NBIPsMulti/data/Butane_4B"
 
-# Loading the database directly
-# (this database can be generated with first_example_butane.jl)
-db = LsqDB(dbpath)
-summary(db)
+data = Butane.load_xyz()
 
-##
+r0 = 3*round(rnn(:C),digits=2)
+E0 = Butane.get_E0()
+
+rcut2 = 2.8 * r0
+# rcut3 = 2.3 * r0
+# rcut4 = 1.9 * r0
+
+@info("Generate descriptors...")
+
+BL2 = MultiDesc(ExpTransform(2, r0), CosCut(rcut2-1.5,rcut2),Val(:AA))
+
+# BL3_AAA = MultiDesc(ExpTransform(2.5,r0), CosCut(rcut3-1.5,rcut3),Val(:AAA))
+#
+# BL3_AAB = MultiDesc(ExpTransform(2.5,r0), CosCut(rcut3-1.5,rcut3),Val(:AAB))
+#
+# BL4_AAAA = MultiDesc(ExpTransform(2.5,r0), CosCut(rcut4-1.5,rcut4),Val(:AAAA))
+#
+# BL4_AAAB = MultiDesc(ExpTransform(2.5,r0), CosCut(rcut4-1.5,rcut4),Val(:AAAB))
+#
+# BL4_AABB = MultiDesc(ExpTransform(2.5,r0), CosCut(rcut4-1.5,rcut4),Val(:AABB))
+
+
+
+@info("Generate a 4B basis ...")
+basis = [
+      nbpolys(BL2, 14, [6,6]);
+      nbpolys(BL2, 14, [1,1]);
+      nbpolys(BL2, 14, [1,6]);
+      # nbpolys(BL3_AAA, 3, [1,1,1]);
+      # nbpolys(BL3_AAA, 3, [6,6,6]);
+      # nbpolys(BL3_AAB, 3, [1,1,6]);
+      # nbpolys(BL3_AAB, 3, [1,6,6]);
+      # nbpolys(BL4_AAAA, 2, [1,1,1,1]);
+      # nbpolys(BL4_AAAA, 2, [6,6,6,6]);
+      # nbpolys(BL4_AAAB, 2, [1,1,1,6]);
+      # nbpolys(BL4_AAAB, 2, [1,6,6,6]);
+      # nbpolys(BL4_AABB, 2, [1,1,6,6]);
+   ]
+
+@info("Assemble the LsqDB ...")
+@show length(basis)
+dbpath = homedir() * "/.julia/dev/NBIPsMulti/data/Butane_4B"
+
+db =  LsqDB(dbpath, basis, data);
+db
+
+# or
+# db = LsqDB(dbpath)
+
 @info("Fit Butane Database basis...")
-#Weights on the observations
+
 obsweights = Dict("E" => 10.0, "F" => 1.0, "V" => 1.0)
+configweights = Dict("nothing"  => 1.0)
 
-# changing configuration names
-for c in db.configs
-    c.configtype = "test"
-end
-#configuration weights
-configweights = Dict("test"  => 1.0)
-
-#Define one-body term
 oneB = MOneBody(Dict("E0" => Dict(:H => -13.5203101677, :C => -1027.28368153)))
+
 
 IP, lsqinfo = lsqfit( db;
                        # E0 = 1.,
                        obsweights=obsweights,
                        configweights=configweights,
-                       solver = (:rrqr, 1e-16), # solver = (:qr,), - to choose
+                       solver = (:rrqr, 1e-16),
+                       # solver = (:qr,),
                        combineIP = NBodyIP,
-                       # Ibasis = Ibasis #for choosing indices
-                       Vref = oneB #reference potential
+                       # Ibasis = Ibasis
+                       Vref = oneB
                        )
 
-#Look at errors
 errs = lsqinfo["errors"]
 rmse_table(rmse(errs)...)
 
-# Save the potential together with the fit info
-save_ip(homedir() * "/.julia/dev/NBIPsMulti/data/Butane_4B_IP.json", IP, lsqinfo)
-
 
 ## Adding a 2B repulsion
-using NBIPsMulti.RepulsionM: RepulsiveCoreM
-
-using NBodyIPs.Repulsion: RepulsiveCore
 
 # Extract 2-body components
 V2_1 = IP.components[2]
@@ -59,17 +95,16 @@ V2_3 = IP.components[4]
 
 # Adding 2-body repulsion
 r0 = 3.
-V2rep_1 = RepulsiveCoreM(V2_1, 0.89*r0, -1.)
-V2rep_2 = RepulsiveCoreM(V2_2, 0.89*r0, -1.)
-V2rep_3 = RepulsiveCoreM(V2_3, 0.89*r0, -1.)
+V2rep_1 = RepulsiveCoreM(V2_1, 0.8*r0, -1.)
+V2rep_2 = RepulsiveCoreM(V2_2, 0.8*r0, -1.)
+V2rep_3 = RepulsiveCoreM(V2_3, 0.8*r0, -1.)
 
-# Redefine the potential with repulsive core
 IP_rep = deepcopy(IP)
 
 IP_rep.components[2] = V2rep_1
 IP_rep.components[3] = V2rep_2
 IP_rep.components[4] = V2rep_3
-save_ip("pot_with_rep_core.json", IP_rep, lsqinfo) #save potential
+
 
 # Show first configuration and its energy
 @show db.configs[1].at
