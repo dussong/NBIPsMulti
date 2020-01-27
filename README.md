@@ -10,7 +10,7 @@ This is an *experimental* code.
 
 To install the package, first clone the repository:
 ```julia
-] add https://github.com/dussong/NBIPsMulti.git
+] dev https://github.com/dussong/NBIPsMulti.git
 ```
 You may need to install additional packages. In particular, the package manager `https://github.com/JuliaMolSim/MolSim` may be useful.
 
