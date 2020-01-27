@@ -90,3 +90,4 @@ The output `IP` of `lsqfit` is a `JuLIP.AbstractCalculator` which supports
 There are some more capabilities, namely:
 * Regularization for the resolution of the least-squares system. This is illustrated in the example `fit_with_regularisation.jl`
 * Addition of a repulsive core for small interatomic distances. This is presented in the example `fit_repulsive_core.jl`
+* Environment dependence example in `fit_with_environment` (experimental).

@@ -39,7 +39,7 @@ reg = [ BLRegulariser(2, rcut0, rcut3, npoints = 30, creg = 1.0,
         BLRegulariser(3, rcut0, rcut3, npoints = 100, creg = 1.0,
                         transform = PolyTransform(1, r0), species = [1,1,1])                 ]
 
-
+# Solving the LSQ system
 IP, lsqinfo = lsqfit( db; E0 = E0,
                        obsweights=obsweights,
                        configweights=configweights,
@@ -50,6 +50,6 @@ IP, lsqinfo = lsqfit( db; E0 = E0,
                        # Ibasis = Ibasis
                        )
 
-
+# Showing errors
 errs = lsqinfo["errors"]
 rmse_table(rmse(errs)...)
