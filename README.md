@@ -14,7 +14,7 @@ To install the package, first clone the repository:
 ```
 You may need to install additional packages.
 
-To run the examples provided in the example folder, one first needs to activate the environment relative to the package. For this, go to the directory of the package and run
+To run the examples provided in the example folder, one first needs to activate the environment relative to the package. For this, run in the directory of the package
 ```julia
 ] activate .
 ```
